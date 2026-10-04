@@ -632,7 +632,7 @@ func _find_and_setup_anim_player(node: Node) -> void:
 		_find_and_setup_anim_player(child)
 
 # Rangos de animación extraídos de la cinemática original continua:
-# Qishilong_fly2 contiene la auténtica secuencia de aleteo fluido y natural (de 33.6s a 36.6s, ciclo de 3.0s con 3 batidos completos)
+# Qishilong_fly2 contiene la auténtica secuencia de aleteo fluido y natural (de 33.6s a 36.6s, ciclo de 3.0s con 2 batidos completos y empalme slerp hermético)
 const ANIM_SPECS = {
 	"Qishilong_fly2": {"source": "Qishilong_fly2", "range": Vector2(33.600, 36.600)}, # Ciclo completo de vuelo natural original
 	"Qishilong_up": {"source": "Qishilong_fly2", "range": Vector2(33.600, 36.600)},   # Vuelo activo
@@ -691,14 +691,38 @@ func _configure_animations() -> void:
 				new_anim.track_insert_key(new_t, 0.0, rest_pelvis_pos)
 				new_anim.track_insert_key(new_t, loop_len, rest_pelvis_pos)
 			else:
-				var first_val = null
-				# Rotación de la pelvis: todas las animaciones (aleteo y picada) comparten la misma
-				# orientación base de referencia (inicio del ciclo de Qishilong_fly2), conservando
-				# el cabeceo/balanceo propio de cada clip. Así el modelo no cambia de rumbo al cambiar de modo.
 				var pelvis_fix = is_pelvis and track_type == Animation.TYPE_ROTATION_3D and pelvis_ref_rot != null
 				var pelvis_base_inv: Quaternion = Quaternion.IDENTITY
 				if pelvis_fix:
 					pelvis_base_inv = (src_anim.rotation_track_interpolate(t, r.x) as Quaternion).inverse()
+				
+				var first_val = null
+				var end_val = null
+				if track_type == Animation.TYPE_ROTATION_3D:
+					first_val = src_anim.rotation_track_interpolate(t, r.x)
+					end_val = src_anim.rotation_track_interpolate(t, r.y)
+					if pelvis_fix:
+						first_val = ((first_val as Quaternion) * pelvis_base_inv) * (pelvis_ref_rot as Quaternion)
+						end_val = ((end_val as Quaternion) * pelvis_base_inv) * (pelvis_ref_rot as Quaternion)
+				elif track_type == Animation.TYPE_POSITION_3D:
+					first_val = src_anim.position_track_interpolate(t, r.x)
+					end_val = src_anim.position_track_interpolate(t, r.y)
+				elif track_type == Animation.TYPE_SCALE_3D:
+					first_val = src_anim.scale_track_interpolate(t, r.x)
+					end_val = src_anim.scale_track_interpolate(t, r.y)
+				
+				# Cálculo de la deriva acumulada a lo largo de todo el ciclo
+				var rot_delta: Quaternion = Quaternion.IDENTITY
+				var pos_delta: Vector3 = Vector3.ZERO
+				if track_type == Animation.TYPE_ROTATION_3D and first_val != null and end_val != null:
+					rot_delta = (end_val as Quaternion).inverse() * (first_val as Quaternion)
+				elif (track_type == Animation.TYPE_POSITION_3D or track_type == Animation.TYPE_SCALE_3D) and first_val != null and end_val != null:
+					pos_delta = (first_val as Vector3) - (end_val as Vector3)
+				
+				# Clave inicial exacta en t=0.0
+				if first_val != null:
+					new_anim.track_insert_key(new_t, 0.0, first_val)
+				
 				for k in range(src_anim.track_get_key_count(t)):
 					var kt = src_anim.track_get_key_time(t, k)
 					if kt >= r.x - 0.005 and kt <= r.y + 0.005:
@@ -706,10 +730,22 @@ func _configure_animations() -> void:
 						if pelvis_fix:
 							val = ((val as Quaternion) * pelvis_base_inv) * (pelvis_ref_rot as Quaternion)
 						var new_t_pos = clamp(kt - r.x, 0.0, loop_len)
-						if first_val == null:
-							first_val = val
+						var progress = new_t_pos / loop_len
+						
+						# Compensación progresiva y uniforme de la deriva a lo largo del ciclo entero:
+						# Distribuye la corrección de forma homogénea e imperceptible a ritmo constante,
+						# eliminando cualquier tirón, corrección repentina o giro brusco al terminar el 2º aleteo.
+						if track_type == Animation.TYPE_ROTATION_3D:
+							var corr = Quaternion.IDENTITY.slerp(rot_delta, progress)
+							val = (val as Quaternion) * corr
+						elif track_type == Animation.TYPE_POSITION_3D or track_type == Animation.TYPE_SCALE_3D:
+							val = (val as Vector3) + pos_delta * progress
 							
 						new_anim.track_insert_key(new_t, new_t_pos, val)
+				
+				# Clave final idéntica en t=loop_len para garantizar continuidad de bucle al 100% (cero saltos)
+				if first_val != null:
+					new_anim.track_insert_key(new_t, loop_len, first_val)
 					
 		if lib.has_animation(anim_name):
 			lib.remove_animation(anim_name)
@@ -943,7 +979,7 @@ func _process(delta: float) -> void:
 	
 	if anim_player and anim_player.is_playing() and has_taken_off:
 		var pos = anim_player.current_animation_position
-		var phase = (pos / 3.0) * TAU * 3.0 # Sincronizado con los 3 aleteos por ciclo
+		var phase = (pos / 3.0) * TAU * 2.0 # Sincronizado con los 2 aleteos reales del ciclo
 		var flap_intensity = 0.45 if current_mode == FlightMode.CLIMB else (0.30 if is_flapping else 0.10)
 		heave = sin(phase) * flap_intensity * flight_factor
 		pitch_surge = -cos(phase) * deg_to_rad(2.5 * flap_intensity) * flight_factor
