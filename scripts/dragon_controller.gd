@@ -416,15 +416,18 @@ func _handle_input_keys(delta: float) -> void:
 	
 	# 6. VIRAJE Y ALABEO COORDINADO
 	var turn_dir: float = 0.0
-	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
-		turn_dir += 1.0
-	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
-		turn_dir -= 1.0
-		
-	if Input.is_key_pressed(KEY_Q):
-		turn_dir += 0.8
-	if Input.is_key_pressed(KEY_E):
-		turn_dir -= 0.8
+	if manual_input_override:
+		turn_dir = manual_turn_input
+	else:
+		if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+			turn_dir += 1.0
+		if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+			turn_dir -= 1.0
+			
+		if Input.is_key_pressed(KEY_Q):
+			turn_dir += 0.8
+		if Input.is_key_pressed(KEY_E):
+			turn_dir -= 0.8
 
 	if turn_dir != 0.0:
 		target_yaw += turn_dir * yaw_speed * 1.5 * delta
@@ -532,7 +535,8 @@ func _calculate_flight_physics(delta: float) -> void:
 			vertical_thrust = Vector3.UP * (climb_vertical_rate * 1.8)
 		FlightMode.GLIDE:
 			target_speed = cruise_speed + pitch_gravity_factor * 1.5
-			current_speed = move_toward(current_speed, target_speed, (normal_drag * 0.5) * delta)
+			current_speed = move_toward(current_speed, target_speed, (normal_drag * 0.35) * delta)
+			vertical_thrust = Vector3.DOWN * 0.8
 		FlightMode.BRAKE:
 			target_speed = -reverse_speed
 			acceleration = air_brake_decel
@@ -752,6 +756,48 @@ func _configure_animations() -> void:
 		lib.add_animation(anim_name, new_anim)
 		print("Animación natural original configurada: %s (duración: %.2fs)" % [anim_name, new_anim.length])
 
+	# Configurar animación de planeo auténtica ("Qishilong_glide") con alas extendidas horizontalmente
+	# extraída de la pose majestuosa de t=45.30s de Qishilong_fly2
+	if source_anims.has("Qishilong_fly2"):
+		var fly_anim: Animation = source_anims["Qishilong_fly2"]
+		var glide_anim = Animation.new()
+		glide_anim.length = 2.0
+		glide_anim.loop_mode = Animation.LOOP_LINEAR
+		var t_glide = 45.30
+		
+		for t in range(fly_anim.get_track_count()):
+			var track_type = fly_anim.track_get_type(t)
+			var track_path = str(fly_anim.track_get_path(t))
+			var is_pelvis = "Bip001_03" in track_path
+			
+			var new_t = glide_anim.add_track(track_type)
+			glide_anim.track_set_path(new_t, NodePath(track_path))
+			glide_anim.track_set_interpolation_type(new_t, Animation.INTERPOLATION_CUBIC)
+			
+			if is_pelvis and track_type == Animation.TYPE_POSITION_3D:
+				glide_anim.track_insert_key(new_t, 0.0, rest_pelvis_pos)
+				glide_anim.track_insert_key(new_t, 2.0, rest_pelvis_pos)
+			elif track_type == Animation.TYPE_ROTATION_3D:
+				var rot = fly_anim.rotation_track_interpolate(t, t_glide)
+				if is_pelvis and pelvis_ref_rot != null:
+					var p_inv = (fly_anim.rotation_track_interpolate(t, t_glide) as Quaternion).inverse()
+					rot = (rot * p_inv) * (pelvis_ref_rot as Quaternion)
+				glide_anim.track_insert_key(new_t, 0.0, rot)
+				glide_anim.track_insert_key(new_t, 2.0, rot)
+			elif track_type == Animation.TYPE_POSITION_3D:
+				var pos = fly_anim.position_track_interpolate(t, t_glide)
+				glide_anim.track_insert_key(new_t, 0.0, pos)
+				glide_anim.track_insert_key(new_t, 2.0, pos)
+			elif track_type == Animation.TYPE_SCALE_3D:
+				var scl = fly_anim.scale_track_interpolate(t, t_glide)
+				glide_anim.track_insert_key(new_t, 0.0, scl)
+				glide_anim.track_insert_key(new_t, 2.0, scl)
+				
+		if lib.has_animation("Qishilong_glide"):
+			lib.remove_animation("Qishilong_glide")
+		lib.add_animation("Qishilong_glide", glide_anim)
+		print("Animación de planeo auténtico configurada: Qishilong_glide (alas extendidas)")
+
 	# Si aún no ha despegado, empieza pausado en la pose estática inicial
 	if not has_taken_off:
 		anim_player.play("Qishilong_fly2")
@@ -780,19 +826,22 @@ func _update_animations() -> void:
 			custom_speed = 1.25
 		FlightMode.CLIMB:
 			target_anim = "Qishilong_fly2"
-			custom_speed = 1.30
+			custom_speed = 1.25
 		FlightMode.GLIDE:
-			target_anim = "Qishilong_fly2"
-			custom_speed = 0.55  # Batir majestuoso espaciado
+			if anim_player.has_animation("Qishilong_glide"):
+				target_anim = "Qishilong_glide"
+			else:
+				target_anim = "Qishilong_fly2"
+			custom_speed = 1.0
 		FlightMode.BRAKE:
 			target_anim = "Qishilong_fly2"
-			custom_speed = 0.75
+			custom_speed = 0.70
 		FlightMode.NORMAL:
 			target_anim = "Qishilong_fly2"
 			custom_speed = 1.05
 		
 	if anim_player.current_animation != target_anim or not anim_player.is_playing():
-		anim_player.play(target_anim, 0.35)
+		anim_player.play(target_anim, 0.40)
 	anim_player.speed_scale = custom_speed
 
 # --- Métodos de Control para Botones de Interfaz / HUD ---
@@ -977,10 +1026,10 @@ func _process(delta: float) -> void:
 	var pitch_surge: float = 0.0
 	var flight_factor: float = clamp(1.0 - ground_blend, 0.0, 1.0)
 	
-	if anim_player and anim_player.is_playing() and has_taken_off:
+	if anim_player and anim_player.is_playing() and has_taken_off and is_flapping:
 		var pos = anim_player.current_animation_position
 		var phase = (pos / 3.0) * TAU * 2.0 # Sincronizado con los 2 aleteos reales del ciclo
-		var flap_intensity = 0.45 if current_mode == FlightMode.CLIMB else (0.30 if is_flapping else 0.10)
+		var flap_intensity = 0.45 if current_mode == FlightMode.CLIMB else 0.28
 		heave = sin(phase) * flap_intensity * flight_factor
 		pitch_surge = -cos(phase) * deg_to_rad(2.5 * flap_intensity) * flight_factor
 		
@@ -989,19 +1038,8 @@ func _process(delta: float) -> void:
 		var surge_basis = Basis.from_euler(Vector3(pitch_surge, 0.0, 0.0))
 		visual_root.basis = surge_basis * _offset_basis() * calib_basis
 		
-		if skeleton and bone_pelvis != -1 and bone_head_idx != -1 and bone_tail_indices.size() > 0:
-			# Estabilizador dinámico de orientación (Paso 2):
-			# Se calcula el eje del cuerpo (cabeza a cola) y se contra-rota visual_root
-			# para eliminar completamente la deriva del clip original, manteniendo el vuelo perfectamente recto.
-			var p_h = skeleton.global_transform * skeleton.get_bone_global_pose(bone_head_idx).origin
-			var p_t = skeleton.global_transform * skeleton.get_bone_global_pose(bone_tail_indices[bone_tail_indices.size() - 1]).origin
-			var fwd_local = (global_transform.basis.inverse() * (p_h - p_t)).normalized()
-			var raw_yaw_err = atan2(fwd_local.x, -fwd_local.z)
-			
-			visual_root.basis = Basis(Vector3.UP, raw_yaw_err) * visual_root.basis
-			
-			# En el clip de vuelo la raíz de la pelvis queda desplazada varios metros del cuerpo,
-			# así que se centra el núcleo del cuerpo (columna + muslos) sobre el CharacterBody3D con suavizado low-pass.
+		if skeleton and bone_pelvis != -1:
+			# Centrar suavemente el núcleo del cuerpo sobre el CharacterBody3D sin interferir en los virajes
 			var anchor_world = _body_core_world()
 			var y_offset = lerp(-0.3 + heave, -0.1, ground_blend)
 			var target_center = global_position + Vector3(lateral_sway, y_offset, 0.0)
@@ -1012,10 +1050,6 @@ func _process(delta: float) -> void:
 			else:
 				smoothed_anchor_offset = smoothed_anchor_offset.lerp(desired_offset, 1.0 - exp(-15.0 * delta))
 			visual_root.global_position += smoothed_anchor_offset
-		elif skeleton and bone_pelvis != -1:
-			var anchor_world = _body_core_world()
-			var target_center = global_position + Vector3(lateral_sway, -0.3 + heave, 0.0)
-			visual_root.global_position += (target_center - anchor_world)
 		else:
 			visual_root.position = model_pos_offset + Vector3(lateral_sway, heave, 0.0)
 
@@ -1041,9 +1075,9 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	var turn = smoothed_turn_rate
 	var flight_factor = clamp(1.0 - ground_blend, 0.0, 1.0)
 	
-	# 1. CUELLO Y CABEZA (Anticipación al viraje + erguido en tierra)
-	var neck_yaw_weights = [0.10, 0.15, 0.20]
-	var neck_pitch_offset = (climb_blend * 0.20) - (dive_fold_blend * 0.12) + (brake_blend * 0.30) + (ground_blend * 0.30)
+	# 1. CUELLO Y CABEZA (Anticipación al viraje + Estabilización de horizonte estilo rapaz)
+	var neck_yaw_weights = [0.12, 0.18, 0.25]
+	var neck_pitch_offset = (climb_blend * 0.25) - (dive_fold_blend * 0.12) + (brake_blend * 0.30) + (ground_blend * 0.30)
 	
 	for i in range(bone_neck_indices.size()):
 		var b = bone_neck_indices[i]
@@ -1053,65 +1087,74 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 			sk.set_bone_pose_rotation(b, yaw_rot * pitch_rot * sk.get_bone_pose_rotation(b))
 			
 	if bone_head_idx != -1 and bone_yaw_axes.has(bone_head_idx):
-		var head_yaw = Quaternion(bone_yaw_axes[bone_head_idx], turn * neck_lead_strength * 0.32 * (1.0 - ground_blend * 0.6))
-		var head_pitch = Quaternion(bone_pitch_axes[bone_head_idx], neck_pitch_offset * 0.30 - ground_blend * 0.15)
-		var head_horizon_roll = Quaternion(bone_roll_axes[bone_head_idx], -target_roll * 0.40 * flight_factor)
+		var head_yaw = Quaternion(bone_yaw_axes[bone_head_idx], turn * neck_lead_strength * 0.40 * (1.0 - ground_blend * 0.6))
+		var head_pitch = Quaternion(bone_pitch_axes[bone_head_idx], neck_pitch_offset * 0.35 - ground_blend * 0.15)
+		# Gimbal vestibular: la cabeza se nivela con el horizonte cancelando el 75% del alabeo corporal
+		var head_horizon_roll = Quaternion(bone_roll_axes[bone_head_idx], -target_roll * 0.75 * flight_factor)
 		sk.set_bone_pose_rotation(bone_head_idx, head_yaw * head_pitch * head_horizon_roll * sk.get_bone_pose_rotation(bone_head_idx))
 
-	# 2. COLUMNA DORSAL (Arco orgánico)
-	var spine_weights = [0.06, 0.12, 0.16]
+	# 2. COLUMNA DORSAL (Arco orgánico continuo en virajes)
+	var spine_weights = [0.08, 0.14, 0.18]
 	for i in range(bone_spine_indices.size()):
 		var b = bone_spine_indices[i]
 		if b != -1 and bone_yaw_axes.has(b):
 			var spine_yaw = Quaternion(bone_yaw_axes[b], turn * spine_curve_strength * spine_weights[i] * flight_factor)
-			var spine_pitch = Quaternion(bone_pitch_axes[b], ((brake_blend * 0.12) - (climb_blend * 0.06)) * flight_factor)
+			var spine_pitch = Quaternion(bone_pitch_axes[b], ((brake_blend * 0.12) - (climb_blend * 0.08)) * flight_factor)
 			sk.set_bone_pose_rotation(b, spine_yaw * spine_pitch * sk.get_bone_pose_rotation(b))
 
-	# 3. ALAS: ASIMETRÍA EN VIRAJES + PLEGADO EN PICADA Y EN TIERRA
+	# 3. ALAS: ASIMETRÍA EN VIRAJES + PLANEO DIEDRO + PLEGADO EN PICADA
 	var fold = clamp(max(dive_fold_blend, wing_fold_blend), 0.0, 1.0)
+	var glide_dihedral = glide_blend * deg_to_rad(4.5)
+	var glide_breathe = sin(tail_wave_time * 1.8) * deg_to_rad(1.5) * glide_blend
+	
 	if bone_l_wing_root != -1 and bone_roll_axes.has(bone_l_wing_root):
-		var l_roll_delta = (turn * wing_asymmetry_strength * 0.30) * (1.0 - fold)
+		# Al virar a la izquierda (turn > 0): ala izquierda (interior) desciende (-turn)
+		var l_roll_delta = (-turn * wing_asymmetry_strength * 0.35 + glide_dihedral + glide_breathe) * (1.0 - fold)
 		var l_pitch_dive = (-fold * 0.85) + (brake_blend * 0.25 * flight_factor)
-		var l_yaw_fold = (fold * 0.55) + (turn * 0.10 * (1.0 - fold))
+		var l_yaw_fold = (fold * 0.55) + (turn * 0.12 * (1.0 - fold))
 		var l_rot = Quaternion(bone_roll_axes[bone_l_wing_root], l_roll_delta) * \
 					Quaternion(bone_pitch_axes[bone_l_wing_root], l_pitch_dive) * \
 					Quaternion(bone_yaw_axes[bone_l_wing_root], l_yaw_fold)
 		sk.set_bone_pose_rotation(bone_l_wing_root, l_rot * sk.get_bone_pose_rotation(bone_l_wing_root))
 
 	if bone_r_wing_root != -1 and bone_roll_axes.has(bone_r_wing_root):
-		var r_roll_delta = (turn * wing_asymmetry_strength * 0.30) * (1.0 - fold)
+		# Ala derecha (exterior al virar a la izquierda): se eleva (+turn)
+		var r_roll_delta = (turn * wing_asymmetry_strength * 0.35 + glide_dihedral + glide_breathe) * (1.0 - fold)
 		var r_pitch_dive = (-fold * 0.85) + (brake_blend * 0.25 * flight_factor)
-		var r_yaw_fold = (-fold * 0.55) + (turn * 0.10 * (1.0 - fold))
+		var r_yaw_fold = (-fold * 0.55) + (turn * 0.12 * (1.0 - fold))
 		var r_rot = Quaternion(bone_roll_axes[bone_r_wing_root], r_roll_delta) * \
 					Quaternion(bone_pitch_axes[bone_r_wing_root], r_pitch_dive) * \
 					Quaternion(bone_yaw_axes[bone_r_wing_root], r_yaw_fold)
 		sk.set_bone_pose_rotation(bone_r_wing_root, r_rot * sk.get_bone_pose_rotation(bone_r_wing_root))
 
 	if bone_l_wing_mid != -1 and bone_pitch_axes.has(bone_l_wing_mid):
-		var mid_l = Quaternion(bone_pitch_axes[bone_l_wing_mid], -fold * 0.65)
+		var mid_l_pitch = -fold * 0.65 + (glide_breathe * 1.5)
+		var mid_l = Quaternion(bone_pitch_axes[bone_l_wing_mid], mid_l_pitch)
 		sk.set_bone_pose_rotation(bone_l_wing_mid, mid_l * sk.get_bone_pose_rotation(bone_l_wing_mid))
 
 	if bone_r_wing_mid != -1 and bone_pitch_axes.has(bone_r_wing_mid):
-		var mid_r = Quaternion(bone_pitch_axes[bone_r_wing_mid], -fold * 0.65)
+		var mid_r_pitch = -fold * 0.65 + (glide_breathe * 1.5)
+		var mid_r = Quaternion(bone_pitch_axes[bone_r_wing_mid], mid_r_pitch)
 		sk.set_bone_pose_rotation(bone_r_wing_mid, mid_r * sk.get_bone_pose_rotation(bone_r_wing_mid))
 
-	# 4. COLA MULTIVERTEBRAL (8 Vértebras)
+	# 4. COLA MULTIVERTEBRAL (8 Vértebras con propagación de látigo fluido)
 	for i in range(bone_tail_indices.size()):
 		var b = bone_tail_indices[i]
 		if b != -1 and bone_yaw_axes.has(b):
 			var idx_ratio = float(i + 1) / float(bone_tail_indices.size())
-			var tail_lag_yaw = -turn * (0.07 * (i + 1)) * tail_lag_strength * (1.0 - ground_blend * 0.5)
-			var wave_amp = 0.045 * (i + 1) * (0.3 if fold > 0.5 else 1.0)
-			var tail_wave_yaw = sin(tail_wave_time - (i * 0.50)) * wave_amp
-			var tail_pitch = ((climb_blend * -0.15 * idx_ratio) + \
+			var tail_lag_yaw = -turn * (0.08 * (i + 1)) * tail_lag_strength * (1.0 - ground_blend * 0.5)
+			var wave_amp = 0.040 * (i + 1) * (0.3 if fold > 0.5 else 1.0)
+			var tail_wave_yaw = sin(tail_wave_time - (i * 0.45)) * wave_amp
+			var tail_pitch = ((climb_blend * -0.18 * idx_ratio) + \
 							 (brake_blend * -0.20 * idx_ratio) + \
-							 (dive_fold_blend * 0.08 * idx_ratio)) * flight_factor + \
+							 (dive_fold_blend * 0.08 * idx_ratio) + \
+							 (glide_blend * 0.05 * idx_ratio)) * flight_factor + \
 							 (ground_blend * -0.12 * idx_ratio)
 			var t_rot = Quaternion(bone_yaw_axes[b], tail_lag_yaw + tail_wave_yaw) * \
 						Quaternion(bone_pitch_axes[b], tail_pitch)
 			sk.set_bone_pose_rotation(b, t_rot * sk.get_bone_pose_rotation(b))
 
-	# 5. PATAS TRASERAS (Marcha y apoyo en tierra / Aerodinámica en vuelo)
+	# 5. PATAS TRASERAS (Marcha y apoyo en tierra / Aerodinámica e inercia en vuelo)
 	if ground_blend > 0.01:
 		var speed_ratio = clamp(current_speed / walk_speed, -1.0, 1.5)
 		var stride = sin(walk_cycle_phase) * speed_ratio
@@ -1140,7 +1183,8 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 		if bone_r_foot != -1 and bone_pitch_axes.has(bone_r_foot):
 			sk.set_bone_pose_rotation(bone_r_foot, Quaternion(bone_pitch_axes[bone_r_foot], r_foot_pitch) * sk.get_bone_pose_rotation(bone_r_foot))
 	else:
-		var leg_pitch = (dive_fold_blend * -0.40) + (brake_blend * 0.50) + (climb_blend * -0.15)
+		var flap_leg_kick = sin((anim_player.current_animation_position / 3.0) * TAU * 2.0) * deg_to_rad(3.5) if (is_flapping and anim_player) else 0.0
+		var leg_pitch = (dive_fold_blend * -0.40) + (brake_blend * 0.50) + (climb_blend * -0.15) + (glide_blend * -0.10) + flap_leg_kick
 		if bone_l_thigh != -1 and bone_pitch_axes.has(bone_l_thigh):
 			sk.set_bone_pose_rotation(bone_l_thigh, Quaternion(bone_pitch_axes[bone_l_thigh], leg_pitch) * sk.get_bone_pose_rotation(bone_l_thigh))
 		if bone_r_thigh != -1 and bone_pitch_axes.has(bone_r_thigh):
