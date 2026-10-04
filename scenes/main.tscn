@@ -1,0 +1,166 @@
+[gd_scene load_steps=10 format=3 uid="uid://c8drg7fl1ght02"]
+
+[ext_resource type="Script" path="res://scripts/dragon_controller.gd" id="1_controller"]
+[ext_resource type="Script" path="res://scripts/flight_camera.gd" id="2_camera"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="3_hud"]
+[ext_resource type="PackedScene" path="res://assets/models/dragon.glb" id="4_dragon_model"]
+[ext_resource type="PackedScene" path="res://assets/models/terrain.glb" id="5_terrain_model"]
+[ext_resource type="Script" path="res://scripts/terrain.gd" id="6_terrain"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.32, 0.54, 0.88, 1)
+sky_horizon_color = Color(0.68, 0.76, 0.86, 1)
+ground_bottom_color = Color(0.18, 0.22, 0.16, 1)
+ground_horizon_color = Color(0.55, 0.65, 0.6, 1)
+
+[sub_resource type="Sky" id="Sky_env"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+sky = SubResource("Sky_env")
+ambient_light_source = 3
+ambient_light_color = Color(0.65, 0.72, 0.8, 1)
+tonemap_mode = 2
+glow_enabled = true
+fog_enabled = true
+fog_light_color = Color(0.7, 0.78, 0.88, 1)
+fog_density = 0.0006
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_dragon"]
+radius = 4.0
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 300, 0)
+shadow_enabled = true
+
+[node name="NaturalLandscape" parent="." instance=ExtResource("5_terrain_model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("6_terrain")
+
+[node name="Dragon" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 120, 0)
+script = ExtResource("1_controller")
+cruise_speed = 26.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dragon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("SphereShape3D_dragon")
+
+[node name="VisualModel" type="Node3D" parent="Dragon"]
+transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, 0, 0, 0)
+
+[node name="DragonModel" parent="Dragon/VisualModel" instance=ExtResource("4_dragon_model")]
+
+[node name="FlightCamera" type="Camera3D" parent="." node_paths=PackedStringArray("target_node")]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 125.0, 10.5)
+current = true
+fov = 74.0
+far = 4000.0
+script = ExtResource("2_camera")
+target_node = NodePath("../Dragon")
+distance = 16.0
+height = 5.0
+base_fov = 74.0
+
+[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("dragon")]
+script = ExtResource("3_hud")
+dragon = NodePath("../Dragon")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD"]
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 380.0
+offset_bottom = 150.0
+
+[node name="SpeedLabel" type="Label" parent="HUD/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "VELOCIDAD: 0 km/h"
+
+[node name="AltLabel" type="Label" parent="HUD/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "ALTITUD: 0 m"
+
+[node name="StateLabel" type="Label" parent="HUD/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "ESTADO: PLANEO"
+
+[node name="ControlsPanel" type="PanelContainer" parent="HUD"]
+visible = false
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -340.0
+offset_top = -210.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 12
+
+[node name="HelpLabel" type="Label" parent="HUD/ControlsPanel/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "CONTROLES DE VUELO (H / F1: mostrar u ocultar):
+• W / SHIFT: AVANZAR (ALETEO FUERTE)
+• S: FRENAR Y RETROCEDER
+• A / D / FLECHAS IZQ-DER: GIRAR (Q / E: GIRO SUAVE)
+• ESPACIO / R: SUBIR  •  C / CTRL: PICADA
+• FLECHAS ARRIBA / ABAJO: CABECEO FINO
+• G: PLANEO
+• CAMARA: V O 1-4 (TRASERA / FRONTAL / DERECHA / IZQUIERDA)
+• CLIC DERECHO + ARRASTRAR: ORBITAR  •  RUEDA: ZOOM
+• ESC: ACTIVAR / DESACTIVAR TIMON CON MOUSE"
+
+[node name="ActionBar" type="PanelContainer" parent="HUD"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -290.0
+offset_top = 25.0
+offset_right = 290.0
+offset_bottom = 75.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/ActionBar"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="BtnNormal" type="Button" parent="HUD/ActionBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = " ● NORMAL [W] "
+
+[node name="BtnClimb" type="Button" parent="HUD/ActionBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = " ▲ SUBIR [ESPACIO] "
+
+[node name="BtnGlide" type="Button" parent="HUD/ActionBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = " ✈ PLANEAR [G] "
+
+[node name="BtnDive" type="Button" parent="HUD/ActionBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = " ▼ PICADA [C] "
+

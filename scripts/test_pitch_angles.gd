@@ -1,0 +1,63 @@
+@tool
+extends SceneTree
+
+func _init():
+	var root_node = Node3D.new()
+	root.add_child(root_node)
+	
+	var light = DirectionalLight3D.new()
+	light.rotation_degrees = Vector3(-45, 45, 0)
+	root_node.add_child(light)
+	
+	var env_node = WorldEnvironment.new()
+	var env = Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.4, 0.5, 0.6)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.7, 0.7, 0.7)
+	env_node.environment = env
+	root_node.add_child(env_node)
+	
+	var raw_scene = load("res://assets/models/dragon.glb").instantiate()
+	root_node.add_child(raw_scene)
+	raw_scene.position = Vector3(0, 0, 0)
+	
+	var ap: AnimationPlayer = null
+	var skel: Skeleton3D = null
+	var q = [raw_scene]
+	while q.size() > 0:
+		var c = q.pop_front()
+		if c is AnimationPlayer: ap = c
+		if c is Skeleton3D: skel = c
+		for ch in c.get_children(): q.append(ch)
+		
+	var cam = Camera3D.new()
+	root_node.add_child(cam)
+	cam.current = true
+	cam.far = 2000.0
+	
+	ap.play("Qishilong_fly2")
+	
+	var b_pelvis = skel.find_bone("Bip001_03")
+	var b_head = skel.find_bone("Bip001-Head_011")
+	
+	for pitch in [-20.0, -32.0, -36.0, -42.0]:
+		raw_scene.rotation_degrees = Vector3(pitch, -83.0, 0)
+		ap.seek(34.0, true)
+		for f in range(2): await process_frame
+		
+		var p_pos = skel.global_transform * skel.get_bone_global_pose(b_pelvis).origin
+		var h_pos = skel.global_transform * skel.get_bone_global_pose(b_head).origin
+		var spine = (h_pos - p_pos).normalized()
+		print("pitch=%.1f -> spine_world = %s" % [pitch, spine])
+		
+		# Camera placed directly behind dragon:
+		cam.position = p_pos + Vector3(0, 4.5, 20.0)
+		cam.look_at_from_position(cam.position, p_pos + Vector3(0, 0, -10.0), Vector3.UP)
+		for f in range(2): await process_frame
+		
+		var img_path = "C:/Users/Lucas Marsiglia/.gemini/antigravity/brain/b0204162-bebf-4cb6-b7d8-eda9ec5ebf28/test_pitch_%.0f.png" % abs(pitch)
+		root.get_viewport().get_texture().get_image().save_png(img_path)
+		print("Saved test_pitch_%.0f" % abs(pitch))
+		
+	quit(0)
