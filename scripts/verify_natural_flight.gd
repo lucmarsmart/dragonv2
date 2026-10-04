@@ -26,8 +26,7 @@ func _init():
 	
 	assert(ap.has_animation("Qishilong_fly2"), "Falta Qishilong_fly2!")
 	assert(ap.has_animation("Qishilong_glide"), "Falta Qishilong_glide!")
-	assert(ap.has_animation("Qishilong_down"), "Falta Qishilong_down!")
-	print("-> Verificación de animaciones: EXITOSA (Qishilong_fly2, Qishilong_glide, Qishilong_down presentes)")
+	print("-> Verificación de animaciones: EXITOSA (Qishilong_fly2 y Qishilong_glide presentes)")
 	
 	print("\n--- 2. VERIFICACIÓN DEL MODO NORMAL ---")
 	dragon.manual_input_override = true

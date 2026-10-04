@@ -155,13 +155,17 @@ func _physics_process(delta: float) -> void:
 	var look_target = chase_target.lerp(saddle, orbit_amount)
 	
 	# El vector UP de la cámara acompaña el alabeo (bank roll) del dragón para un manejo intuitivo
-	var cam_up = up.lerp(Vector3.UP, 0.35).normalized()
+	var pitch_steepness = clamp(absf(forward.y), 0.0, 1.0)
+	var cam_up = up.lerp(Vector3.UP, lerp(0.35, 0.90, pitch_steepness)).normalized()
 	if absf(orbit_pitch) > 0.5 or cam_up.length_squared() < 0.5:
 		cam_up = Vector3.UP
 	
 	var current_transform = global_transform
 	var to_look = look_target - global_position
 	if to_look.length_squared() > 0.01:
+		var look_dir = to_look.normalized()
+		if absf(cam_up.dot(look_dir)) > 0.92 or cam_up.length_squared() < 0.1:
+			cam_up = Vector3.UP if absf(look_dir.y) < 0.95 else Vector3.FORWARD
 		var target_transform = current_transform.looking_at(look_target, cam_up)
 		global_transform = current_transform.interpolate_with(target_transform, rotation_smoothness * delta)
 	
