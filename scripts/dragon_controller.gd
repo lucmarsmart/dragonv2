@@ -123,6 +123,7 @@ var glide_blend: float = 0.0
 
 # Dinámica de bamboleo y transferencia de peso (Resorte de 2do orden)
 var smoothed_turn_rate: float = 0.0
+var climb_roll_wobble: float = 0.0
 var sway_offset_x: float = 0.0
 var sway_vel_x: float = 0.0
 var sway_offset_y: float = 0.0
@@ -400,7 +401,7 @@ func _handle_input_keys(delta: float) -> void:
 		target_pitch = lerp(target_pitch, deg_to_rad(15.0), 4.0 * delta)
 	elif is_climbing:
 		current_mode = FlightMode.CLIMB
-		target_pitch = lerp(target_pitch, deg_to_rad(28.0), 3.8 * delta)
+		target_pitch = lerp(target_pitch, deg_to_rad(42.0), 3.0 * delta)
 	elif glide_mode_active:
 		current_mode = FlightMode.GLIDE
 	else:
@@ -832,7 +833,7 @@ func _update_animations() -> void:
 			custom_speed = 1.0
 		FlightMode.CLIMB:
 			target_anim = "Qishilong_fly2"
-			custom_speed = 1.35
+			custom_speed = 0.72 # Aleteo más lento y pesado: el esfuerzo contra el aire (ref. video climb)
 		FlightMode.GLIDE:
 			if anim_player.has_animation("Qishilong_glide"):
 				target_anim = "Qishilong_glide"
@@ -1035,13 +1036,17 @@ func _process(delta: float) -> void:
 	if anim_player and anim_player.is_playing() and has_taken_off and is_flapping:
 		var pos = anim_player.current_animation_position
 		var phase = (pos / 3.0) * TAU * 2.0 # Sincronizado con los 2 aleteos reales del ciclo
-		var flap_intensity = 0.55 if current_mode == FlightMode.CLIMB else 0.28
+		var flap_intensity = 1.1 if current_mode == FlightMode.CLIMB else 0.28
 		heave = sin(phase) * flap_intensity * flight_factor
-		pitch_surge = -cos(phase) * deg_to_rad(3.5 if current_mode == FlightMode.CLIMB else 2.0) * flight_factor
+		pitch_surge = -cos(phase) * deg_to_rad(7.0 if current_mode == FlightMode.CLIMB else 2.0) * flight_factor
+		# Bamboleo de esfuerzo en trepada: el cuerpo se balancea de lado a lado (un ciclo por aleteo doble)
+		climb_roll_wobble = sin(phase * 0.5 + 0.6) * deg_to_rad(5.0) * climb_blend * flight_factor
+	else:
+		climb_roll_wobble = lerp(climb_roll_wobble, 0.0, 0.1)
 		
 	if visual_root:
 		var lateral_sway = sway_offset_x * 0.30 * flight_factor
-		var surge_basis = Basis.from_euler(Vector3(pitch_surge, 0.0, 0.0))
+		var surge_basis = Basis.from_euler(Vector3(pitch_surge, 0.0, climb_roll_wobble))
 		visual_root.basis = surge_basis * _offset_basis() * calib_basis
 		
 		if skeleton and bone_pelvis != -1:
@@ -1116,8 +1121,11 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	# Carrera de potencia en trepada (power downstroke amplitude + forward reach)
 	var flap_anim_pos = anim_player.current_animation_position if (anim_player and anim_player.is_playing()) else 0.0
 	var flap_cycle_phase = (flap_anim_pos / 3.0) * TAU * 2.0
-	var climb_wing_forward = deg_to_rad(7.0) * climb_blend
-	var climb_downstroke_boost = max(0.0, sin(flap_cycle_phase)) * deg_to_rad(10.0) * climb_blend
+	var climb_wing_forward = deg_to_rad(12.0) * climb_blend
+	# Carrera de potencia amplia (bajada) y recuperación más corta (subida), con alas hacia adelante
+	var climb_downstroke_boost = (max(0.0, sin(flap_cycle_phase)) * deg_to_rad(20.0) - max(0.0, -sin(flap_cycle_phase)) * deg_to_rad(8.0)) * climb_blend
+	# Flexión del ala media en la subida (la punta se arrastra por la resistencia del aire)
+	var climb_wing_flex = max(0.0, -sin(flap_cycle_phase)) * deg_to_rad(18.0) * climb_blend
 	
 	if bone_l_wing_root != -1 and bone_roll_axes.has(bone_l_wing_root):
 		# Al virar a la izquierda (turn > 0): ala izquierda (interior) desciende (-turn)
@@ -1140,12 +1148,12 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 		sk.set_bone_pose_rotation(bone_r_wing_root, r_rot * sk.get_bone_pose_rotation(bone_r_wing_root))
 
 	if bone_l_wing_mid != -1 and bone_pitch_axes.has(bone_l_wing_mid):
-		var mid_l_pitch = -fold * 0.55 + (glide_breathe * 1.5)
+		var mid_l_pitch = -fold * 0.55 + (glide_breathe * 1.5) - climb_wing_flex
 		var mid_l = Quaternion(bone_pitch_axes[bone_l_wing_mid], mid_l_pitch)
 		sk.set_bone_pose_rotation(bone_l_wing_mid, mid_l * sk.get_bone_pose_rotation(bone_l_wing_mid))
 
 	if bone_r_wing_mid != -1 and bone_pitch_axes.has(bone_r_wing_mid):
-		var mid_r_pitch = -fold * 0.55 + (glide_breathe * 1.5)
+		var mid_r_pitch = -fold * 0.55 + (glide_breathe * 1.5) - climb_wing_flex
 		var mid_r = Quaternion(bone_pitch_axes[bone_r_wing_mid], mid_r_pitch)
 		sk.set_bone_pose_rotation(bone_r_wing_mid, mid_r * sk.get_bone_pose_rotation(bone_r_wing_mid))
 
@@ -1157,13 +1165,14 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 			var tail_lag_yaw = -turn * (0.08 * (i + 1)) * tail_lag_strength * (1.0 - ground_blend * 0.5)
 			var wave_amp = 0.040 * (i + 1) * (0.12 if fold > 0.5 else 1.0)
 			var tail_wave_yaw = sin(tail_wave_time - (i * 0.45)) * wave_amp
+			var tail_flap_lag = sin(flap_cycle_phase - (i + 1) * 0.5) * deg_to_rad(2.5) * (i + 1) * climb_blend * flight_factor
 			var tail_pitch = ((climb_blend * -0.22 * idx_ratio) + \
 							 (brake_blend * -0.20 * idx_ratio) + \
 							 (dive_fold_blend * 0.05 * idx_ratio) + \
 							 (glide_blend * 0.05 * idx_ratio)) * flight_factor + \
 							 (ground_blend * -0.12 * idx_ratio)
 			var t_rot = Quaternion(bone_yaw_axes[b], tail_lag_yaw + tail_wave_yaw) * \
-						Quaternion(bone_pitch_axes[b], tail_pitch)
+						Quaternion(bone_pitch_axes[b], tail_pitch + tail_flap_lag)
 			sk.set_bone_pose_rotation(b, t_rot * sk.get_bone_pose_rotation(b))
 
 	# 5. PATAS TRASERAS (Marcha y apoyo en tierra / Aerodinámica e inercia en vuelo)
