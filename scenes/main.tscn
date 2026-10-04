@@ -118,9 +118,10 @@ theme_override_constants/margin_bottom = 12
 [node name="HelpLabel" type="Label" parent="HUD/ControlsPanel/MarginContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "CONTROLES DE VUELO (H / F1: mostrar u ocultar):
-• W / SHIFT: AVANZAR (ALETEO FUERTE)
-• S: FRENAR Y RETROCEDER
+text = "CONTROLES DE VUELO Y TIERRA (H / F1: mostrar u ocultar):
+• L: ATERRIZAR / DESPEGAR
+• EN TIERRA: W / S CAMINAR, SHIFT CORRER, A / D GIRAR, ESPACIO SALTAR / DESPEGAR
+• EN VUELO: W / SHIFT AVANZAR (ALETEO FUERTE), S FRENAR
 • A / D / FLECHAS IZQ-DER: GIRAR (Q / E: GIRO SUAVE)
 • ESPACIO / R: SUBIR  •  C / CTRL: PICADA
 • FLECHAS ARRIBA / ABAJO: CABECEO FINO
@@ -133,9 +134,9 @@ text = "CONTROLES DE VUELO (H / F1: mostrar u ocultar):
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -290.0
+offset_left = -375.0
 offset_top = 25.0
-offset_right = 290.0
+offset_right = 375.0
 offset_bottom = 75.0
 grow_horizontal = 2
 
@@ -163,4 +164,9 @@ text = " ✈ PLANEAR [G] "
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = " ▼ PICADA [C] "
+
+[node name="BtnLand" type="Button" parent="HUD/ActionBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = " ⬇ ATERRIZAR [L] "
 

@@ -107,6 +107,13 @@ func _physics_process(delta: float) -> void:
 			orbit_pitch_target = 0.0
 	
 	# Interpolar suavemente zoom y ángulos de órbita
+	# Adaptación dinámica de altura y distancia al estar en tierra
+	var is_ground = target_node and "locomotion_state" in target_node and target_node.locomotion_state == 2 # GROUNDED
+	var target_h = 3.2 if is_ground else 5.0
+	var target_d = 12.0 if is_ground else 16.0
+	height = lerp(height, target_h, 3.0 * delta)
+	target_distance = lerp(target_distance, target_d, 3.0 * delta)
+
 	distance = lerp(distance, target_distance, 10.0 * delta)
 	var k = 1.0 - exp(-orbit_smoothness * delta)
 	orbit_yaw = lerp_angle(orbit_yaw, orbit_yaw_target, k)
@@ -148,13 +155,15 @@ func _physics_process(delta: float) -> void:
 	var look_target = chase_target.lerp(saddle, orbit_amount)
 	
 	# El vector UP de la cámara acompaña el alabeo (bank roll) del dragón para un manejo intuitivo
-	var cam_up = up.slerp(Vector3.UP, 0.35).normalized()
-	if absf(orbit_pitch) > 0.5:
+	var cam_up = up.lerp(Vector3.UP, 0.35).normalized()
+	if absf(orbit_pitch) > 0.5 or cam_up.length_squared() < 0.5:
 		cam_up = Vector3.UP
 	
 	var current_transform = global_transform
-	var target_transform = current_transform.looking_at(look_target, cam_up)
-	global_transform = current_transform.interpolate_with(target_transform, rotation_smoothness * delta)
+	var to_look = look_target - global_position
+	if to_look.length_squared() > 0.01:
+		var target_transform = current_transform.looking_at(look_target, cam_up)
+		global_transform = current_transform.interpolate_with(target_transform, rotation_smoothness * delta)
 	
 	# 6. Efecto dinámico de FOV según velocidad
 	if target_node and "current_speed" in target_node:
