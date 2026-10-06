@@ -1,6 +1,0 @@
-{
-  "scripts/dragon_controller.gd": "7794ccc5eb16de9f8276d39bdfc6c30d074d07b7459a80b49bac3a1a9bc1ffb4",
-  "scripts/dragon_head_pose.gd": "e3f8923e3454c1069c41e35360e9bbf276c26a58ca509ef7e5a04572b7a32aec",
-  "scripts/dragon_wing_contact.gd": "b7cf743a9a296cdfcd98134d87936d98ea9d9a1574ff16a0ee349873d6dd7d0a",
-  "scripts/test_dragon_anatomy.gd": "160a38107648e77baa02af5bb44623ff508c2965c3e3a6196f2392fdefe0b0b1"
-}

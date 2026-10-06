@@ -1,7 +1,0 @@
-{
-  "checks": 54,
-  "failures": [],
-  "max_air_velocity_delta": 0.46666756272316,
-  "max_foot_error": 0.0000615101453149691,
-  "touchdown_vertical_speed": 1.39999997615814
-}
