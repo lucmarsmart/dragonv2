@@ -1,0 +1,12 @@
+[
+  {
+    "lod": 0,
+    "provider_object": "fir_tree_01_a_LOD2",
+    "original_polygons": 48149,
+    "runtime_polygons": 28534,
+    "twig_faces_preserved": true,
+    "height_m": 18.748504638671875,
+    "runtime_triangles": 43349,
+    "measurement": "GLB primitive index count /3; polygons in earlier reports were not triangle counts"
+  }
+]

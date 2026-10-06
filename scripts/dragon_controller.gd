@@ -6,6 +6,60 @@ class_name DragonController
 # Vuelo original natural de Qishilong_fly2, despegue fluido y control total de maniobras
 # ==============================================================================
 
+const GroundPose = preload("res://scripts/dragon_ground_pose.gd")
+var ground_pose = GroundPose.new()
+var ground_guard_motion := Vector3.ZERO
+var ground_executed_motion := Vector3.ZERO
+var ground_yaw_motion := 0.0
+var ground_guard_snap_delta := Vector3.ZERO
+const HeadPose = preload("res://scripts/dragon_head_pose.gd")
+var head_pose = HeadPose.new()
+const PoseProbe = preload("res://scripts/dragon_pose_probe.gd")
+var glide_pose_probe = PoseProbe.new()
+const WingContact = preload("res://scripts/dragon_wing_contact.gd")
+var wing_contact = WingContact.new()
+var contact_fold_requested := 0.0
+var has_head_pose_driver := true
+var head_pose_blocked := false
+var pose_turn_blocked := false
+var head_aim_active := false
+var attack_mode_active := false
+var head_aim_direction := Vector3.FORWARD
+var head_rendered_direction := Vector3.FORWARD
+var head_aim_yaw := 0.0
+var head_aim_pitch := 0.0
+var head_requested_yaw := 0.0
+var head_requested_pitch := 0.0
+
+func set_head_aim(yaw: float, pitch: float) -> void:
+	head_aim_active = true
+	head_requested_yaw = clampf(yaw, -PI / 4.0, PI / 4.0)
+	head_requested_pitch = clampf(pitch, -PI / 6.0, PI / 6.0)
+
+func _update_head_aim(delta: float) -> void:
+	if head_aim_active and not manual_input_override:
+		var horizontal := float(Input.is_key_pressed(KEY_LEFT)) - float(Input.is_key_pressed(KEY_RIGHT))
+		var vertical := float(Input.is_key_pressed(KEY_UP)) - float(Input.is_key_pressed(KEY_DOWN))
+		set_head_aim(head_requested_yaw + horizontal * delta * 0.9, head_requested_pitch + vertical * delta * 0.9)
+	var yaw := head_requested_yaw if head_aim_active else sin(tail_wave_time * 0.43) * deg_to_rad(2.2) + smoothed_turn_rate * 0.12
+	var pitch := head_requested_pitch if head_aim_active else deg_to_rad(3.0) + sin(tail_wave_time * 0.68) * deg_to_rad(1.4)
+	var response := 1.0 - exp(-9.0 * delta)
+	var head_step := (Vector2(yaw, pitch) - Vector2(head_aim_yaw, head_aim_pitch)) * response
+	head_step = head_step.limit_length(deg_to_rad(240.0) * delta)
+	head_aim_yaw += head_step.x
+	head_aim_pitch += head_step.y
+	var world_wanted := (global_basis * Basis(Vector3.UP, head_aim_yaw) * Basis(Vector3.RIGHT, head_aim_pitch) * Vector3.FORWARD).normalized()
+	var world_angle := head_aim_direction.angle_to(world_wanted)
+	if world_angle < 0.01:
+		head_aim_direction = world_wanted
+	else:
+		var axis := head_aim_direction.cross(world_wanted)
+		if axis.length_squared() < 0.000001:
+			axis = head_aim_direction.cross(Vector3.UP)
+			if axis.length_squared() < 0.000001: axis = head_aim_direction.cross(Vector3.RIGHT)
+		head_aim_direction = (Basis(axis.normalized(),minf(world_angle,deg_to_rad(240.0) * delta)) * head_aim_direction).normalized()
+
+
 const DragonSkeletonModifier = preload("res://scripts/dragon_skeleton_modifier.gd")
 
 # --- Modos de Vuelo ---
@@ -29,7 +83,7 @@ enum LocomotionState {
 @export_group("Locomoción Terrestre y Aterrizaje")
 @export var walk_speed: float = 7.5             # Velocidad de marcha en tierra (m/s)
 @export var sprint_speed: float = 14.0          # Velocidad de trote/carrera en tierra (Shift, m/s)
-@export var ground_turn_speed: float = 2.0       # Tasa de giro horizontal en tierra (rad/s)
+@export var ground_turn_speed: float = 0.7       # Tasa de giro horizontal en tierra (rad/s)
 @export var ground_accel: float = 18.0          # Aceleración en tierra
 @export var ground_friction: float = 14.0       # Fricción al detenerse
 @export var jump_impulse: float = 16.0          # Impulso de salto / despegue (m/s)
@@ -85,6 +139,7 @@ var ground_blend: float = 0.0          # 0 = Vuelo, 1 = Tierra
 var landing_blend: float = 0.0         # 1 = Flare / Aterrizaje
 var wing_fold_blend: float = 0.0       # 1 = Alas plegadas
 var walk_cycle_phase: float = 0.0      # Fase cíclica de las patas
+var body_clearance_lift := 0.0
 var ground_normal: Vector3 = Vector3.UP
 
 var current_speed: float = 25.0
@@ -108,12 +163,22 @@ var has_taken_off: bool = false
 var takeoff_timer: float = 0.0
 
 # Controles programáticos (para scripts, cinemáticas y tests)
+var ground_motion_speed: float = 0.0
 var manual_input_override: bool = false
 var manual_move_input: float = 0.0
 var manual_turn_input: float = 0.0
 var manual_sprint: bool = false
 var manual_climb: bool = false
 var manual_dive: bool = false
+var manual_brake: bool = false
+var ground_contact: Dictionary = {}
+var ground_air_timer: float = 0.0
+var landing_target: Vector3 = Vector3.ZERO
+var landing_target_active: bool = false
+var landscape: Node = null
+var shoreline_blocked: bool = false
+var recovery_count: int = 0
+var recovery_message: String = ""
 
 # Blends de transición cinemática para posturas suaves
 var dive_fold_blend: float = 0.0
@@ -187,7 +252,7 @@ func _ready() -> void:
 	_find_and_setup_skeleton(self)
 	_find_and_setup_anim_player(self)
 	
-	floor_snap_length = 0.8
+	floor_snap_length = 1.2
 	floor_max_angle = deg_to_rad(50.0)
 	floor_stop_on_slope = true
 	
@@ -248,6 +313,26 @@ func _calibrate_model_orientation() -> void:
 	print("Orientación calibrada. forward=%s up=%s right=%s" % [fwd, up, right])
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_T:
+		head_aim_active = not head_aim_active
+		attack_mode_active = head_aim_active
+		mouse_captured = head_aim_active
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if head_aim_active else Input.MOUSE_MODE_VISIBLE)
+		return
+	if event is InputEventMouseMotion and head_aim_active:
+		var wanted_yaw:float=head_requested_yaw-event.relative.x*mouse_sensitivity
+		var neck_yaw:float=clampf(wanted_yaw,-PI/4.0,PI/4.0)
+		# One mouse controls aim and, beyond the neck's range, body orientation.
+		# Ordinary head aiming retains its independent anatomical range.
+		if attack_mode_active and not manual_input_override and locomotion_state in [LocomotionState.GROUNDED,LocomotionState.FLYING]:
+			var overflow:=wanted_yaw-neck_yaw
+			if not is_zero_approx(overflow):
+				# Repeated aiming events must not queue several complete body turns
+				# while the grounded animal is still stepping into the first one.
+				target_yaw=rotation.y+overflow if locomotion_state==LocomotionState.GROUNDED else target_yaw+overflow
+		set_head_aim(neck_yaw, head_requested_pitch - event.relative.y * mouse_sensitivity)
+		return
+
 	# ESC: alterna el timón con mouse (opcional). Por defecto está apagado.
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
 		mouse_captured = !mouse_captured
@@ -281,20 +366,59 @@ func _physics_process(delta: float) -> void:
 			if anim_player and anim_player.has_animation("Qishilong_fly2"):
 				anim_player.play("Qishilong_fly2", 0.5)
 	
+	_check_world_boundary()
+	_sample_ground()
 	_handle_input_keys(delta)
+	_update_mode_blends(delta)
 	_calculate_flight_physics(delta)
+	var rotation_before_pose := rotation
 	_apply_smooth_rotations(delta)
-	_update_animations()
-	
+	ground_pose.constrain_support_rotation(self,rotation_before_pose.y)
+	var turn_started := Time.get_ticks_usec() if PoseProbe.profiling else 0
+	wing_contact.constrain_rotation(self,rotation_before_pose)
+	ground_yaw_motion=wrapf(rotation.y-rotation_before_pose.y,-PI,PI) if locomotion_state==LocomotionState.GROUNDED else 0.0
+	PoseProbe.record("rotation_guard",turn_started)
+	_update_head_aim(delta)
+	var position_before_move := global_position
+	var grounded_before_move := locomotion_state == LocomotionState.GROUNDED
+	var constrain_started := Time.get_ticks_usec() if PoseProbe.profiling else 0
+	ground_pose.constrain_support_motion(self,delta)
+	wing_contact.constrain(self, delta)
+	if ground_pose.constrain_support_motion(self,delta):
+		# Support limits can shorten a projected wall slide; recast the actual final displacement.
+		wing_contact.constrain(self,delta)
+	PoseProbe.record("wing_constrain",constrain_started)
+	ground_guard_motion = velocity*delta if grounded_before_move else Vector3.ZERO
 	move_and_slide()
+	ground_executed_motion = global_position-position_before_move if grounded_before_move else Vector3.ZERO
+	ground_guard_snap_delta = ground_executed_motion-ground_guard_motion
 	_handle_terrain_collisions(delta)
+	if grounded_before_move and locomotion_state == LocomotionState.GROUNDED:
+		var actual_motion := global_position - position_before_move
+		var heading := -Basis(Vector3.UP, rotation.y).z
+		ground_motion_speed = actual_motion.dot(heading) / maxf(delta, 0.0001)
+		var distance_walked := Vector2(actual_motion.x, actual_motion.z).length()
+		if (is_on_wall() or wing_contact.predictive_contact) and absf(ground_motion_speed) < 0.1:
+			current_speed = 0.0
+		if distance_walked > 0.001 or absf(ground_yaw_motion) > 0.0001:
+			walk_cycle_phase += (distance_walked + absf(ground_yaw_motion) * 4.0) * TAU / 3.5
+	_update_animations()
 
 # --- Entrada de Teclado y Control de Modos ---
 func _handle_input_keys(delta: float) -> void:
 	# Actualizar blends de locomoción
 	ground_blend = move_toward(ground_blend, 1.0 if locomotion_state == LocomotionState.GROUNDED else 0.0, 4.5 * delta)
 	landing_blend = move_toward(landing_blend, 1.0 if locomotion_state == LocomotionState.LANDING else 0.0, 4.5 * delta)
-	wing_fold_blend = move_toward(wing_fold_blend, 1.0 if (locomotion_state == LocomotionState.GROUNDED or is_diving) else 0.0, 3.8 * delta)
+	var safe_fold := 1.0 if locomotion_state == LocomotionState.GROUNDED or is_diving else 0.0
+	if locomotion_state == LocomotionState.FLYING:
+		safe_fold = maxf(safe_fold, clampf((26.0 - ground_proximity) / 14.0, 0.0, 1.0))
+	if locomotion_state == LocomotionState.LANDING:
+		safe_fold = clampf((42.0 - ground_proximity) / 25.0, 0.0, 1.0)
+	if locomotion_state == LocomotionState.TAKING_OFF:
+		safe_fold = clampf((20.0 - ground_proximity) / 14.0, 0.0, 1.0)
+	safe_fold = maxf(safe_fold, contact_fold_requested)
+	contact_fold_requested = move_toward(contact_fold_requested, 0.0, delta)
+	wing_fold_blend = move_toward(wing_fold_blend, safe_fold, 2.5 * delta)
 
 	# --- MODO TERRESTRE (GROUNDED) ---
 	if locomotion_state == LocomotionState.GROUNDED:
@@ -313,24 +437,39 @@ func _handle_input_keys(delta: float) -> void:
 			turn_input = manual_turn_input
 			is_sprint = manual_sprint
 		else:
-			if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+			if Input.is_key_pressed(KEY_W) or (Input.is_key_pressed(KEY_UP) and not head_aim_active):
 				move_input += 1.0
-			if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+			if Input.is_key_pressed(KEY_S) or (Input.is_key_pressed(KEY_DOWN) and not head_aim_active):
 				move_input -= 0.6
 				
 			is_sprint = Input.is_key_pressed(KEY_SHIFT)
-			if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+			if Input.is_key_pressed(KEY_A) or (Input.is_key_pressed(KEY_LEFT) and not head_aim_active):
 				turn_input += 1.0
-			if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+			if Input.is_key_pressed(KEY_D) or (Input.is_key_pressed(KEY_RIGHT) and not head_aim_active):
 				turn_input -= 1.0
 			
 		var target_walk = (sprint_speed if is_sprint else walk_speed) * move_input
-		current_speed = move_toward(current_speed, target_walk, (ground_accel if move_input != 0.0 else ground_friction) * delta)
+		# The landing stabilizer is still settling the four planted supports.
+		# Retain the input, but begin walking acceleration after that pose settles.
+		var settling_supports := ground_blend < 0.99
+		if settling_supports: target_walk = 0.0
+		shoreline_blocked = false
+		if target_walk != 0.0 and is_instance_valid(landscape) and landscape.has_method("is_water_at"):
+			var walk_direction := -Basis(Vector3.UP, rotation.y).z * signf(target_walk)
+			var stopping_distance := current_speed * current_speed / (2.0 * ground_accel) + 3.2
+			for step in range(1, ceili(stopping_distance) + 1):
+				if landscape.is_water_at(global_position + walk_direction * float(step)):
+					shoreline_blocked = true
+					target_walk = 0.0
+					break
+		current_speed = move_toward(current_speed, target_walk, (ground_accel if move_input != 0.0 and not settling_supports else ground_friction) * delta)
 		
 		# Giro horizontal (Yaw) en tierra
 		if turn_input != 0.0:
 			target_yaw += turn_input * ground_turn_speed * delta
 			
+		current_mode = FlightMode.NORMAL
+		smoothed_turn_rate = lerpf(smoothed_turn_rate, turn_input * 0.35, 1.0 - exp(-8.0 * delta))
 		is_flapping = false
 		glide_mode_active = false
 		is_diving = false
@@ -345,9 +484,9 @@ func _handle_input_keys(delta: float) -> void:
 		is_flapping = false
 		
 		var turn_input := 0.0
-		if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+		if Input.is_key_pressed(KEY_A) or (Input.is_key_pressed(KEY_LEFT) and not head_aim_active):
 			turn_input += 1.0
-		if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+		if Input.is_key_pressed(KEY_D) or (Input.is_key_pressed(KEY_RIGHT) and not head_aim_active):
 			turn_input -= 1.0
 		if turn_input != 0.0:
 			target_yaw += turn_input * yaw_speed * delta
@@ -373,19 +512,19 @@ func _handle_input_keys(delta: float) -> void:
 	wings_contracted = is_diving
 	
 	# 3. FRENADO / MARCHA ATRÁS (BRAKE) - S (si no estamos en picada)
-	is_braking = Input.is_key_pressed(KEY_S) and not is_diving
+	is_braking = ((manual_brake if manual_input_override else Input.is_key_pressed(KEY_S))) and not is_diving
 	
 	# 4. ALETEO ACTIVO / AVANCE - W o SHIFT
-	var w_pressed = Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_SHIFT)
+	var w_pressed = (manual_move_input > 0.0 or manual_sprint) if manual_input_override else (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_SHIFT))
 	w_boost = w_pressed and not is_braking
 	if w_pressed or is_climbing or is_diving:
 		glide_mode_active = false
 	
 	# 4b. CABECEO FINO - FLECHAS ARRIBA / ABAJO
 	var pitch_input: float = 0.0
-	if Input.is_key_pressed(KEY_UP):
+	if (Input.is_key_pressed(KEY_UP) and not head_aim_active):
 		pitch_input += 1.0
-	if Input.is_key_pressed(KEY_DOWN):
+	if (Input.is_key_pressed(KEY_DOWN) and not head_aim_active):
 		pitch_input -= 1.0
 	if pitch_input != 0.0:
 		target_pitch = clamp(target_pitch + pitch_input * pitch_speed * delta, -deg_to_rad(80.0), deg_to_rad(80.0))
@@ -409,20 +548,14 @@ func _handle_input_keys(delta: float) -> void:
 		
 	is_flapping = (current_mode == FlightMode.NORMAL or current_mode == FlightMode.CLIMB)
 	
-	# Blends cinemáticos de posturas
-	dive_fold_blend = lerp(dive_fold_blend, 1.0 if current_mode == FlightMode.DIVE else 0.0, 5.5 * delta)
-	climb_blend = lerp(climb_blend, 1.0 if current_mode == FlightMode.CLIMB else 0.0, 4.5 * delta)
-	brake_blend = lerp(brake_blend, 1.0 if current_mode == FlightMode.BRAKE else 0.0, 6.0 * delta)
-	glide_blend = lerp(glide_blend, 1.0 if current_mode == FlightMode.GLIDE else 0.0, 4.0 * delta)
-	
 	# 6. VIRAJE Y ALABEO COORDINADO
 	var turn_dir: float = 0.0
 	if manual_input_override:
 		turn_dir = manual_turn_input
 	else:
-		if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+		if Input.is_key_pressed(KEY_A) or (Input.is_key_pressed(KEY_LEFT) and not head_aim_active):
 			turn_dir += 1.0
-		if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+		if Input.is_key_pressed(KEY_D) or (Input.is_key_pressed(KEY_RIGHT) and not head_aim_active):
 			turn_dir -= 1.0
 			
 		if Input.is_key_pressed(KEY_Q):
@@ -440,6 +573,29 @@ func _handle_input_keys(delta: float) -> void:
 	var desired_bank = smoothed_turn_rate * bank_amount
 	target_roll = lerp_angle(target_roll, desired_bank, return_to_level_rate * delta)
 
+func _update_mode_blends(delta: float) -> void:
+	var rate := 1.0 - exp(-5.0 * delta)
+	dive_fold_blend = lerpf(dive_fold_blend, 1.0 if current_mode == FlightMode.DIVE and locomotion_state == LocomotionState.FLYING else 0.0, rate)
+	climb_blend = lerpf(climb_blend, 1.0 if current_mode == FlightMode.CLIMB and locomotion_state != LocomotionState.GROUNDED else 0.0, rate)
+	brake_blend = lerpf(brake_blend, 1.0 if current_mode == FlightMode.BRAKE and locomotion_state != LocomotionState.GROUNDED else 0.0, rate)
+	glide_blend = lerpf(glide_blend, 1.0 if current_mode == FlightMode.GLIDE and locomotion_state == LocomotionState.FLYING else 0.0, rate)
+
+func _sample_ground() -> void:
+	if not is_instance_valid(landscape):
+		landscape = get_tree().get_first_node_in_group("landscape")
+	var ray := PhysicsRayQueryParameters3D.create(global_position + Vector3.UP, global_position + Vector3.DOWN * 350.0, 1)
+	ray.exclude = [get_rid()]
+	ground_contact = get_world_3d().direct_space_state.intersect_ray(ray)
+	ground_proximity = maxf(0.0, global_position.y - ground_contact.position.y) if ground_contact else 999.0
+	if ground_contact:
+		ground_normal = ground_contact.normal
+
+func _over_water() -> bool:
+	return is_instance_valid(landscape) and landscape.has_method("is_water_at") and landscape.is_water_at(global_position)
+
+func _ground_is_walkable() -> bool:
+	return not ground_contact.is_empty() and ground_contact.normal.dot(Vector3.UP) >= cos(floor_max_angle) and not _over_water()
+
 # --- Físicas Aerodinámicas y Comportamiento por Modos ---
 func _calculate_flight_physics(delta: float) -> void:
 	if not has_taken_off:
@@ -452,13 +608,15 @@ func _calculate_flight_physics(delta: float) -> void:
 		forward_flat.y = 0.0
 		forward_flat = forward_flat.normalized()
 		
-		if is_on_floor():
-			var floor_n = get_floor_normal()
+		if is_on_floor() or (ground_proximity<6.0 and _ground_is_walkable()):
+			# A volume guard may suppress one snap tick while the centre ray still
+			# has a valid support surface. Do not level the torso into that slope.
+			var floor_n = ground_normal if ground_proximity<6.0 and _ground_is_walkable() else get_floor_normal()
 			forward_flat = forward_flat.slide(floor_n).normalized()
-			var local_n = global_transform.basis.inverse() * floor_n
-			target_pitch = lerp_angle(target_pitch, -atan2(local_n.z, local_n.y), 6.0 * delta)
-			target_roll = lerp_angle(target_roll, atan2(local_n.x, local_n.y), 6.0 * delta)
-			velocity.y = forward_flat.y * current_speed - 2.0
+			var local_n = Basis(Vector3.UP, rotation.y).inverse() * floor_n
+			target_pitch = lerp_angle(target_pitch, atan2(local_n.z, local_n.y), 6.0 * delta)
+			target_roll = lerp_angle(target_roll, -atan2(local_n.x, local_n.y), 6.0 * delta)
+			velocity.y = forward_flat.y * current_speed
 		else:
 			velocity.y -= gravity_magnitude * 2.2 * delta
 			target_pitch = lerp_angle(target_pitch, 0.0, 4.0 * delta)
@@ -467,117 +625,77 @@ func _calculate_flight_physics(delta: float) -> void:
 		velocity.x = forward_flat.x * current_speed
 		velocity.z = forward_flat.z * current_speed
 		
-		if abs(current_speed) > 0.1:
-			walk_cycle_phase += current_speed * delta * 2.2
-		else:
-			walk_cycle_phase = lerp_angle(walk_cycle_phase, 0.0, 5.0 * delta)
 		return
 
-	# 2. FÍSICAS DE ATERRIZAJE (LANDING)
+	# Approach speed and vertical velocity change continuously; a wall cannot end landing.
 	if locomotion_state == LocomotionState.LANDING:
-		current_speed = move_toward(current_speed, 4.5, air_brake_decel * 0.8 * delta)
-		var fwd_dir = -transform.basis.z.normalized()
-		velocity.x = fwd_dir.x * current_speed
-		velocity.z = fwd_dir.z * current_speed
-		
-		var space_state = get_world_3d().direct_space_state
-		var ground_ray = PhysicsRayQueryParameters3D.create(global_position, global_position + Vector3.DOWN * 250.0)
-		ground_ray.exclude = [get_rid()]
-		var ground_hit = space_state.intersect_ray(ground_ray)
-		if ground_hit:
-			ground_proximity = global_position.distance_to(ground_hit.position)
-			# Descenso suave y flare gradual al aproximarse a tierra
-			if ground_proximity < 14.0:
-				velocity.y = move_toward(velocity.y, -3.2, 10.0 * delta)
-			else:
-				velocity.y = move_toward(velocity.y, -12.0, 6.0 * delta)
-		else:
-			ground_proximity = 999.0
-			velocity.y = move_toward(velocity.y, -12.0, 6.0 * delta)
-			
-		if is_on_floor() or get_slide_collision_count() > 0 or (ground_proximity < 3.8 and velocity.y <= 0.0):
-			locomotion_state = LocomotionState.GROUNDED
-			current_speed = 0.0
-			velocity = Vector3.ZERO
-			target_pitch = 0.0
-			target_roll = 0.0
-			print("¡Aterrizaje completado con éxito! Bienvenido a tierra.")
+		var approaching_dry := false
+		var approach_speed := 3.0 if ground_proximity < 14.0 else 12.0
+		if landing_target_active:
+			var to_target := landing_target - global_position
+			to_target.y = 0.0
+			approaching_dry = to_target.length() > 2.0 or _over_water()
+			# Keep the selected landing patch until touchdown. Previously arriving
+			# horizontally discarded it and carried the dragon onto the next slope.
+			approach_speed = minf(approach_speed,to_target.length()*0.8)
+			if to_target.length() > 0.5:
+				target_yaw = atan2(-to_target.x, -to_target.z)
+		current_speed = move_toward(current_speed,approach_speed,air_brake_decel*0.8*delta)
+		var heading := -Basis(Vector3.UP, rotation.y).z
+		var sink := -clampf((ground_proximity - 3.3) * 0.45, 1.4, 12.0) if _ground_is_walkable() else -4.0
+		if approaching_dry:
+			var approach_height:float=landing_target.y+22.0
+			if not ground_contact.is_empty():approach_height=maxf(approach_height,ground_contact.position.y+22.0)
+			sink = clampf((approach_height - global_position.y) * 0.45, -8.0, 8.0)
+		var wanted := heading * current_speed + Vector3.UP * sink
+		velocity = velocity.move_toward(wanted, 16.0 * delta)
 		return
 
-	# 3. FÍSICAS DE DESPEGUE (TAKING_OFF)
 	if locomotion_state == LocomotionState.TAKING_OFF:
 		takeoff_timer += delta
-		velocity = Vector3.UP * jump_impulse + (-transform.basis.z * 10.0)
-		if takeoff_timer >= 0.8 or (ground_proximity > 6.0 and takeoff_timer >= 0.35):
+		var wanted := -Basis(Vector3.UP, rotation.y).z * climb_forward_speed + Vector3.UP * jump_impulse
+		velocity = velocity.move_toward(wanted, 24.0 * delta)
+		current_speed = Vector2(velocity.x, velocity.z).length()
+		if takeoff_timer >= 0.85 and not is_on_floor():
 			locomotion_state = LocomotionState.FLYING
 			current_mode = FlightMode.NORMAL
-			current_speed = cruise_speed * 0.85
-			print("¡Despegue completado! Transición a vuelo libre.")
 		return
 
-	# 4. FÍSICAS DE VUELO LIBRE (FLYING)
-	var forward_dir: Vector3 = -transform.basis.z.normalized()
-	var up_dir: Vector3 = transform.basis.y.normalized()
-	
-	var pitch_gravity_factor = -forward_dir.y * gravity_magnitude * 1.5
-	var target_speed = cruise_speed
-	var acceleration = 0.0
-	var vertical_thrust = Vector3.ZERO
-	
+	# Acceleration-limited velocity preserves momentum through pitch and turns.
+	var forward_dir := -transform.basis.z.normalized()
+	var target_speed := cruise_speed
+	var acceleration := flap_acceleration
 	match current_mode:
 		FlightMode.DIVE:
 			target_speed = dive_terminal_speed
-			acceleration = flap_acceleration * 1.8 + pitch_gravity_factor * 1.5
-			current_speed = move_toward(current_speed, target_speed, acceleration * delta)
+			acceleration = flap_acceleration + maxf(0.0, -forward_dir.y) * gravity_magnitude
 		FlightMode.CLIMB:
 			target_speed = climb_forward_speed
-			acceleration = flap_acceleration * 1.4
-			current_speed = move_toward(current_speed, target_speed, acceleration * delta)
-			vertical_thrust = Vector3.UP * (climb_vertical_rate * climb_blend)
 		FlightMode.GLIDE:
-			target_speed = cruise_speed + pitch_gravity_factor * 1.2
-			current_speed = move_toward(current_speed, target_speed, (normal_drag * 0.35) * delta)
-			vertical_thrust = Vector3.DOWN * 0.4
+			target_speed = clampf(cruise_speed - forward_dir.y * 9.0, min_stall_speed, dive_terminal_speed)
+			acceleration = 3.0
 		FlightMode.BRAKE:
-			target_speed = -reverse_speed
+			target_speed = min_stall_speed
 			acceleration = air_brake_decel
-			current_speed = move_toward(current_speed, target_speed, acceleration * delta)
 		FlightMode.NORMAL:
-			target_speed = cruise_speed + pitch_gravity_factor * 1.8
-			if w_boost:
-				target_speed = max_flap_speed + pitch_gravity_factor * 1.8
-			acceleration = flap_acceleration + pitch_gravity_factor
-			current_speed = move_toward(current_speed, target_speed, acceleration * delta)
-		
-	current_speed = clamp(current_speed, -reverse_speed, dive_terminal_speed)
-	
-	var lift_ratio = clamp(current_speed / cruise_speed, 0.0, 2.0)
-	var lift_force = up_dir * (gravity_magnitude * lift_ratio)
-	var gravity_force = Vector3.DOWN * gravity_magnitude
-	
-	var ground_cushion_lift = Vector3.ZERO
-	var space_state = get_world_3d().direct_space_state
-	var ground_ray = PhysicsRayQueryParameters3D.create(global_position, global_position + Vector3.DOWN * 24.0)
-	ground_ray.exclude = [get_rid()]
-	var ground_hit = space_state.intersect_ray(ground_ray)
-	
-	if ground_hit:
-		ground_proximity = global_position.distance_to(ground_hit.position)
-		if ground_proximity < 16.0:
-			var cushion_factor = 1.0 - (ground_proximity / 16.0)
-			ground_cushion_lift = Vector3.UP * (gravity_magnitude * 3.5 * cushion_factor)
-			# En picada cerca del suelo: auto-flare aerodinámico suave para evitar colisiones bruscas
-			if ground_proximity < 10.0 and target_pitch < 0.0:
-				target_pitch = lerp(target_pitch, deg_to_rad(8.0), 6.5 * delta)
-				if is_diving and ground_proximity < 6.0:
-					is_diving = false
-					glide_mode_active = true
-	else:
-		ground_proximity = 999.0
-	
-	var flight_velocity = forward_dir * current_speed
-	var aero_balance = (lift_force + gravity_force) * (0.05 if is_diving else 0.4)
-	velocity = flight_velocity + vertical_thrust + ground_cushion_lift + (aero_balance * delta)
+			target_speed = max_flap_speed if w_boost else cruise_speed
+	current_speed = move_toward(current_speed, target_speed, acceleration * delta)
+	current_speed = clampf(current_speed, min_stall_speed, dive_terminal_speed)
+	var wanted_velocity := forward_dir * current_speed
+	if current_mode == FlightMode.GLIDE:
+		wanted_velocity.y -= 1.0
+	if current_mode == FlightMode.CLIMB:
+		# Thrust follows body pitch instead of adding a second full climb velocity.
+		wanted_velocity.y = maxf(wanted_velocity.y, climb_vertical_rate * climb_blend)
+	if ground_proximity < 10.0 and _ground_is_walkable():
+		if velocity.y < -1.0:
+			target_pitch = maxf(target_pitch, deg_to_rad(10.0))
+			wanted_velocity.y = maxf(wanted_velocity.y, 3.0)
+			if current_mode == FlightMode.DIVE:
+				ui_dive_active = false
+				is_diving = false
+				current_mode = FlightMode.NORMAL
+	velocity = velocity.move_toward(wanted_velocity, (28.0 if current_mode == FlightMode.DIVE else 22.0) * delta)
 
 	var centrifugal_accel = -smoothed_turn_rate * (current_speed / cruise_speed) * weight_sway_strength * 3.0
 	var spring_force_x = -weight_spring_stiffness * sway_offset_x - weight_damping * sway_vel_x + centrifugal_accel
@@ -587,48 +705,36 @@ func _calculate_flight_physics(delta: float) -> void:
 
 # --- Respuesta Físico-Colisional con el Terreno ---
 func _handle_terrain_collisions(delta: float) -> void:
-	is_touching_ground = is_on_floor() or get_slide_collision_count() > 0
-	
-	# En tierra respetamos el terreno mediante las colisiones físicas de move_and_slide()
+	is_touching_ground = is_on_floor()
 	if locomotion_state == LocomotionState.GROUNDED:
+		ground_air_timer = 0.0 if is_on_floor() else ground_air_timer + delta
+		if ground_air_timer > 0.25 and ground_proximity > 6.0:
+			locomotion_state = LocomotionState.FLYING
+			ground_pose.reset()
 		return
-		
-	if locomotion_state == LocomotionState.LANDING:
-		if is_on_floor() or get_slide_collision_count() > 0:
-			locomotion_state = LocomotionState.GROUNDED
-			current_speed = 0.0
-			velocity = Vector3.ZERO
+	var reached_landing_patch:bool=not landing_target_active or Vector2(global_position.x-landing_target.x,global_position.z-landing_target.z).length()<=2.0
+	if locomotion_state == LocomotionState.LANDING and reached_landing_patch and is_on_floor() and get_floor_normal().dot(Vector3.UP) >= cos(floor_max_angle) and not _over_water() and ground_proximity < 5.0:
+		locomotion_state = LocomotionState.GROUNDED
+		current_mode = FlightMode.NORMAL
+		current_speed = Vector2(velocity.x, velocity.z).length()
+		target_pitch = 0.0
+		target_roll = 0.0
+		# Keep contacts calibrated during the landing approach.
+		landing_target_active = false
 		return
-		
-	# En vuelo: amortiguación y rebote
-	var col_count = get_slide_collision_count()
-	if col_count > 0:
-		for i in range(col_count):
-			var col = get_slide_collision(i)
-			var n = col.get_normal()
-			if n.y > 0.15:
-				if velocity.dot(n) < 0.0:
-					velocity = velocity.slide(n)
-				target_pitch = max(target_pitch, deg_to_rad(6.0))
-				current_speed = move_toward(current_speed, cruise_speed * 0.75, 30.0 * delta)
-				if is_diving:
-					is_diving = false
-					wings_contracted = false
-					glide_mode_active = true
-			else:
-				if velocity.dot(n) < 0.0:
-					velocity = velocity.slide(n)
-				current_speed = move_toward(current_speed, min_stall_speed, 40.0 * delta)
-				
-	if global_position.y < 3.8:
-		global_position.y = 3.8
-		if velocity.y < 0.0:
-			velocity.y = 0.0
-		target_pitch = max(target_pitch, deg_to_rad(5.0))
+	for i in range(get_slide_collision_count()):
+		var n := get_slide_collision(i).get_normal()
+		velocity = velocity.slide(n)
+		current_speed = move_toward(current_speed, min_stall_speed, 25.0 * delta)
+		if n.y >= cos(floor_max_angle):
+			target_pitch = maxf(target_pitch, deg_to_rad(12.0))
 
 # --- Suavizado de Rotaciones Globales ---
 func _apply_smooth_rotations(delta: float) -> void:
-	rotation.y = lerp_angle(rotation.y, target_yaw, 10.0 * delta)
+	var yaw_step:=wrapf(target_yaw-rotation.y,-PI,PI)*minf(1.0,10.0*delta)
+	if locomotion_state==LocomotionState.GROUNDED:
+		yaw_step=clampf(yaw_step,-ground_turn_speed*delta,ground_turn_speed*delta)
+	rotation.y+=yaw_step
 	rotation.x = lerp_angle(rotation.x, target_pitch, 8.0 * delta)
 	rotation.z = lerp_angle(rotation.z, target_roll, 8.0 * delta)
 
@@ -813,12 +919,10 @@ func _update_animations() -> void:
 		return
 		
 	if locomotion_state == LocomotionState.GROUNDED:
-		if anim_player.current_animation != "Qishilong_fly2" or not anim_player.is_playing():
-			anim_player.play("Qishilong_fly2", 0.4)
-		if abs(current_speed) > 0.2:
-			anim_player.speed_scale = clamp(abs(current_speed) / walk_speed, 0.4, 1.2)
-		else:
-			anim_player.speed_scale = 0.25 # Reposo / respiración sutil
+		# Constant authored body pose is refreshed each frame, without a flight cycle on land.
+		if anim_player.current_animation != "Qishilong_glide" or not anim_player.is_playing():
+			anim_player.play("Qishilong_glide", 0.35)
+		anim_player.speed_scale = 1.0
 		return
 
 	var target_anim = "Qishilong_fly2"
@@ -857,6 +961,11 @@ func trigger_landing() -> void:
 		has_taken_off = true
 		locomotion_state = LocomotionState.LANDING
 		current_mode = FlightMode.BRAKE
+		ui_climb_active = false
+		ui_dive_active = false
+		if is_instance_valid(landscape) and landscape.has_method("find_landing_site"):
+			landing_target = landscape.find_landing_site(global_position)
+			landing_target_active = true
 		print("Iniciando aproximación y flare de aterrizaje...")
 
 func trigger_takeoff() -> void:
@@ -864,7 +973,11 @@ func trigger_takeoff() -> void:
 		has_taken_off = true
 		locomotion_state = LocomotionState.TAKING_OFF
 		takeoff_timer = 0.0
-		velocity = Vector3.UP * jump_impulse + (-transform.basis.z * 8.0)
+		velocity.y = jump_impulse
+		body_clearance_lift = 0.0
+		ground_pose.reset()
+		ui_climb_active = false
+		ui_dive_active = false
 		target_pitch = deg_to_rad(18.0)
 		if anim_player and anim_player.has_animation("Qishilong_fly2"):
 			anim_player.play("Qishilong_fly2", 0.3)
@@ -878,6 +991,7 @@ func toggle_land_takeoff() -> void:
 	elif locomotion_state == LocomotionState.LANDING:
 		locomotion_state = LocomotionState.FLYING
 		current_mode = FlightMode.NORMAL
+		landing_target_active = false
 
 func trigger_climb() -> void:
 	has_taken_off = true
@@ -1045,15 +1159,16 @@ func _process(delta: float) -> void:
 		climb_roll_wobble = lerp(climb_roll_wobble, 0.0, 0.1)
 		
 	if visual_root:
-		var lateral_sway = sway_offset_x * 0.30 * flight_factor
+		var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+		var lateral_sway = sway_offset_x * 0.30 * flight_factor + sin(walk_cycle_phase) * 0.045 * step_weight * ground_blend
 		var surge_basis = Basis.from_euler(Vector3(pitch_surge, 0.0, climb_roll_wobble))
 		visual_root.basis = surge_basis * _offset_basis() * calib_basis
 		
 		if skeleton and bone_pelvis != -1:
 			# Centrar suavemente el núcleo del cuerpo sobre el CharacterBody3D sin interferir en los virajes
 			var anchor_world = _body_core_world()
-			var y_offset = lerp(-0.3 + heave, -0.1, ground_blend)
-			var target_center = global_position + Vector3(lateral_sway, y_offset, 0.0)
+			var y_offset = lerp(-0.3 + heave, -0.65 + cos(walk_cycle_phase * 2.0) * 0.025 * step_weight, ground_blend)
+			var target_center = global_position + Vector3(lateral_sway, y_offset+body_clearance_lift*ground_blend, 0.0)
 			var desired_offset = target_center - anchor_world
 			if not stabilizer_initialized:
 				smoothed_anchor_offset = desired_offset
@@ -1086,24 +1201,6 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	var turn = smoothed_turn_rate
 	var flight_factor = clamp(1.0 - ground_blend, 0.0, 1.0)
 	
-	# 1. CUELLO Y CABEZA (Anticipación al viraje + Estabilización de horizonte estilo rapaz)
-	var neck_yaw_weights = [0.12, 0.18, 0.25]
-	var neck_pitch_offset = (climb_blend * 0.22) - (dive_fold_blend * 0.15) + (brake_blend * 0.30) + (ground_blend * 0.30)
-	
-	for i in range(bone_neck_indices.size()):
-		var b = bone_neck_indices[i]
-		if b != -1 and bone_yaw_axes.has(b):
-			var yaw_rot = Quaternion(bone_yaw_axes[b], turn * neck_lead_strength * neck_yaw_weights[i] * (1.0 - ground_blend * 0.6))
-			var pitch_rot = Quaternion(bone_pitch_axes[b], neck_pitch_offset * (0.25 + 0.25 * i))
-			sk.set_bone_pose_rotation(b, yaw_rot * pitch_rot * sk.get_bone_pose_rotation(b))
-			
-	if bone_head_idx != -1 and bone_yaw_axes.has(bone_head_idx):
-		var head_yaw = Quaternion(bone_yaw_axes[bone_head_idx], turn * neck_lead_strength * 0.40 * (1.0 - ground_blend * 0.6))
-		var head_pitch = Quaternion(bone_pitch_axes[bone_head_idx], neck_pitch_offset * 0.35 - ground_blend * 0.15)
-		# Gimbal vestibular: la cabeza se nivela con el horizonte cancelando el 75% del alabeo corporal
-		var head_horizon_roll = Quaternion(bone_roll_axes[bone_head_idx], -target_roll * 0.75 * flight_factor)
-		sk.set_bone_pose_rotation(bone_head_idx, head_yaw * head_pitch * head_horizon_roll * sk.get_bone_pose_rotation(bone_head_idx))
-
 	# 2. COLUMNA DORSAL (Arco orgánico continuo en virajes)
 	var spine_weights = [0.08, 0.14, 0.18]
 	for i in range(bone_spine_indices.size()):
@@ -1114,7 +1211,7 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 			sk.set_bone_pose_rotation(b, spine_yaw * spine_pitch * sk.get_bone_pose_rotation(b))
 
 	# 3. ALAS: ASIMETRÍA EN VIRAJES + PLANEO DIEDRO + PLEGADO EN PICADA + APERTURA EN TREPADA
-	var fold = clamp(max(dive_fold_blend, wing_fold_blend), 0.0, 1.0)
+	var fold = clamp(dive_fold_blend, 0.0, 1.0) * (1.0 - ground_blend)
 	var glide_dihedral = glide_blend * deg_to_rad(4.5)
 	var glide_breathe = sin(tail_wave_time * 1.8) * deg_to_rad(1.5) * glide_blend
 	
@@ -1139,7 +1236,7 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 
 	if bone_r_wing_root != -1 and bone_roll_axes.has(bone_r_wing_root):
 		# Ala derecha (exterior al virar a la izquierda): se eleva (+turn)
-		var r_roll_delta = (turn * wing_asymmetry_strength * 0.35 + glide_dihedral + glide_breathe + climb_downstroke_boost) * (1.0 - fold)
+		var r_roll_delta = (turn * wing_asymmetry_strength * 0.35 - glide_dihedral - glide_breathe + climb_downstroke_boost) * (1.0 - fold)
 		var r_pitch_dive = (-fold * 0.75) + (brake_blend * 0.25 * flight_factor) - (climb_wing_forward * (1.0 - fold))
 		var r_yaw_fold = (-fold * 0.50) + (turn * 0.12 * (1.0 - fold))
 		var r_rot = Quaternion(bone_roll_axes[bone_r_wing_root], r_roll_delta) * \
@@ -1156,6 +1253,31 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 		var mid_r_pitch = -fold * 0.55 + (glide_breathe * 1.5) - climb_wing_flex
 		var mid_r = Quaternion(bone_pitch_axes[bone_r_wing_mid], mid_r_pitch)
 		sk.set_bone_pose_rotation(bone_r_wing_mid, mid_r * sk.get_bone_pose_rotation(bone_r_wing_mid))
+
+	# The source's held frame is asymmetric. Level equivalent distal joints in body space,
+	# rather than assuming mirrored imported quaternion axes have mirrored poses.
+	if glide_blend > 0.01:
+		var held_weight := glide_blend * (1.0 - wing_fold_blend)
+		_aim_bone_direction(sk, 96, 108, global_basis * Vector3(-1.0, 0.075, 0.08), held_weight)
+		_aim_bone_direction(sk, 120, 132, global_basis * Vector3(1.0, 0.075, 0.08), held_weight)
+
+	if glide_blend > 0.95 and wing_fold_blend < 0.01:
+		if glide_pose_probe.samples.is_empty():
+			glide_pose_probe.configure(self, sk, 12)
+			glide_pose_probe.samples = glide_pose_probe.samples.filter(func(sample): return sample.wing)
+		for level_pass in 2:
+			var left := Vector3.ZERO
+			var right := Vector3.ZERO
+			for point in glide_pose_probe.points(sk, true):
+				var local: Vector3 = to_local(point.position)
+				if local.x < left.x: left = local
+				if local.x > right.x: right = local
+			var center_y := (left.y + right.y) * 0.5
+			_aim_bone_skin_point(sk, 96, to_global(left), to_global(Vector3(left.x,center_y,left.z)))
+			_aim_bone_skin_point(sk, 120, to_global(right), to_global(Vector3(right.x,center_y,right.z)))
+
+	# A folded wing doubles back at the elbow and long finger joints.
+	# Directions are measured on the live rig, independent of imported bone axes.
 
 	# 4. COLA MULTIVERTEBRAL (8 Vértebras con propagación de látigo fluido)
 	for i in range(bone_tail_indices.size()):
@@ -1175,38 +1297,140 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 						Quaternion(bone_pitch_axes[b], tail_pitch + tail_flap_lag)
 			sk.set_bone_pose_rotation(b, t_rot * sk.get_bone_pose_rotation(b))
 
-	# 5. PATAS TRASERAS (Marcha y apoyo en tierra / Aerodinámica e inercia en vuelo)
-	if ground_blend > 0.01:
-		var speed_ratio = clamp(current_speed / walk_speed, -1.0, 1.5)
-		var stride = sin(walk_cycle_phase) * speed_ratio
-		var step_lift_l = max(0.0, cos(walk_cycle_phase)) * abs(speed_ratio)
-		var step_lift_r = max(0.0, -cos(walk_cycle_phase)) * abs(speed_ratio)
-		
-		var l_thigh_pitch = (stride * deg_to_rad(30.0) + deg_to_rad(12.0)) * ground_blend
-		var r_thigh_pitch = (-stride * deg_to_rad(30.0) + deg_to_rad(12.0)) * ground_blend
-		
-		var l_calf_pitch = (-step_lift_l * deg_to_rad(32.0) + deg_to_rad(16.0)) * ground_blend
-		var r_calf_pitch = (-step_lift_r * deg_to_rad(32.0) + deg_to_rad(16.0)) * ground_blend
-		
-		var l_foot_pitch = (step_lift_l * deg_to_rad(22.0) - stride * deg_to_rad(14.0) - deg_to_rad(28.0)) * ground_blend
-		var r_foot_pitch = (step_lift_r * deg_to_rad(22.0) + stride * deg_to_rad(14.0) - deg_to_rad(28.0)) * ground_blend
-		
-		if bone_l_thigh != -1 and bone_pitch_axes.has(bone_l_thigh):
-			sk.set_bone_pose_rotation(bone_l_thigh, Quaternion(bone_pitch_axes[bone_l_thigh], l_thigh_pitch) * sk.get_bone_pose_rotation(bone_l_thigh))
-		if bone_r_thigh != -1 and bone_pitch_axes.has(bone_r_thigh):
-			sk.set_bone_pose_rotation(bone_r_thigh, Quaternion(bone_pitch_axes[bone_r_thigh], r_thigh_pitch) * sk.get_bone_pose_rotation(bone_r_thigh))
-		if bone_l_calf != -1 and bone_pitch_axes.has(bone_l_calf):
-			sk.set_bone_pose_rotation(bone_l_calf, Quaternion(bone_pitch_axes[bone_l_calf], l_calf_pitch) * sk.get_bone_pose_rotation(bone_l_calf))
-		if bone_r_calf != -1 and bone_pitch_axes.has(bone_r_calf):
-			sk.set_bone_pose_rotation(bone_r_calf, Quaternion(bone_pitch_axes[bone_r_calf], r_calf_pitch) * sk.get_bone_pose_rotation(bone_r_calf))
-		if bone_l_foot != -1 and bone_pitch_axes.has(bone_l_foot):
-			sk.set_bone_pose_rotation(bone_l_foot, Quaternion(bone_pitch_axes[bone_l_foot], l_foot_pitch) * sk.get_bone_pose_rotation(bone_l_foot))
-		if bone_r_foot != -1 and bone_pitch_axes.has(bone_r_foot):
-			sk.set_bone_pose_rotation(bone_r_foot, Quaternion(bone_pitch_axes[bone_r_foot], r_foot_pitch) * sk.get_bone_pose_rotation(bone_r_foot))
-	else:
+	# Recover parents before solving any descendant pose or stance contact.
+	wing_contact.smooth_body_recovery(self,sk)
+	var head_started := Time.get_ticks_usec() if PoseProbe.profiling else 0
+	head_pose.apply(self, sk)
+	PoseProbe.record("head_total",head_started)
+	_refit_compact_wings(sk)
+	# Rear knees/hocks prepare beneath the torso before ground IK takes over.
+	# Authored brake frames lift the hind feet above the spine. Correct live FK
+	# directions in body space; never change bind/pose translations or link lengths.
+	var rear_preparation := maxf(brake_blend,landing_blend) if locomotion_state in [LocomotionState.FLYING,LocomotionState.LANDING] else 0.0
+	var support_ik := locomotion_state == LocomotionState.GROUNDED or ground_blend > 0.01 or (locomotion_state == LocomotionState.LANDING and ground_proximity < 12.0)
+	# Retain the authored airborne kick when it is not preparing a landing.
+	if not support_ik and rear_preparation<=.01:
 		var flap_leg_kick = sin((anim_player.current_animation_position / 3.0) * TAU * 2.0) * deg_to_rad(3.5) if (is_flapping and anim_player) else 0.0
-		var leg_pitch = (dive_fold_blend * -0.45) + (brake_blend * 0.50) + (climb_blend * -0.25) + (glide_blend * -0.10) + flap_leg_kick
+		var leg_pitch = (dive_fold_blend * -0.45) + (climb_blend * -0.25) + (glide_blend * -0.10) + flap_leg_kick
 		if bone_l_thigh != -1 and bone_pitch_axes.has(bone_l_thigh):
 			sk.set_bone_pose_rotation(bone_l_thigh, Quaternion(bone_pitch_axes[bone_l_thigh], leg_pitch) * sk.get_bone_pose_rotation(bone_l_thigh))
 		if bone_r_thigh != -1 and bone_pitch_axes.has(bone_r_thigh):
 			sk.set_bone_pose_rotation(bone_r_thigh, Quaternion(bone_pitch_axes[bone_r_thigh], leg_pitch) * sk.get_bone_pose_rotation(bone_r_thigh))
+	var rear_cache: Dictionary = get_meta("air_rear_joint_pose",{})
+	var recovering: bool = get_meta("air_rear_prepared",false) and locomotion_state == LocomotionState.FLYING
+	var current_tick := Engine.get_physics_frames()
+	if rear_preparation>.01 or recovering:
+		# Seed all orientations before changing any parent; sequential initialization
+		# would add each parent's angular change to its child on the first frame.
+		var authored := {}
+		for b in [5,6,7,20,21,22,39,40,80,81]:
+			var q := (global_basis.inverse()*sk.global_basis*sk.get_bone_global_pose(b).basis).get_rotation_quaternion()
+			authored[b]=q
+			if not rear_cache.has(b) or current_tick-int(rear_cache[b].tick)>6:
+				rear_cache[b]={"rotation":q,"tick":current_tick-1}
+		var needs_recovery := false
+		for chain in [[5,6,7,8,-1.0],[20,21,22,23,1.0],[39,40,41,-1.0],[80,81,82,1.0]]:
+			var fore:bool=chain.size()==4
+			var side_sign:float=chain[-1]
+			var directions:Array=[Vector3(side_sign*.08,-.85,.25),Vector3(side_sign*.04,-.85,-.35)] if fore else [Vector3(side_sign*.12,-.8,-.55),Vector3(side_sign*.05,-.7,.75),Vector3(0,-.9,-.35)]
+			for joint in directions.size():
+				var b: int = chain[joint]
+				var old: Dictionary = rear_cache[b]
+				var wanted: Quaternion = authored[b]
+				if rear_preparation>.01:
+					_aim_bone_direction(sk,b,chain[joint+1],global_basis*directions[joint],rear_preparation)
+					wanted=(global_basis.inverse()*sk.global_basis*sk.get_bone_global_pose(b).basis).get_rotation_quaternion()
+				var previous: Quaternion = old.rotation
+				var maximum_angle := deg_to_rad(4.0)*clampf(current_tick-int(old.tick),0,2)
+				var angle := previous.angle_to(wanted)
+				needs_recovery=needs_recovery or angle>maximum_angle+.0001
+				var published := previous.slerp(wanted,minf(1.0,maximum_angle/maxf(angle,.000001)))
+				var parent := sk.get_bone_parent(b)
+				var parent_q := sk.get_bone_global_pose(parent).basis.get_rotation_quaternion()
+				var sk_q := (sk.global_basis.inverse()*global_basis*Basis(published)).get_rotation_quaternion()
+				sk.set_bone_pose_rotation(b,parent_q.inverse()*sk_q)
+		set_meta("air_rear_prepared",rear_preparation>.01 or needs_recovery)
+	# Ground IK has precedence. Keep the published result as the next air anchor,
+	# including its transition blend, instead of caching a pose that IK overwrites.
+	if support_ik:
+		var ground_started := Time.get_ticks_usec() if PoseProbe.profiling else 0
+		ground_pose.apply(self, sk)
+		PoseProbe.record("ground_total",ground_started)
+	if locomotion_state == LocomotionState.GROUNDED:
+		set_meta("air_rear_joint_pose",{})
+		set_meta("air_rear_prepared",false)
+	else:
+		for b in [5,6,7,20,21,22,39,40,80,81]:
+			rear_cache[b]={"rotation":(global_basis.inverse()*sk.global_basis*sk.get_bone_global_pose(b).basis).get_rotation_quaternion(),"tick":current_tick}
+		set_meta("air_rear_joint_pose",rear_cache)
+
+	var sample_started := Time.get_ticks_usec() if PoseProbe.profiling else 0
+	wing_contact.sample_final(self, sk)
+	wing_contact.guard_body_pose(self,sk)
+	PoseProbe.record("wing_total",sample_started)
+
+func _refit_compact_wings(sk: Skeleton3D) -> void:
+	var compact_blend := maxf(wing_fold_blend,dive_fold_blend)
+	if compact_blend<=0.01: return
+	var narrow := wing_fold_blend if locomotion_state in [LocomotionState.LANDING,LocomotionState.GROUNDED] else ground_blend
+	# Digital flexors gather the membrane before the elbow and shoulder tuck;
+	# opening follows the reverse order. The same original final pose is kept.
+	var digit_fold:float=smoothstep(0.0,.65,compact_blend)
+	var elbow_fold:float=smoothstep(.08,.82,compact_blend)
+	var shoulder_fold:float=smoothstep(.18,.95,compact_blend)
+	for side in [[96,97,104,108,98,102,111,115,-1.0],[120,121,128,132,122,126,135,139,1.0]]:
+		var sign_side: float = side[8]
+		_aim_bone_direction(sk,side[0],side[1],global_basis*Vector3(sign_side*lerpf(1.0,.12,narrow),1.0,2.2),shoulder_fold)
+		_aim_bone_direction(sk,side[1],side[2],global_basis*Vector3(sign_side*lerpf(.7,.0,narrow),.4,3.6),elbow_fold)
+		_aim_bone_direction(sk,side[2],side[3],global_basis*Vector3(sign_side*lerpf(.1,.0,narrow),.7,-5.5),digit_fold)
+		_aim_bone_direction(sk,side[4],side[5],global_basis*Vector3(sign_side*lerpf(.2,.0,narrow),.6,-5.0),digit_fold)
+		_aim_bone_direction(sk,side[6],side[7],global_basis*Vector3(sign_side*lerpf(.2,.0,narrow),.8,-4.8),digit_fold)
+
+func _aim_bone_skin_point(sk: Skeleton3D, bone: int, current_world: Vector3, desired_world: Vector3) -> void:
+	var pose := sk.get_bone_global_pose(bone)
+	var current := sk.to_local(current_world) - pose.origin
+	var desired := sk.to_local(desired_world) - pose.origin
+	var correction := Quaternion(current.normalized(), desired.normalized())
+	var parent := sk.get_bone_parent(bone)
+	var parent_q := sk.get_bone_global_pose(parent).basis.get_rotation_quaternion() if parent >= 0 else Quaternion.IDENTITY
+	sk.set_bone_pose_rotation(bone, parent_q.inverse() * correction * pose.basis.get_rotation_quaternion())
+
+func _rotate_bone_world(sk: Skeleton3D, bone: int, axis: Vector3, angle: float) -> void:
+	if bone < 0:
+		return
+	var parent := sk.get_bone_parent(bone)
+	var parent_basis := sk.get_bone_global_pose(parent).basis if parent >= 0 else Basis.IDENTITY
+	var axis_local := (parent_basis.inverse() * sk.global_basis.inverse() * axis).normalized()
+	sk.set_bone_pose_rotation(bone, Quaternion(axis_local, angle) * sk.get_bone_pose_rotation(bone))
+
+func _aim_bone_direction(sk: Skeleton3D, bone: int, tip: int, wanted_world_direction: Vector3, weight: float) -> void:
+	var pose := sk.get_bone_global_pose(bone)
+	var actual := sk.get_bone_global_pose(tip).origin - pose.origin
+	var desired := sk.global_basis.inverse() * wanted_world_direction
+	var correction := Quaternion(actual.normalized(), desired.normalized())
+	correction = Quaternion.IDENTITY.slerp(correction, weight)
+	var parent := sk.get_bone_parent(bone)
+	var parent_q := sk.get_bone_global_pose(parent).basis.get_rotation_quaternion() if parent >= 0 else Quaternion.IDENTITY
+	sk.set_bone_pose_rotation(bone, parent_q.inverse() * correction * pose.basis.get_rotation_quaternion())
+
+func _check_world_boundary() -> void:
+	var extent := maxf(absf(global_position.x), absf(global_position.z))
+	if extent > 1320.0 and locomotion_state != LocomotionState.GROUNDED:
+		var inward := -Vector2(global_position.x, global_position.z).normalized()
+		target_yaw = atan2(-inward.x, -inward.y)
+		if locomotion_state == LocomotionState.LANDING:
+			locomotion_state = LocomotionState.FLYING
+			ui_climb_active = true
+	if extent > 1650.0 or global_position.y < -90.0:
+		global_position = Vector3(180.0, 160.0, 120.0)
+		velocity = Vector3.ZERO
+		locomotion_state = LocomotionState.FLYING
+		current_mode = FlightMode.NORMAL
+		current_speed = cruise_speed
+		ui_climb_active = false
+		ui_dive_active = false
+		target_pitch = 0.0
+		target_roll = 0.0
+		ground_pose.reset()
+		recovery_count += 1
+		recovery_message = "Regreso al valle: límite del mundo alcanzado"

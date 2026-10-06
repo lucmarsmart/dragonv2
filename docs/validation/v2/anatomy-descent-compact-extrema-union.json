@@ -1,0 +1,34 @@
+{
+  "construction_poses": [
+    "brake_descent_180",
+    "brake_descent_90",
+    "dive_180",
+    "dive_90",
+    "ground_compact"
+  ],
+  "old": 1088,
+  "new": 1108,
+  "added_ids": [
+    "Object_7:0:1416",
+    "Object_7:0:1553",
+    "Object_7:0:1991",
+    "Object_7:0:2012",
+    "Object_7:0:224",
+    "Object_7:0:2456",
+    "Object_7:0:2602",
+    "Object_7:0:3076",
+    "Object_7:0:3077",
+    "Object_7:0:3173",
+    "Object_7:0:3175",
+    "Object_7:0:3543",
+    "Object_7:0:3622",
+    "Object_7:0:3830",
+    "Object_7:0:3888",
+    "Object_7:0:3891",
+    "Object_7:0:4302",
+    "Object_7:0:453",
+    "Object_7:0:4632",
+    "Object_7:0:5077"
+  ],
+  "method": "Union of original convex hull vertex IDs from five new construction poses; holdout not included"
+}

@@ -1,0 +1,492 @@
+extends RefCounted
+# World-space planted feet; FABRIK preserves lengths and the published rear articulation branch.
+const Probe = preload("res://scripts/dragon_pose_probe.gd")
+var claw_probe = Probe.new()
+var limbs: Array[Dictionary] = []
+var debug_contacts: Array[Vector3] = []
+var debug_errors: Array[float] = []
+var pose_blend := 1.0
+var prepared_skeleton_id := 0
+var prepared_probes: Dictionary = {}
+var preparation_count := 0
+var planning_frame := -1
+var planned_move_direction := 0
+
+func reset() -> void:
+	planning_frame=-1
+	planned_move_direction=0
+	limbs.clear()
+	debug_contacts.clear()
+	debug_errors.clear()
+
+# Metadata can be warmed before briefing. Contacts/orientation stay initialized
+# by apply on its actual first pose; reset retains this same-skeleton cache.
+func prepare(dragon: Node3D, sk: Skeleton3D) -> void:
+	if prepared_skeleton_id == sk.get_instance_id() and not prepared_probes.is_empty(): return
+	limbs.clear()
+	prepared_probes.clear()
+	claw_probe.configure(dragon,sk,1)
+	claw_probe.samples = claw_probe.samples.filter(func(sample): return int(sample.limb_claw)>=0)
+	for end in [8,82,23,41]:
+		var foot := Probe.new()
+		foot.samples = claw_probe.samples.filter(func(sample): return int(sample.limb_claw)==end)
+		foot.profile_label = "claw_%d" % end
+		# All original foot vertices: terrain height is not affine across cells.
+		foot.prepare_coordinates()
+		prepared_probes[end] = foot
+	prepared_skeleton_id = sk.get_instance_id()
+	preparation_count += 1
+
+func _configure(sk: Skeleton3D) -> void:
+	var specs := [
+		[[5, 6, 7], 8, Vector3(-1.45, 0.0, 1.65), 0.0],
+		[[80, 81], 82, Vector3(1.35, 0.0, -2.55), 0.25],
+		[[20, 21, 22], 23, Vector3(1.45, 0.0, 1.65), 0.5],
+		[[39, 40], 41, Vector3(-1.35, 0.0, -2.55), 0.75],
+	]
+	for spec in specs:
+		limbs.append({"chain": spec[0], "end": spec[1], "home": spec[2], "phase": spec[3], "planted": Vector3.ZERO, "start": Vector3.ZERO, "finish": Vector3.ZERO, "swinging": false, "initialized": false, "foot_basis": Basis.IDENTITY, "repositioning": false, "step_t": 0.0, "actual": Vector3.ZERO, "clearance": 1.4, "probe": prepared_probes[spec[1]], "contact_sample": {}, "contact_anchor": Vector3.ZERO})
+
+func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
+	pose_blend = dragon.ground_blend
+	if dragon.locomotion_state == dragon.LocomotionState.LANDING:
+		pose_blend = maxf(pose_blend,1.0-smoothstep(5.0,12.0,dragon.ground_proximity))
+	elif dragon.locomotion_state == dragon.LocomotionState.GROUNDED:
+		pose_blend = 1.0
+	prepare(dragon,sk)
+	if limbs.is_empty(): _configure(sk)
+	debug_contacts.clear()
+	debug_errors.clear()
+	var moving: bool = (absf(dragon.ground_motion_speed) > 0.12 or absf(dragon.smoothed_turn_rate) > 0.03) and dragon.locomotion_state == dragon.LocomotionState.GROUNDED
+	var requested_step: bool = absf(dragon.manual_move_input)>0.01 or absf(dragon.manual_turn_input)>0.01 if dragon.manual_input_override else (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_D) or (not dragon.head_aim_active and (Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_RIGHT))))
+	var heading := Basis(Vector3.UP, dragon.rotation.y)
+	var forward := -heading.z * signf(dragon.ground_motion_speed)
+	# A previous idle correction must not count as the first requested walking
+	# cycle. Queue every foot once at translation start/reversal, before solves.
+	if not recovery and planning_frame!=Engine.get_physics_frames():
+		planning_frame=Engine.get_physics_frames()
+		var move_direction:=int(signf(dragon.ground_motion_speed)) if requested_step and absf(dragon.ground_motion_speed)>.12 and dragon.locomotion_state==dragon.LocomotionState.GROUNDED else 0
+		if move_direction!=0 and move_direction!=planned_move_direction:
+			for pending in limbs:
+				pending.last_swing_cycle=int(floor(dragon.walk_cycle_phase/TAU+float(pending.phase)))-1
+				pending.startup_pending=true
+		planned_move_direction=move_direction
+	# Advance/complete every primary clock before choosing a support owner.
+	# Completing the last array entry must not delay the first one a frame.
+	var plan_frame:=Engine.get_physics_frames()
+	if not recovery:
+		for candidate in limbs:
+			var cycle:float=dragon.walk_cycle_phase/TAU+float(candidate.phase)
+			if int(candidate.get("swing_clock_frame",-1))!=plan_frame:
+				var elapsed_s:=float(maxi(1,plan_frame-int(candidate.get("swing_clock_frame",plan_frame-1))))/Engine.physics_ticks_per_second
+				var advance:=maxf(0,cycle-float(candidate.get("swing_clock_cycle",cycle)))
+				if candidate.swinging and not candidate.repositioning and bool(candidate.get("startup_step",false)):
+					advance=maxf(advance,dragon.walk_speed/3.5*elapsed_s)
+				if candidate.swinging and not candidate.repositioning:
+					advance/=float(candidate.get("startup_distance_scale",1.0))
+				if advance>0: candidate.swing_clock_rate=advance/elapsed_s
+				if candidate.swinging and not candidate.repositioning:
+					candidate.swing_elapsed=float(candidate.get("swing_elapsed",0))+(advance if advance>0 else float(candidate.get("swing_clock_rate",0))*elapsed_s)
+				candidate.swing_clock_frame=plan_frame
+				candidate.swing_clock_cycle=cycle
+			if candidate.swinging and not candidate.repositioning and float(candidate.get("swing_elapsed",0))>=.24:
+				candidate.swinging=false
+				candidate.planted=candidate.finish
+				candidate.swing_elapsed=0.0
+			if candidate.repositioning:
+				if int(candidate.get("reposition_frame",-1))!=plan_frame:
+					candidate.step_t=minf(1,candidate.step_t+float(maxi(1,plan_frame-int(candidate.get("reposition_frame",plan_frame-1))))/Engine.physics_ticks_per_second/.18)
+					candidate.reposition_frame=plan_frame
+				if candidate.step_t>=1:
+					candidate.planted=candidate.finish
+					candidate.repositioning=false
+					candidate.swinging=false
+					candidate.last_swing_cycle=int(floor(cycle))
+					candidate.swing_elapsed=0.0
+	var sequential_support: bool = dragon.locomotion_state==dragon.LocomotionState.GROUNDED
+	var grounded_step_ready: bool = sequential_support and dragon.ground_blend>.99
+	var swing_owner := -1
+	for candidate in limbs:
+		if candidate.swinging or candidate.repositioning:
+			swing_owner=int(candidate.end)
+			break
+	var planned_start := -1
+	var oldest_start := 2147483647
+	if not recovery and swing_owner<0 and moving and grounded_step_ready:
+		for candidate in limbs:
+			var cycle:float=dragon.walk_cycle_phase/TAU+float(candidate.phase)
+			var started:int=int(candidate.get("last_swing_started_frame",-1))
+			if int(candidate.get("last_swing_cycle",-999))!=int(floor(cycle)) and started<oldest_start:
+				planned_start=int(candidate.end)
+				oldest_start=started
+	for limb in limbs:
+		# Continue rear support from its published articulated branch. Starting each
+		# FABRIK solve from the next imported flight frame can invert the hock when
+		# LANDING becomes GROUNDED, despite an unchanged ankle target.
+		var rear: bool = int(limb.end) in [8,23]
+		limb.actor_basis=dragon.global_basis
+		if rear and dragon.locomotion_state == dragon.LocomotionState.LANDING:
+			limb.support_transition=true
+		if rear and bool(limb.get("support_transition",false)):
+			if int(limb.get("support_frame",-1))!=Engine.get_physics_frames():
+				limb.support_frame=Engine.get_physics_frames()
+				var anchors := {}
+				for b in limb.chain:
+					anchors[b]=limb.support_rotations[b] if limb.has("support_rotations") else (dragon.global_basis.inverse()*sk.global_basis*sk.get_bone_global_pose(b).basis).get_rotation_quaternion()
+				limb.support_anchors=anchors
+				limb.support_body_basis=dragon.global_basis
+			limb.support_limited=false
+		var home: Vector3 = dragon.global_position + heading * limb.home
+		var hit := _ray(dragon, home)
+		if hit.is_empty():
+			continue
+		# Wrist/ankle joints sit above the toe/claw tips in this asset.
+		var clearance: float = limb.clearance
+		home.y = hit.position.y + clearance
+		var phase := fposmod(dragon.walk_cycle_phase / TAU + float(limb.phase), 1.0)
+		if recovery and limb.has("recovery_phase"): phase = limb.recovery_phase
+		var raw_cycle: float=dragon.walk_cycle_phase/TAU+float(limb.phase)
+		var frame:=Engine.get_physics_frames()
+		var swing_t:=clampf(float(limb.get("swing_elapsed",0))/.24,0,1)
+		var continuing_swing: bool=limb.swinging and not limb.repositioning and swing_t<1
+		var swing_now: bool=continuing_swing or (not recovery and int(limb.end)==planned_start)
+		if not limb.initialized:
+			if rear:
+				var origin: Vector3 = sk.get_bone_global_pose(limb.chain[0]).origin
+				var end_origin: Vector3 = sk.get_bone_global_pose(limb.end).origin
+				var axis: Vector3 = (end_origin-origin).normalized()
+				var knee: Vector3 = sk.get_bone_global_pose(limb.chain[1]).origin-origin
+				var branch: Vector3 = (knee-axis*knee.dot(axis)).normalized()
+				if not branch.is_zero_approx(): limb.pole_world=(sk.global_basis*branch).normalized()
+			limb.planted = home
+			limb.start = home
+			limb.finish = home
+			var foot_world := sk.global_basis * sk.get_bone_global_pose(limb.end).basis
+			var digit_sum := Vector3.ZERO
+			var digit_count := 0
+			for digit in sk.get_bone_count():
+				if sk.get_bone_parent(digit) == int(limb.end):
+					digit_sum += sk.to_global(sk.get_bone_global_pose(digit).origin)
+					digit_count += 1
+			var toe_direction := (digit_sum / maxf(1, digit_count) - sk.to_global(sk.get_bone_global_pose(limb.end).origin)).normalized()
+			var wanted_toes := (heading * Vector3(0,-0.15,-1)).normalized()
+			limb.foot_basis = Basis(Quaternion(toe_direction, wanted_toes)) * foot_world
+			limb.foot_yaw = dragon.rotation.y
+			limb.actual = home
+			limb.initialized = true
+		if swing_now and not limb.swinging:
+			swing_owner=int(limb.end)
+			limb.last_swing_started_frame=frame
+			limb.startup_step=bool(limb.get("startup_pending",false))
+			limb.startup_pending=false
+			limb.swing_elapsed=0.0
+			swing_t=0.0
+			limb.last_swing_cycle=int(floor(raw_cycle))
+			limb.start = limb.planted
+			limb.finish = home + forward * 1.32
+			var finish_hit := _ray(dragon, limb.finish)
+			if finish_hit:
+				limb.finish.y = finish_hit.position.y + clearance
+			# Every normal reach has the same foot speed as the nominal 3.5 m step.
+			limb.startup_distance_scale=maxf(1.0,(limb.finish as Vector3).distance_to(limb.start)/3.5)
+		var target: Vector3 = limb.planted
+		# A planted foot must lift before a pivot stretches the leg beyond its support.
+		if not recovery and (not sequential_support or (grounded_step_ready and swing_owner<0)) and planned_start<0 and not swing_now and not limb.repositioning and (limb.planted as Vector3).distance_to(home) > 2.3:
+			swing_owner=int(limb.end)
+			limb.last_swing_started_frame=frame
+			limb.repositioning = true
+			limb.step_t = 0.0
+			limb.reposition_frame=frame
+			limb.start = limb.actual
+			limb.finish = home + forward * 0.45
+			var corrective_hit := _ray(dragon, limb.finish)
+			if corrective_hit:
+				limb.finish.y = corrective_hit.position.y + clearance
+		if limb.repositioning:
+			var t: float = limb.step_t
+			swing_t=t
+			target = (limb.start as Vector3).lerp(limb.finish, t * t * (3.0 - 2.0 * t))
+			target.y += sin(t * PI) * 0.42
+			swing_now = true
+		elif swing_now:
+			var t := swing_t
+			var smooth_t := t * t * (3.0 - 2.0 * t)
+			target = (limb.start as Vector3).lerp(limb.finish, smooth_t)
+			target.y += sin(t * PI) * 0.65
+			limb.planted = limb.finish
+		elif not moving and (limb.planted as Vector3).distance_to(home) > 1.8:
+			# Reposition when turning in place; avoid stretching limbs through the body.
+			limb.planted = (limb.planted as Vector3).lerp(home, 0.0 if recovery else 0.12)
+			target = limb.planted
+		if swing_now and not recovery:
+			var yaw_step := clampf(wrapf(dragon.rotation.y-float(limb.get("foot_yaw",dragon.rotation.y)),-PI,PI),-deg_to_rad(4),deg_to_rad(4))
+			limb.foot_basis = Basis(Vector3.UP,yaw_step)*limb.foot_basis
+			limb.foot_yaw = float(limb.get("foot_yaw",dragon.rotation.y))+yaw_step
+		limb.swinging = swing_now
+		if recovery and limb.has("recovery_target"): target = limb.recovery_target
+		if int(limb.get("primary_frame",-1))!=frame:
+			var target_jump: float=target.distance_to(limb.get("previous_primary_target",target))
+			limb.primary_step_world=target_jump
+			if OS.get_cmdline_user_args().has("--leg-diagnostic") and target_jump>.5: print("PRIMARY_JUMP frame=",frame," end=",limb.end," jump=",target_jump," phase=",phase," swing_t=",swing_t," swing=",swing_now," was=",limb.swinging," reposition=",limb.repositioning," startup=",limb.get("startup_step",false)," scale=",limb.get("startup_distance_scale",1.0)," target=",target," previous=",limb.get("previous_primary_target",target)," start=",limb.start," finish=",limb.finish," planted=",limb.planted)
+			limb.primary_frame=frame
+			limb.previous_primary_target=target
+		var actual := sk.to_global(sk.get_bone_global_pose(limb.end).origin)
+		var blend_target := actual.lerp(target, pose_blend)
+		_solve_limb(sk, limb.chain, limb.end, sk.to_local(blend_target),limb)
+		# Preserve authored foot orientation rather than inheriting every knee rotation.
+		var end_pose := sk.get_bone_global_pose(limb.end)
+		var desired_basis: Basis = sk.global_basis.inverse() * limb.foot_basis
+		var parent := sk.get_bone_parent(limb.end)
+		var parent_basis := sk.get_bone_global_pose(parent).basis.orthonormalized()
+		var local_basis := parent_basis.inverse() * desired_basis.orthonormalized()
+		sk.set_bone_pose_rotation(limb.end, sk.get_bone_pose_rotation(limb.end).slerp(local_basis.get_rotation_quaternion(), pose_blend))
+		# Calibrate from the actual claw skin after orientation, then solve its surface contact.
+		# An ankle target may be exact while the visible toes still float or penetrate.
+		if pose_blend > 0.01:
+			for correction_pass in 3:
+				var lowest := INF
+				for point in limb.probe.coordinates(sk):
+					# The support ray supplies the collider triangle's plane; skin contacts use it directly.
+					# Independent validation still raycasts each claw vertex against the real collider.
+					var plane_clearance: float = (point - hit.position).dot(hit.normal) / maxf(hit.normal.y,0.1)
+					if is_instance_valid(dragon.landscape) and dragon.landscape.has_method("ground_height"):
+						# The landscape exposes the exact same piecewise triangles as its collider.
+						# A single support plane misses a cell boundary under a mixed foot/hock vertex.
+						var local: Vector3 = dragon.landscape.to_local(point)
+						var surface: Vector3 = dragon.landscape.to_global(Vector3(local.x,dragon.landscape.ground_height(local.x,local.z),local.z))
+						plane_clearance = point.y-surface.y
+					lowest = minf(lowest,plane_clearance)
+				if OS.get_cmdline_user_args().has("--claw-diagnostic") and lowest<-.1:
+					print("CLAW_SOLVE frame=",Engine.get_physics_frames()," end=",limb.end," blend=",dragon.ground_blend," pass=",correction_pass," lowest=",lowest," target=",target," actual=",sk.to_global(sk.get_bone_global_pose(limb.end).origin)," clearance=",limb.clearance," recovery=",recovery)
+				if is_inf(lowest): break
+				var wanted_clearance := 0.025 + (sin(swing_t * PI) * (0.42 if limb.repositioning else 0.65) if swing_now else 0.0)
+				var correction := wanted_clearance - lowest
+				if dragon.locomotion_state == dragon.LocomotionState.LANDING: correction = maxf(0.0,correction)
+				if absf(correction) < 0.006: break
+				# Stance correction moves vertically; the planted horizontal contact remains locked.
+				var previous_target_y := target.y
+				target.y = sk.to_global(sk.get_bone_global_pose(limb.end).origin).y+correction
+				var target_change := target.y-previous_target_y
+				limb.clearance += target_change
+				limb.planted.y += target_change
+				limb.finish.y += target_change
+				limb.start.y += target_change
+				_solve_limb(sk, limb.chain, limb.end, sk.to_local(target),limb)
+				parent_basis = sk.get_bone_global_pose(parent).basis.orthonormalized()
+				local_basis = parent_basis.inverse() * desired_basis.orthonormalized()
+				sk.set_bone_pose_rotation(limb.end, local_basis.get_rotation_quaternion())
+		if swing_now:
+			limb.contact_sample = {}
+		elif dragon.ground_blend > 0.99:
+			for anchor_pass in 3:
+				var contact_points: Array = limb.probe.points(sk) if limb.contact_sample.is_empty() else [{"position":limb.probe.point(sk,limb.contact_sample),"sample":limb.contact_sample}]
+				if limb.contact_sample.is_empty():
+					var lowest_point: Dictionary = {}
+					for point in contact_points:
+						if lowest_point.is_empty() or point.position.y < lowest_point.position.y: lowest_point = point
+					if not lowest_point.is_empty():
+						limb.contact_sample = lowest_point.sample
+						limb.contact_anchor = lowest_point.position
+				for point in contact_points:
+					if int(point.sample.index) != int(limb.contact_sample.get("index",-1)) or point.sample.mesh != limb.contact_sample.get("mesh",""): continue
+					var offset: Vector3 = limb.contact_anchor - point.position
+					offset.y = 0
+					if offset.length() < 0.002: break
+					target += offset
+					limb.planted += offset
+					_solve_limb(sk, limb.chain, limb.end, sk.to_local(target),limb)
+					parent_basis = sk.get_bone_global_pose(parent).basis.orthonormalized()
+					local_basis = parent_basis.inverse() * desired_basis.orthonormalized()
+					sk.set_bone_pose_rotation(limb.end,local_basis.get_rotation_quaternion())
+					break
+		if pose_blend>.01:
+			for final_pass in 3:
+				var minimum := INF
+				for point in limb.probe.coordinates(sk):
+					var below: float = (point-hit.position).dot(hit.normal)/maxf(hit.normal.y,.1)
+					if is_instance_valid(dragon.landscape) and dragon.landscape.has_method("ground_height"):
+						var lp: Vector3 = dragon.landscape.to_local(point)
+						below = point.y-dragon.landscape.to_global(Vector3(lp.x,dragon.landscape.ground_height(lp.x,lp.z),lp.z)).y
+					minimum = minf(minimum,below)
+				if minimum>=.019: break
+				var correction := .025-minimum
+				target.y = sk.to_global(sk.get_bone_global_pose(limb.end).origin).y+correction
+				limb.planted.y += correction
+				limb.finish.y += correction
+				limb.start.y += correction
+				limb.clearance += correction
+				_solve_limb(sk,limb.chain,limb.end,sk.to_local(target),limb)
+				parent_basis = sk.get_bone_global_pose(parent).basis.orthonormalized()
+				local_basis = parent_basis.inverse()*desired_basis.orthonormalized()
+				sk.set_bone_pose_rotation(limb.end,local_basis.get_rotation_quaternion())
+		if OS.get_cmdline_user_args().has("--claw-diagnostic"):
+			var final_low := INF
+			for point in limb.probe.coordinates(sk):
+				var lp: Vector3 = dragon.landscape.to_local(point)
+				final_low = minf(final_low,lp.y-dragon.landscape.ground_height(lp.x,lp.z))
+			if final_low<-.05: print("CLAW_FINAL frame=",Engine.get_physics_frames()," end=",limb.end," poseblend=",pose_blend," min=",final_low," target=",target," recovery=",recovery)
+		limb.actual = sk.to_global(sk.get_bone_global_pose(limb.end).origin)
+		if rear:
+			var rotations := {}
+			for b in limb.chain:
+				rotations[b]=(dragon.global_basis.inverse()*sk.global_basis*sk.get_bone_global_pose(b).basis).get_rotation_quaternion()
+			limb.support_rotations=rotations
+			# A converged solve does not end touchdown: the stabilizer still moves
+			# on subsequent idle frames. Keep the published stance budget until
+			# this limb actually lifts into its first walking swing.
+			if dragon.locomotion_state == dragon.LocomotionState.GROUNDED and dragon.ground_blend>.99 and swing_now and requested_step and not bool(limb.get("support_limited",false)):
+				limb.support_transition=false
+		debug_contacts.append(target)
+		debug_errors.append(sk.to_global(sk.get_bone_global_pose(limb.end).origin).distance_to(target))
+
+func _ray(dragon: Node3D, point: Vector3) -> Dictionary:
+	var query := PhysicsRayQueryParameters3D.create(point + Vector3.UP * 12.0, point + Vector3.DOWN * 18.0, 1)
+	query.exclude = [dragon.get_rid()]
+	return dragon.get_world_3d().direct_space_state.intersect_ray(query)
+
+# A two-link elbow has one redundant bend plane. Swivel that plane about the
+# hip/wrist line instead of carrying a planted wrist with a local-pose rollback.
+func recover_fore_stance(dragon: Node3D, sk: Skeleton3D, limb: Dictionary) -> bool:
+	if limb.chain.size()!=2 or limb.swinging or limb.contact_sample.is_empty(): return false
+	var bones:Array=limb.chain.duplicate()
+	bones.append(limb.end)
+	var rotations:Dictionary={}
+	for bone in bones:rotations[bone]=sk.get_bone_pose_rotation(bone)
+	var original_global:Dictionary={}
+	for bone in limb.chain:original_global[bone]=(sk.global_basis*sk.get_bone_global_pose(bone).basis).orthonormalized().get_rotation_quaternion()
+	var hip:Vector3=sk.get_bone_global_pose(bones[0]).origin
+	var knee:Vector3=sk.get_bone_global_pose(bones[1]).origin
+	var wrist:Vector3=sk.get_bone_global_pose(limb.end).origin
+	var wrist_rotation:Quaternion=sk.get_bone_global_pose(limb.end).basis.orthonormalized().get_rotation_quaternion()
+	var axis:Vector3=(wrist-hip).normalized()
+	if axis.is_zero_approx(): return false
+	var lengths:PackedFloat32Array=PackedFloat32Array([hip.distance_to(knee),knee.distance_to(wrist)])
+	var frame:=Engine.get_physics_frames()
+	if int(limb.get("fore_limit_frame",-1))!=frame:
+		limb.fore_limit_frame=frame
+		limb.fore_limit_rotations=limb.get("fore_published",{}).duplicate()
+	var published:Dictionary=limb.fore_limit_rotations
+	for step in range(1,17):
+		for direction in [-1,1]:
+			for bone in bones:sk.set_bone_pose_rotation(bone,rotations[bone])
+			var wanted_knee:Vector3=hip+(knee-hip).rotated(axis,deg_to_rad(float(step)*.25*direction))
+			var upper_pose:Transform3D=sk.get_bone_global_pose(bones[0])
+			var upper_rotation:Quaternion=Quaternion((knee-hip).normalized(),(wanted_knee-hip).normalized())*upper_pose.basis.orthonormalized().get_rotation_quaternion()
+			var upper_parent:Quaternion=sk.get_bone_global_pose(sk.get_bone_parent(bones[0])).basis.orthonormalized().get_rotation_quaternion()
+			sk.set_bone_pose_rotation(bones[0],upper_parent.inverse()*upper_rotation)
+			var lower_pose:Transform3D=sk.get_bone_global_pose(bones[1])
+			var current_wrist:Vector3=sk.get_bone_global_pose(limb.end).origin
+			var lower_rotation:Quaternion=Quaternion((current_wrist-lower_pose.origin).normalized(),(wrist-lower_pose.origin).normalized())*lower_pose.basis.orthonormalized().get_rotation_quaternion()
+			var lower_parent:Quaternion=sk.get_bone_global_pose(bones[0]).basis.orthonormalized().get_rotation_quaternion()
+			sk.set_bone_pose_rotation(bones[1],lower_parent.inverse()*lower_rotation)
+			var wrist_parent:Quaternion=sk.get_bone_global_pose(bones[1]).basis.orthonormalized().get_rotation_quaternion()
+			sk.set_bone_pose_rotation(limb.end,wrist_parent.inverse()*wrist_rotation)
+			var valid:=true
+			for bone in limb.chain:
+				var actual:Quaternion=(sk.global_basis*sk.get_bone_global_pose(bone).basis).orthonormalized().get_rotation_quaternion()
+				var previous:Quaternion=published.get(bone,original_global[bone])
+				if rad_to_deg(previous.angle_to(actual))>4.001:valid=false
+			var actual_hip:Vector3=sk.get_bone_global_pose(bones[0]).origin
+			var actual_knee:Vector3=sk.get_bone_global_pose(bones[1]).origin
+			var actual_wrist:Vector3=sk.get_bone_global_pose(limb.end).origin
+			var scale:float=sk.global_basis.x.length()
+			if (absf(actual_hip.distance_to(actual_knee)-lengths[0])>0.0001/scale or absf(actual_knee.distance_to(actual_wrist)-lengths[1])>0.0001/scale or actual_wrist.distance_to(wrist)>0.0001/scale):valid=false
+			var contact_error:Vector3=limb.probe.point(sk,limb.contact_sample)-limb.contact_anchor
+			if Vector2(contact_error.x,contact_error.z).length()>.015:valid=false
+			if not valid:continue
+			dragon.wing_contact.sample_final(dragon,sk)
+			if not dragon.wing_contact._body_contact(dragon):
+				var pole:Vector3=wanted_knee-hip
+				pole=(pole-axis*pole.dot(axis)).normalized()
+				limb.pole_world=(sk.global_basis*pole).normalized()
+				limb.pole_frame=Engine.get_process_frames()
+				if OS.get_cmdline_user_args().has("--leg-diagnostic"):print("FORE_STANCE_RECOVERY frame=",frame," end=",limb.end," angle=",float(step)*.25*direction," anchor_error=",Vector2(contact_error.x,contact_error.z).length())
+				return true
+	for bone in bones:sk.set_bone_pose_rotation(bone,rotations[bone])
+	dragon.wing_contact.sample_final(dragon,sk)
+	return false
+
+func _solve_limb(sk: Skeleton3D, chain: Array, end: int, target: Vector3, limb: Dictionary) -> void:
+	var joints := PackedVector3Array()
+	for bone in chain: joints.append(sk.get_bone_global_pose(int(bone)).origin)
+	joints.append(sk.get_bone_global_pose(end).origin)
+	var lengths := PackedFloat32Array()
+	var total := 0.0
+	for index in chain.size():
+		var length := joints[index].distance_to(joints[index+1])
+		lengths.append(length)
+		total += length
+	var origin := joints[0]
+	var axis := (target-origin).normalized()
+	var up := (sk.global_basis.inverse()*Vector3.UP).normalized()
+	var projected_up := up-axis*up.dot(axis)
+	var side := axis.cross(up).normalized()
+	if limb.has("pole_world"):
+		var old: Vector3 = sk.global_basis.inverse()*limb.pole_world
+		if side.dot(old)<0: side = -side
+	if side.is_zero_approx(): side = (Vector3.FORWARD-axis*Vector3.FORWARD.dot(axis)).normalized()
+	# A horizontal perpendicular bias removes the vertical singularity without
+	# choosing a downward elbow or changing any bone length.
+	var pole := (projected_up+side*.35*(1.0-smoothstep(.05,.35,projected_up.length()))).normalized()
+	if limb.has("pole_world"):
+		var previous: Vector3 = sk.global_basis.inverse()*limb.pole_world
+		previous = (previous-axis*previous.dot(axis)).normalized()
+		if not previous.is_zero_approx() and (end in [8,23] or previous.dot(up)>=0):
+			# Near a vertical root/foot line, UP provides no stable elbow side.
+			# Retain the previous branch and budget one angular step per render.
+			if projected_up.length()<.1 or int(limb.get("pole_frame",-1))==Engine.get_process_frames():
+				pole = previous
+			else:
+				var angle := previous.signed_angle_to(pole,axis)
+				pole = previous.rotated(axis,clampf(angle,-deg_to_rad(4),deg_to_rad(4))).normalized()
+	if pole.is_zero_approx(): pole = (Vector3.FORWARD-axis*Vector3.FORWARD.dot(axis)).normalized()
+	limb.pole_world = (sk.global_basis*pole).normalized()
+	limb.pole_frame = Engine.get_process_frames()
+	# The original bone lengths support a continuous elbow/hock arc preserving
+	# its published bend direction.
+	var accumulated := 0.0
+	for index in range(1,chain.size()):
+		accumulated += lengths[index-1]
+		var fraction := accumulated/maxf(total,0.000001)
+		var arc := origin.lerp(target,fraction)+pole*(total*.35*sin(fraction*PI))
+		joints[index] = joints[index].lerp(arc,smoothstep(0.0,1.0,pose_blend))
+	for iteration in 32:
+		joints[-1] = target
+		for index in range(chain.size()-1,-1,-1):
+			joints[index] = joints[index+1]+(joints[index]-joints[index+1]).normalized()*lengths[index]
+		joints[0] = origin
+		for index in chain.size():
+			joints[index+1] = joints[index]+(joints[index+1]-joints[index]).normalized()*lengths[index]
+		if joints[-1].distance_to(target)<0.004: break
+	for index in chain.size():
+		var bone: int = chain[index]
+		var child: int = int(chain[index+1]) if index+1<chain.size() else end
+		var pose := sk.get_bone_global_pose(bone)
+		var current := sk.get_bone_global_pose(child).origin-pose.origin
+		var wanted := joints[index+1]-joints[index]
+		if current.length_squared()<0.00000001 or wanted.length_squared()<0.00000001: continue
+		var correction := Quaternion(current.normalized(),wanted.normalized())
+		var global_rotation := correction*pose.basis.orthonormalized().get_rotation_quaternion()
+		# Keep the published twist while aiming the unchanged original child axis.
+		# Imported flight roll is unrelated to the terrestrial knee/hock direction.
+		if end in [8,23] and limb.get("support_rotations",{}).has(bone):
+			var previous_actor: Quaternion=limb.support_rotations[bone]
+			var original_child_axis: Vector3=(pose.basis.inverse()*current).normalized()
+			var previous_axis: Vector3=(Basis(previous_actor)*original_child_axis).normalized()
+			var wanted_axis: Vector3=((limb.actor_basis as Basis).inverse()*sk.global_basis*wanted).normalized()
+			var transported: Quaternion=Quaternion(previous_axis,wanted_axis)*previous_actor
+			global_rotation=(sk.global_basis.inverse()*(limb.actor_basis as Basis)*Basis(transported)).orthonormalized().get_rotation_quaternion()
+
+		# All calibration passes share the same published-frame budget; a pass
+		# must not add another angular step or discard the prepared rear branch.
+		if bool(limb.get("support_transition",false)) and limb.get("support_anchors",{}).has(bone):
+			var previous: Quaternion = limb.support_anchors[bone]
+			var wanted_rotation: Quaternion = ((limb.support_body_basis as Basis).inverse()*sk.global_basis*Basis(global_rotation)).get_rotation_quaternion()
+			var angle := previous.angle_to(wanted_rotation)
+			# Leave angular room for the torso's simultaneous landing rotation.
+			limb.support_limited=bool(limb.get("support_limited",false)) or angle>deg_to_rad(3.0)
+			var published: Quaternion = previous.slerp(wanted_rotation,minf(1.0,deg_to_rad(3.0)/maxf(angle,.000001)))
+			global_rotation=(sk.global_basis.inverse()*(limb.support_body_basis as Basis)*Basis(published)).get_rotation_quaternion()
+		var parent := sk.get_bone_parent(bone)
+		var parent_rotation := sk.get_bone_global_pose(parent).basis.orthonormalized().get_rotation_quaternion()
+		sk.set_bone_pose_rotation(bone,parent_rotation.inverse()*global_rotation)

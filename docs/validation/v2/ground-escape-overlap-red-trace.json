@@ -1,0 +1,338 @@
+[
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 0,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 30,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 60,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 90,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 120,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 150,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 0,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 30,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 60,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 90,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 120,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 150,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 0,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "left",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 30,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "left",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 60,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "left",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 90,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "left",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 0,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 30,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 60,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 90,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 120,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 150,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 180,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "nonconvex_overlap_requires_clearance"
+   }
+  ],
+  "frame": 210,
+  "position": "(214.4754, 28.18995, 195.358)",
+  "stage": "right",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ }
+]

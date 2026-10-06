@@ -1,0 +1,16 @@
+{
+  "scripts/dragon_controller.gd": "72ba92ce1745d2b838f2ece3064a658e454362d5c6c3911f96aa0ccde9ef33c9",
+  "scripts/dragon_ground_pose.gd": "258ea0da74f81a86a7456ce624ad003cee6d6f4d779e213c4aee85928fc5d1e2",
+  "scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+  "scripts/dragon_wing_contact.gd": "b658afdfd6dd9875f13ecf07951abcab0dfda05d4f6f685e2a0f538eb4709c74",
+  "scripts/dragon_ground_contact.gd": "d32898ac30ea9d3abb9c1fb40dac3bcbd2c30c7ad51386144c3eb215f68254e0",
+  "scripts/dragon_head_pose.gd": "88ad9052c82bb2ff89bd8cf2170195cfcd470be739a2801c696ff422a198fbea",
+  "scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+  "scripts/anatomy_descent_compact_repro.gd": "e7b07accbd37da5f2eadba024f89b0dbd0cfee8a86a0746b3a59f6f463d3fd93",
+  "scripts/test_dragon_anatomy.gd": "28ae6595ef910f6f268ac7154e969485338a20d58206129b3f34837c7b962e6a",
+  "scripts/dragon_wing_extrema.json": "eb13212defa06dff530e0a8a82f96c063359ef45eb7d007b50ef1a5db8509bd6",
+  "docs/validation/v2/anatomy-hull-verifier.py": "c9b7c646e2932adcec8fe55936136b788a1da438fd4c90cd717be3735b4a6585",
+  "scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+  "assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+  "assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc"
+}

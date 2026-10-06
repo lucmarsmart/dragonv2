@@ -1,0 +1,10 @@
+{
+  "method": "reconstructed SHA from recorded profiling patches; unchanged head/ground/probe from native red",
+  "sha256": {
+    "scripts/dragon_controller.gd": "8f7cded1c8eddd081fa4c8a16ceb883d6f1e2b7fc9d728b3ea3afab8a3a24ede",
+    "scripts/dragon_wing_contact.gd": "0f37d3ec84a957869daa12a44c4cca6f4adb8f4cc6bd567e1d0611292dc00025",
+    "scripts/dragon_ground_pose.gd": "7ce7d5a621a69b5a306039fe254230e076b74553b15eb6613ad0df6a8edbd443",
+    "scripts/dragon_head_pose.gd": "121826b3644dfc11e75856a3dc840cfbc870c0ba38136e46757383cb13fca93c",
+    "scripts/dragon_pose_probe.gd": "8786a7c7fab61cdf04365620b65b588d6934cb091e193ab12bdf80d341901344"
+  }
+}

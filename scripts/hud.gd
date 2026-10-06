@@ -1,129 +1,195 @@
 extends CanvasLayer
 
 @export var dragon: CharacterBody3D
-
 @onready var speed_label: Label = $VBoxContainer/SpeedLabel
 @onready var alt_label: Label = $VBoxContainer/AltLabel
 @onready var state_label: Label = $VBoxContainer/StateLabel
+@onready var breath_label: Label = $VBoxContainer/BreathLabel
 @onready var controls_panel: PanelContainer = $ControlsPanel
-
-# Botones de modo interactivos en pantalla
-@onready var btn_normal: Button = get_node_or_null("ActionBar/HBoxContainer/BtnNormal")
-@onready var btn_climb: Button = get_node_or_null("ActionBar/HBoxContainer/BtnClimb")
-@onready var btn_glide: Button = get_node_or_null("ActionBar/HBoxContainer/BtnGlide")
-@onready var btn_dive: Button = get_node_or_null("ActionBar/HBoxContainer/BtnDive")
-@onready var btn_land: Button = get_node_or_null("ActionBar/HBoxContainer/BtnLand")
+@onready var action_bar: PanelContainer = $ActionBar
+@onready var buttons: HBoxContainer = $ActionBar/HBoxContainer
+@onready var btn_normal: Button = $ActionBar/HBoxContainer/BtnNormal
+@onready var btn_climb: Button = $ActionBar/HBoxContainer/BtnClimb
+@onready var btn_glide: Button = $ActionBar/HBoxContainer/BtnGlide
+@onready var btn_dive: Button = $ActionBar/HBoxContainer/BtnDive
+@onready var btn_land: Button = $ActionBar/HBoxContainer/BtnLand
+@onready var btn_fire: Button = $ActionBar/HBoxContainer/BtnFire
+var breath: DragonBreath
+var btn_aim: Button
+var reticle: Label
+var aim_preview_point := Vector3.ZERO
+var aim_preview_distance := 26.0
+var aim_preview_collider_id := 0
+var aim_preview_tick := -1
+const INK := Color(0.035,0.055,0.065,0.87)
+const TEXT := Color(0.95,0.94,0.85)
+const GOLD := Color(1.0,0.76,0.36)
 
 func _ready() -> void:
-	if btn_normal:
-		btn_normal.pressed.connect(_on_normal_pressed)
-	if btn_climb:
-		btn_climb.pressed.connect(_on_climb_pressed)
-	if btn_glide:
-		btn_glide.pressed.connect(_on_glide_pressed)
-	if btn_dive:
-		btn_dive.pressed.connect(_on_dive_pressed)
-	if btn_land:
-		btn_land.pressed.connect(_on_land_pressed)
+	breath = dragon.get_node("DragonBreath") as DragonBreath
+	btn_aim = Button.new()
+	btn_aim.name = "BtnAim"
+	btn_aim.text = "ATAQUE [T]"
+	buttons.add_child(btn_aim)
+	btn_aim.pressed.connect(func():
+		# Share the controller's one-pulse transition for button and keyboard.
+		var event := InputEventKey.new()
+		event.keycode = KEY_T
+		event.physical_keycode = KEY_T
+		event.pressed = true
+		Input.parse_input_event(event)
+		var release_event := InputEventKey.new()
+		release_event.keycode = KEY_T
+		release_event.physical_keycode = KEY_T
+		release_event.pressed = false
+		Input.parse_input_event(release_event))
+	reticle = Label.new()
+	reticle.text = "+"
+	reticle.add_theme_font_size_override("font_size",28)
+	reticle.add_theme_color_override("font_color",GOLD)
+	reticle.add_theme_constant_override("outline_size",4)
+	reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(reticle)
+	btn_normal.pressed.connect(dragon.trigger_normal)
+	btn_climb.pressed.connect(dragon.trigger_climb)
+	btn_glide.pressed.connect(dragon.toggle_glide)
+	btn_dive.pressed.connect(dragon.toggle_dive)
+	btn_land.pressed.connect(dragon.toggle_land_takeoff)
+	btn_fire.button_down.connect(func(): breath.set_firing(true))
+	btn_fire.button_up.connect(func(): breath.set_firing(false))
+	var panel := _box(INK, Color(0.35,0.4,0.38,0.55))
+	action_bar.add_theme_stylebox_override("panel", panel)
+	controls_panel.add_theme_stylebox_override("panel", panel)
+	for button: Button in buttons.get_children():
+		button.custom_minimum_size = Vector2(120,48)
+		button.add_theme_font_size_override("font_size",14)
+		button.add_theme_stylebox_override("normal", _box(Color(0.075,0.105,0.11,0.95), Color(0.28,0.34,0.32)))
+		button.add_theme_stylebox_override("hover", _box(Color(0.14,0.20,0.19,1), GOLD))
+		button.add_theme_stylebox_override("pressed", _box(Color(0.23,0.27,0.18,1), GOLD))
+		button.add_theme_stylebox_override("focus", _box(Color(0,0,0,0), GOLD, 2))
+		button.add_theme_color_override("font_color", TEXT)
+		button.add_theme_color_override("font_disabled_color", Color(0.53,0.58,0.57))
+		button.add_theme_stylebox_override("disabled", _box(Color(0.05,0.07,0.075,0.8), Color(0.17,0.21,0.22)))
+	for label: Label in $VBoxContainer.get_children():
+		label.add_theme_color_override("font_color", TEXT)
+		label.add_theme_color_override("font_shadow_color", Color(0.015,0.02,0.02,0.95))
+		label.add_theme_constant_override("shadow_offset_x", 1)
+		label.add_theme_constant_override("shadow_offset_y", 2)
+		label.add_theme_constant_override("outline_size", 3)
+		label.add_theme_color_override("font_outline_color", Color(0.015,0.025,0.03,0.7))
+	btn_normal.text = "VUELO [W]"
+	btn_climb.text = "SUBIR [ESP]"
+	btn_glide.text = "PLANEAR [G]"
+	btn_dive.text = "PICADA [C]"
+	btn_fire.text = "FUEGO [F]"
+	$ControlsPanel/MarginContainer/HelpLabel.add_theme_color_override("font_color", TEXT)
+	$HintLabel.add_theme_color_override("font_color", TEXT)
+	$HintLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
+	$HintLabel.add_theme_constant_override("shadow_offset_y",2)
+	$HintLabel.text = "T activa/desactiva ataque · W/S mover · Ratón apuntar y girar · Clic izquierdo fuego · L aterrizar/despegar · H ayuda · P pausa"
+	$ControlsPanel/MarginContainer/HelpLabel.text = "ATAQUE\nPulsa T una vez para entrar o salir; no hace falta mantenerla\nW/S avanzar/retroceder · Ratón apuntar y girar · Clic izquierdo fuego\nLa cabeza apunta libre hasta su límite; al seguir moviendo el ratón gira el cuerpo\nCámara sobre la cabeza en tierra y durante ataque en vuelo\n\nVUELO\nW/Shift acelerar · S frenar · Espacio/R subir · C/Ctrl picada · G planear\nL aterrizar/cancelar/despegar\n\nOTROS CONTROLES\nA/D girar · Flechas apuntar · F exhalar · Shift correr en tierra\n\nCÁMARA Y MISIÓN\nV/1–4 vista · Botón derecho orbitar · Rueda zoom · E liberar nido\nH/F1 ayuda · P pausa · Esc alterna cursor"
+	get_viewport().size_changed.connect(_resize)
+	_resize()
+
+func _box(fill: Color, border: Color, width: int = 1) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = fill
+	style.set_border_width_all(width)
+	style.border_color = border
+	style.set_corner_radius_all(4)
+	style.content_margin_left = 8
+	style.content_margin_right = 8
+	return style
+
+func _resize() -> void:
+	var view_size := get_viewport().get_visible_rect().size
+	var bar_width := minf(1032, view_size.x - 32)
+	action_bar.offset_left = -bar_width / 2
+	action_bar.offset_right = bar_width / 2
+	buttons.add_theme_constant_override("separation", 6)
+	controls_panel.offset_left = -minf(720, view_size.x - 32)
+	controls_panel.offset_top = -minf(380, view_size.y - 150)
+
+func _input(event: InputEvent) -> void:
+	# SPACE is the flight control even after a mouse click gives a button focus.
+	# ENTER remains the explicit GUI activation key.
+	if event is InputEventKey and event.keycode == KEY_SPACE:
+		get_viewport().set_input_as_handled()
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and breath:
+		breath.set_firing(false)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_H or event.keycode == KEY_F1:
-			if controls_panel:
-				controls_panel.visible = !controls_panel.visible
+			controls_panel.visible = not controls_panel.visible
 
-func _on_normal_pressed() -> void:
-	if dragon and dragon.has_method("trigger_normal"):
-		dragon.trigger_normal()
+func _physics_process(_delta: float) -> void:
+	_update_aim_preview()
 
-func _on_climb_pressed() -> void:
-	if dragon and dragon.has_method("trigger_climb"):
-		dragon.trigger_climb()
-
-func _on_glide_pressed() -> void:
-	if dragon and dragon.has_method("toggle_glide"):
-		dragon.toggle_glide()
-
-func _on_dive_pressed() -> void:
-	if dragon and dragon.has_method("toggle_dive"):
-		dragon.toggle_dive()
-
-func _on_land_pressed() -> void:
-	if dragon and dragon.has_method("toggle_land_takeoff"):
-		dragon.toggle_land_takeoff()
+func _update_aim_preview() -> void:
+	if not dragon or not breath or not dragon.head_aim_active:
+		return
+	# Aim preview is independent of fuel/fire; the last fired impact is stale
+	# whenever the player turns the head or moves without exhaling.
+	var origin: Vector3 = breath.mouth_position
+	var direction: Vector3 = breath.breath_direction.normalized()
+	var ray := PhysicsRayQueryParameters3D.create(origin, origin + direction * breath.max_reach, 7)
+	ray.exclude = [dragon.get_rid()]
+	var hit := dragon.get_world_3d().direct_space_state.intersect_ray(ray)
+	aim_preview_point = hit.position if not hit.is_empty() else origin + direction * breath.max_reach
+	aim_preview_distance = origin.distance_to(aim_preview_point)
+	aim_preview_collider_id = int(hit.collider_id) if not hit.is_empty() else 0
+	aim_preview_tick = Engine.get_physics_frames()
 
 func _process(_delta: float) -> void:
 	if not dragon:
 		return
-		
-	var speed_kmh = dragon.current_speed * 3.6
-	var altitude = dragon.global_position.y
-	
-	if speed_label:
-		speed_label.text = "VELOCIDAD: %d km/h" % int(speed_kmh)
-	if alt_label:
-		alt_label.text = "ALTITUD: %d m" % int(altitude)
-		
-	if state_label:
-		var state_str = "VUELO NORMAL (CICLO SYMMONDS)"
-		var state_color = Color(0.4, 0.75, 1.0, 1.0)
-		
-		if "locomotion_state" in dragon:
-			match dragon.locomotion_state:
-				dragon.LocomotionState.GROUNDED:
-					if abs(dragon.current_speed) > 0.2:
-						state_str = "🐾 EN TIERRA: CAMINANDO (%s)" % ("CARRERA" if Input.is_key_pressed(KEY_SHIFT) else "PASO")
-					else:
-						state_str = "🐾 EN TIERRA: REPOSO (ALAS PLEGADAS)"
-					state_color = Color(0.4, 0.95, 0.4, 1.0)
-				dragon.LocomotionState.LANDING:
-					state_str = "⬇ ATERRIZANDO (FLARE / APROXIMACIÓN)"
-					state_color = Color(1.0, 0.7, 0.2, 1.0)
-				dragon.LocomotionState.TAKING_OFF:
-					state_str = "⬆ DESPEGANDO (IMPULSO VERTICAL)"
-					state_color = Color(0.3, 0.9, 1.0, 1.0)
-				dragon.LocomotionState.FLYING:
-					if "is_touching_ground" in dragon and dragon.is_touching_ground:
-						state_str = "RASANTE / CONTACTO CON TERRENO"
-						state_color = Color(1.0, 0.6, 0.2, 1.0)
-					elif "ground_proximity" in dragon and dragon.ground_proximity < 12.0:
-						state_str = "EFECTO SUELO (%d m) - COJÍN DE AIRE" % int(dragon.ground_proximity)
-						state_color = Color(0.3, 0.9, 0.6, 1.0)
-					elif "current_mode" in dragon:
-						match dragon.current_mode:
-							dragon.FlightMode.CLIMB:
-								state_str = "▲ SUBIENDO (CLIMB / TREPADA)"
-								state_color = Color(0.2, 0.95, 0.5, 1.0)
-							dragon.FlightMode.GLIDE:
-								state_str = "✈ MODO PLANEO (GLIDE)"
-								state_color = Color(1.0, 0.85, 0.25, 1.0)
-							dragon.FlightMode.DIVE:
-								state_str = "▼ EN PICADA (DIVE CONTROLADO)"
-								state_color = Color(1.0, 0.45, 0.35, 1.0)
-							dragon.FlightMode.BRAKE:
-								state_str = "■ FRENADO AERODINÁMICO (AIRBRAKE)"
-								state_color = Color(0.9, 0.3, 0.3, 1.0)
-							dragon.FlightMode.NORMAL:
-								state_str = "● VUELO NORMAL (CICLO SYMMONDS)"
-								state_color = Color(0.4, 0.75, 1.0, 1.0)
-					
-		state_label.text = "ESTADO: " + state_str
-		state_label.modulate = state_color
-
-	# Actualizar resaltado de los botones de la barra de acciones
-	if "current_mode" in dragon and "locomotion_state" in dragon:
-		var mode = dragon.current_mode
-		var is_ground = dragon.locomotion_state == dragon.LocomotionState.GROUNDED
-		var is_landing = dragon.locomotion_state == dragon.LocomotionState.LANDING
-		
-		if btn_normal:
-			btn_normal.modulate = Color(1.3, 1.3, 1.3) if (mode == dragon.FlightMode.NORMAL and not is_ground) else Color(0.75, 0.75, 0.75, 0.9)
-		if btn_climb:
-			btn_climb.modulate = Color(0.4, 1.4, 0.6) if mode == dragon.FlightMode.CLIMB else Color(0.75, 0.75, 0.75, 0.9)
-		if btn_glide:
-			btn_glide.modulate = Color(1.4, 1.25, 0.3) if mode == dragon.FlightMode.GLIDE else Color(0.75, 0.75, 0.75, 0.9)
-		if btn_dive:
-			btn_dive.modulate = Color(1.4, 0.5, 0.4) if mode == dragon.FlightMode.DIVE else Color(0.75, 0.75, 0.75, 0.9)
-		if btn_land:
-			btn_land.modulate = Color(1.4, 1.2, 0.4) if (is_ground or is_landing) else Color(0.75, 0.75, 0.75, 0.9)
-			btn_land.text = " ⬆ DESPEGAR [L] " if is_ground else " ⬇ ATERRIZAR [L] "
+	# Render pose may have completed after the physics callback. Project the
+	# same final mouth that emits the visible flame, including silent aiming.
+	_update_aim_preview()
+	var grounded: bool = dragon.locomotion_state == dragon.LocomotionState.GROUNDED
+	var landing: bool = dragon.locomotion_state == dragon.LocomotionState.LANDING
+	var taking_off: bool = dragon.locomotion_state == dragon.LocomotionState.TAKING_OFF
+	speed_label.text = "VELOCIDAD  %d km/h" % int(dragon.velocity.length() * 3.6)
+	alt_label.text = "SOBRE TERRENO  %d m" % int(maxf(0, dragon.ground_proximity - 3.5)) if dragon.ground_proximity < 900 else "ALTITUD  %d m" % int(dragon.global_position.y)
+	var state := "VUELO"
+	if grounded:
+		state = "CAMINANDO" if absf(dragon.current_speed) > 0.2 else "EN TIERRA"
+	elif landing:
+		state = "ATERRIZANDO · L para cancelar"
+	elif taking_off:
+		state = "DESPEGANDO"
+	else:
+		state = ["VUELO", "PLANEO", "ASCENSO", "PICADA", "FRENADO"][dragon.current_mode]
+	if dragon.recovery_message != "":
+		state += " · " + dragon.recovery_message
+	state_label.text = state
+	state_label.modulate = GOLD
+	breath_label.text = "FUEGO  %d%% · %s" % [roundi(breath.fuel * 100), "RECUPERANDO" if breath.exhausted else ("EXHALANDO" if breath.is_firing else "LISTO")]
+	breath_label.modulate = Color(1,0.66,0.33) if breath.is_firing else TEXT
+	btn_fire.disabled = breath.exhausted
+	if breath.exhausted:
+		breath.set_firing(false)
+	btn_climb.disabled = grounded or landing or taking_off
+	btn_dive.disabled = grounded or landing or taking_off
+	btn_glide.disabled = grounded or landing or taking_off
+	btn_normal.disabled = grounded or landing or taking_off
+	btn_land.disabled = taking_off
+	btn_land.text = "DESPEGAR [L]" if grounded else ("CANCELAR [L]" if landing else "ATERRIZAR [L]")
+	for b: Button in [btn_normal,btn_climb,btn_glide,btn_dive]:
+		b.modulate = TEXT
+	if not grounded and not landing and not taking_off:
+		var active: Button = [btn_normal,btn_glide,btn_climb,btn_dive,btn_normal][dragon.current_mode]
+		active.modulate = GOLD
+	btn_fire.modulate = GOLD if breath.is_firing else TEXT
+	btn_aim.modulate = GOLD if dragon.head_aim_active else TEXT
+	reticle.visible = dragon.head_aim_active and not controls_panel.visible
+	if reticle.visible:
+		var camera := get_viewport().get_camera_3d()
+		var target: Vector3 = aim_preview_point
+		if camera and not camera.is_position_behind(target):
+			reticle.position = camera.unproject_position(target)-Vector2(8,18)
+			var contact := instance_from_id(aim_preview_collider_id) if aim_preview_collider_id else null
+			reticle.modulate = Color(1.0, 0.35, 0.16) if is_instance_valid(contact) and contact.is_in_group("siege_enemy") else Color.WHITE
+		else:
+			reticle.visible = false

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8drg7fl1ght02"]
+[gd_scene load_steps=16 format=3 uid="uid://c8drg7fl1ght02"]
 
 [ext_resource type="Script" path="res://scripts/dragon_controller.gd" id="1_controller"]
 [ext_resource type="Script" path="res://scripts/flight_camera.gd" id="2_camera"]
@@ -6,6 +6,16 @@
 [ext_resource type="PackedScene" path="res://assets/models/dragon.glb" id="4_dragon_model"]
 [ext_resource type="PackedScene" path="res://assets/models/terrain.glb" id="5_terrain_model"]
 [ext_resource type="Script" path="res://scripts/terrain.gd" id="6_terrain"]
+
+[ext_resource type="Script" path="res://scripts/dragon_breath.gd" id="7_breath"]
+
+[ext_resource type="Script" path="res://scripts/scenery_collisions.gd" id="8_details"]
+
+[ext_resource type="Script" path="res://scripts/dragon_surface_materials.gd" id="9_skin"]
+
+[ext_resource type="Script" path="res://scripts/siege_environment.gd" id="10_fort"]
+[ext_resource type="Script" path="res://scripts/combat/siege_combat.gd" id="11_combat"]
+[ext_resource type="Script" path="res://scripts/combat/siege_ui.gd" id="12_mission_ui"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.32, 0.54, 0.88, 1)
@@ -43,9 +53,13 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("6_terrain")
 
+[node name="SiegeEnvironment" type="Node3D" parent="."]
+script = ExtResource("10_fort")
+
 [node name="Dragon" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 120, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 180, 140, 120)
 script = ExtResource("1_controller")
+collision_mask = 7
 cruise_speed = 26.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Dragon"]
@@ -56,6 +70,10 @@ shape = SubResource("SphereShape3D_dragon")
 transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, 0, 0, 0)
 
 [node name="DragonModel" parent="Dragon/VisualModel" instance=ExtResource("4_dragon_model")]
+script = ExtResource("9_skin")
+
+[node name="DragonBreath" type="Node3D" parent="Dragon"]
+script = ExtResource("7_breath")
 
 [node name="FlightCamera" type="Camera3D" parent="." node_paths=PackedStringArray("target_node")]
 transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 125.0, 10.5)
@@ -73,10 +91,10 @@ script = ExtResource("3_hud")
 dragon = NodePath("../Dragon")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD"]
-offset_left = 30.0
-offset_top = 30.0
-offset_right = 380.0
-offset_bottom = 150.0
+offset_left = 24.0
+offset_top = 92.0
+offset_right = 550.0
+offset_bottom = 224.0
 
 [node name="SpeedLabel" type="Label" parent="HUD/VBoxContainer"]
 layout_mode = 2
@@ -101,8 +119,8 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -340.0
-offset_top = -210.0
+offset_left = -700.0
+offset_top = -312.0
 offset_right = -30.0
 offset_bottom = -30.0
 grow_horizontal = 0
@@ -118,8 +136,10 @@ theme_override_constants/margin_bottom = 12
 [node name="HelpLabel" type="Label" parent="HUD/ControlsPanel/MarginContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
 text = "CONTROLES DE VUELO Y TIERRA (H / F1: mostrar u ocultar):
-• L: ATERRIZAR / DESPEGAR
+• F / BOTÓN FUEGO: SOPLO (MANTENER); RECARGA AL SOLTAR
+• L: ATERRIZAR / DESPEGAR (L CANCELA APROXIMACIÓN)
 • EN TIERRA: W / S CAMINAR, SHIFT CORRER, A / D GIRAR, ESPACIO SALTAR / DESPEGAR
 • EN VUELO: W / SHIFT AVANZAR (ALETEO FUERTE), S FRENAR
 • A / D / FLECHAS IZQ-DER: GIRAR (Q / E: GIRO SUAVE)
@@ -134,10 +154,10 @@ text = "CONTROLES DE VUELO Y TIERRA (H / F1: mostrar u ocultar):
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -375.0
-offset_top = 25.0
-offset_right = 375.0
-offset_bottom = 75.0
+offset_left = -464.0
+offset_top = 20.0
+offset_right = 464.0
+offset_bottom = 68.0
 grow_horizontal = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HUD/ActionBar"]
@@ -170,3 +190,34 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = " ⬇ ATERRIZAR [L] "
 
+
+[node name="BtnFire" type="Button" parent="HUD/ActionBar/HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(128, 48)
+theme_override_font_sizes/font_size = 14
+text = " FUEGO [F] "
+
+[node name="BreathLabel" type="Label" parent="HUD/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "FUEGO: LISTO · 100%"
+
+[node name="HintLabel" type="Label" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -44.0
+offset_right = 920.0
+offset_bottom = -12.0
+theme_override_font_sizes/font_size = 16
+text = "ESPACIO subir · C picada · L aterrizar · F fuego · H ayuda · V cámara"
+
+[node name="SceneryCollisions" type="Node3D" parent="."]
+script = ExtResource("8_details")
+
+[node name="SiegeCombat" type="Node3D" parent="."]
+script = ExtResource("11_combat")
+
+[node name="SiegeUI" type="CanvasLayer" parent="."]
+script = ExtResource("12_mission_ui")

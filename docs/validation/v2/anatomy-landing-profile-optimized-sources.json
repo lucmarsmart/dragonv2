@@ -1,0 +1,19 @@
+{
+  "sha256": {
+    "scripts/dragon_controller.gd": "10c6cc56df31395f2032382dc7abd827c50a4f85e148755b0544b159c6709773",
+    "scripts/dragon_ground_pose.gd": "fd50ede482da3ec922cf33984f77eafbbb738b8ea7c790d7bd29b11ffe4a2611",
+    "scripts/dragon_pose_probe.gd": "e9f2ffc19dbd94d531a5564eedff9e279cc1a881f077824d373e2735956105ef",
+    "scripts/dragon_wing_contact.gd": "dbe8db17b2f859e3a3db2c5624448bbea71915dcc678a18310e928044229ec9b",
+    "scripts/dragon_wing_extrema.json": "e2dffc6c0f7f8e41126927d9c0e5ae343ee6d3a82cd55bb57c48e898bcd2f45c",
+    "scripts/anatomy_profile_landing.gd": "9f9f62bd36ea3292c7be37166d9bf35c37f5c791b706ea07378d0402adb67e63"
+  },
+  "changed_owned_runtime_files": [
+    "scripts/dragon_ground_pose.gd",
+    "scripts/dragon_pose_probe.gd",
+    "scripts/dragon_wing_contact.gd"
+  ],
+  "parent_metadata_prewarm_call": "scripts/combat/siege_combat.gd _prepare",
+  "parent_combat_source_sha256": "a846e04a7ebec7e4ccbdeb0e42176ef44f8f7eefb5a157bb7b89c464818b3161",
+  "metadata": "SameOriginalVerticesBindWeights; no pose caching; matrices refreshed percoordinates call; ready before briefing; reset retains sameSkeleton probes.",
+  "consumers_review": "Normal only moves pitch under FLYING; LANDING contact_details diagnostics not steering. Cast/intersect all18shapes mask3 margin1.2 retained."
+}

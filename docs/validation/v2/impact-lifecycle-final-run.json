@@ -1,0 +1,12 @@
+{
+  "command": "./tools/godot.sh --headless --path . --fixed-fps 60 --script res://docs/validation/v2/test-impact-lifecycle.gd",
+  "returncode": 0,
+  "checks": 3,
+  "passed": true,
+  "engine_errors": [],
+  "source_sha256": {
+    "scripts/combat/siege_combat.gd": "83ca56f45b1313f633ea3520e5efdc5960da1c16ae5242a367706451715527f8",
+    "docs/validation/v2/test-impact-lifecycle.gd": "00aa91f5fd1f2b9233fe2012f80020355f45494e5274755885b3bee467fc4218"
+  },
+  "log_sha256": "365d9e3a49aa09a2fab8ef84eda39e1c47909ea02caa951d352e657c2e6f5693"
+}

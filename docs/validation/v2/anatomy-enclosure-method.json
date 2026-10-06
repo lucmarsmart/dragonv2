@@ -1,0 +1,47 @@
+{
+  "generated_utc": "2026-10-05T09:33:32.325135+00:00",
+  "final_extrema_count": 1088,
+  "final_extrema_sha256": "e2dffc6c0f7f8e41126927d9c0e5ae343ee6d3a82cd55bb57c48e898bcd2f45c",
+  "base_987_preserved": true,
+  "historical_base_training_poses": 184,
+  "construction_extensions": [
+    {
+      "file": "anatomy-full-skin.json",
+      "poses": 7,
+      "sha256": "bf5c2d7af81e3e44076a61fbe1bcd0c08b86f8a704638c42548d1ef91da1f026"
+    },
+    {
+      "file": "anatomy-real-full-skin.json",
+      "poses": 14,
+      "sha256": "88025690eb80129b7f96e07ce2d7814732b9353bbb666749e6898ee9455f739d"
+    },
+    {
+      "file": "anatomy-enclosure-construction-holdout1.json",
+      "poses": 12,
+      "sha256": "e39e858575aa6da77e1e280d7ea42c1f98415934c589f97a9552afafa9ff3f4b"
+    }
+  ],
+  "independent_holdout": {
+    "file": "anatomy-enclosure-holdout2-independent.json",
+    "poses": 12,
+    "sha256": "2b53ec2a9ec32dff379eb3588c9757053f6c2b5a36581bf18bfd4a4dd46766df",
+    "used_for_selection": false,
+    "different_from_construction": "Air timings13/31/17/37/23/41/19/43ticks and different aim; ground warm91ticks, timing23/37/47/61, different turn/aim."
+  },
+  "first_holdout_promoted_to_construction_after_red": {
+    "file": "anatomy-enclosure-construction-holdout1.json",
+    "red": "anatomy-enclosure-holdout1-red.json",
+    "outside_m": 0.28298151877398137
+  },
+  "independent_algorithm": "SciPy ConvexHull signed plane distance against every original5412 wingvertex. Runtime mode uses actual final query shape points; no added tolerance margin. Physical terrestrial margin0.0m, visible penetration tolerance0.05m.",
+  "selection_verification": {
+    "poses": 213,
+    "maximum_outside_m": 0.0005312788792295464,
+    "sha256": "9cf106039649e01a02db3b8241c5ebf4977c913f05ff08b81026fd5878d53894"
+  },
+  "runtime_verification": {
+    "poses": 33,
+    "maximum_outside_m": 0.0005210226173364418,
+    "sha256": "786f783093f81eca91730650fee6ab5dd788bc4066e95a40454a67f82d5e0a42"
+  }
+}

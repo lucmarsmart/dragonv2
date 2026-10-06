@@ -1,0 +1,8 @@
+{
+  "scripts/dragon_controller.gd": "10c6cc56df31395f2032382dc7abd827c50a4f85e148755b0544b159c6709773",
+  "scripts/dragon_ground_pose.gd": "1a8d773f0936c1d10763cfe5cb97103538b8f8d29b80284e5c35eaa6d28a5fc1",
+  "scripts/dragon_pose_probe.gd": "c3a135545a0a4eb2c9840a1d3c047df8bc24cc1974ef80707052ae5a787332e2",
+  "scripts/dragon_wing_contact.gd": "3940ba716f0dc90a1f17026f00a8f1896c2a374ab07394504ed82d6d87912f31",
+  "scripts/dragon_wing_extrema.json": "e2dffc6c0f7f8e41126927d9c0e5ae343ee6d3a82cd55bb57c48e898bcd2f45c",
+  "scripts/anatomy_profile_landing.gd": "d46e3fea159b576fd4ce1d726c7fb9206af26290e1a10f3e891686e147a6cb5d"
+}

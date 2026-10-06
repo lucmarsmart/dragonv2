@@ -1,0 +1,116 @@
+{
+  "candidate_count": 1088,
+  "poses": 12,
+  "all_passed": true,
+  "maximum_outside_m": 0.0005210226173364418,
+  "checks": {
+    "holdout2_air_0": {
+      "max_signed_outside_m": [
+        3.5530000046357646e-05,
+        3.072814238080923e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_air_1": {
+      "max_signed_outside_m": [
+        4.518405782283352e-05,
+        3.9088024410105504e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_air_2": {
+      "max_signed_outside_m": [
+        3.8140997375535335e-05,
+        0.0005210226173364418
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_air_3": {
+      "max_signed_outside_m": [
+        3.711678353401915e-05,
+        3.110339975886944e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_air_4": {
+      "max_signed_outside_m": [
+        3.564976559777833e-05,
+        0.00016934895344755674
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_air_5": {
+      "max_signed_outside_m": [
+        2.2918884761136127e-05,
+        3.2406830912545814e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_air_6": {
+      "max_signed_outside_m": [
+        2.8536143328095065e-05,
+        3.621162466904693e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_air_7": {
+      "max_signed_outside_m": [
+        3.494694290939737e-05,
+        3.555631682972127e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "holdout2_ground_0": {
+      "max_signed_outside_m": [
+        1.396780413687182e-05,
+        1.4789196565390128e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "holdout2_ground_1": {
+      "max_signed_outside_m": [
+        1.6707733785592538e-05,
+        1.53867077148373e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "holdout2_ground_2": {
+      "max_signed_outside_m": [
+        1.4110225991625924e-05,
+        1.4575832674834643e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "holdout2_ground_3": {
+      "max_signed_outside_m": [
+        1.7340488672745735e-05,
+        1.6645341958554383e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    }
+  }
+}

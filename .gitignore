@@ -13,3 +13,10 @@ mono_crash.*.json
 .DS_Store
 Thumbs.db
 *.tmp
+
+# Generated validation recordings and logs
+docs/validation/**/*.avi
+docs/validation/**/*.mp4
+docs/validation/**/*.log
+docs/validation/**/*-poses.json*
+docs/validation/**/*-skin.json

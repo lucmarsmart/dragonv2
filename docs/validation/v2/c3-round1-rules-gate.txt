@@ -1,0 +1,33 @@
+VEREDICTOS: APROBADO
+
+REGLAS CONSULTADAS
+
+- `docs/validation/v2/project-rules-input.md`: existe. Instrucciones humanas de honestidad, concisión y lectura de cumplimiento bajo demanda.
+- `AGENTS.md` y `CLAUDE.md`: no encontrados en el repositorio, subdirectorios afectados ni directorios superiores examinados.
+- `ARCHITECTURE.md`, documentos `arquitectura*`, `docs/adr/`, `DESIGN.md` y tokens: no encontrados en el snapshot. No hay convenciones de arquitectura o diseño escritas que permitan bloquear por esas materias.
+- `/Users/fede/.claude/claude-config/implementation-rules.md`: existe; búsqueda selectiva por `Godot`, `GDScript`, `juego`, `native` y `python`, sin coincidencias. No se leyó completo.
+- `/Users/fede/.claude/claude-config/instructions/cumplimiento-normativo-cl.md`: existe y fue leído. No identifiqué tratamiento de datos personales ni envío de datos a APIs en el código de juego examinado.
+- `docs/validation/v2/review-sources.md`: existe; contrasté sus declaraciones sobre disponibilidad de reglas con las búsquedas anteriores.
+- `/Users/fede/.codex/skills/feature-dev/references/revisor-de-reglas.md` y `docs/validation/v2/c3-rules-prompt.md`: existen; protocolo aplicado.
+
+Modelo: `gpt-6-astra`. Esfuerzo: `high`.
+Directorio: `/Users/fede/Proyectos/Dragonv2`.
+Rango exacto: `161070425ce3dbd3905487d48901826fde76c59d..aca31ebd600c7e1bf1dd29fc850677c2c2800775`.
+Diff consultado mediante `git -C /Users/fede/Proyectos/Dragonv2 diff 161070425ce3dbd3905487d48901826fde76c59d..aca31ebd600c7e1bf1dd29fc850677c2c2800775`, con selección de archivos para inspección.
+
+HALLAZGOS
+
+- No identifiqué contradicciones con las reglas escritas aplicables ni un riesgo funcional suficientemente sustentado para emitir un hallazgo.
+- Las afirmaciones de rendimiento de `README.md:33` coinciden con los resultados registrados: combate 89,77 FPS/p95 13,698 ms; misión 71,87 FPS/p95 15,617 ms. La grabación MovieMaker está identificada como evidencia visual y su informe declara que no es una medición válida de FPS.
+- Contrasté contra los objetos Git del snapshot las huellas de 164 archivos presentes del grupo runtime, 137 configuraciones de importación y 20 auxiliares de validación examinados: sin diferencias. También coinciden las 28 fuentes explícitas de los informes de partida y las fuentes presentes de los recibos finales consultados.
+- No convierto la ausencia de reglas de arquitectura, convenciones o diseño en una aprobación general de calidad. Este veredicto corresponde exclusivamente a las reglas disponibles.
+
+QUÉ NO PUDE VERIFICAR
+
+- Ocho auxiliares enumerados en el manifiesto y recibos no existen en el commit revisado: `benchmark_env_agent.gd`, `capture_acceptance.gd`, `capture_env_agent.gd`, `capture_ground_new.gd`, `inspect_material_runtime.gd`, `test_env_agent.gd`, `test_locomotion_new.gd` y `test_render_quality.gd`, todos bajo `scripts/`. Sus entradas aparecen en `docs/validation/v2/final-manifest.json:51`, `:61`, `:71`, `:81`, `:351`, `:576`, `:621` y `:711`. No encontré referencias a ellos desde scripts versionados, escenas, lanzadores o configuración del juego. Esto limita la reconstrucción íntegra del inventario, pero no demuestra un fallo del juego ni contradice una regla escrita de entrega.
+- No ejecuté Godot, pruebas, GPU ni benchmarks. Las comprobaciones dinámicas se sustentan en código, registros y recibos existentes; no reproduje visualmente su comportamiento.
+- No recalculé todas las huellas de assets binarios y evidencia multimedia ni audité exhaustivamente su contenido.
+- No leí la spec, informes del otro revisor, archivos personales ni el PDF del usuario. No modifiqué archivos.
+- Idea 10x a ~2x esfuerzo: generar el inventario final desde archivos efectivamente incluidos en el snapshot y comprobar automáticamente su existencia y huella; elimina esta limitación de trazabilidad en futuras entregas.
+
+FIN DEL INFORME

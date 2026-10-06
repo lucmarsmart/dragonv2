@@ -1,0 +1,1657 @@
+{
+  "failures": [
+    "W walks more than1m after landing on this terrain",
+    "S retreats more than1m after terrain landing",
+    "A turns more than30deg after terrain landing",
+    "Both ground directions remain available after turning",
+    "Every original rendered vertex stays within the existing5cm terrain limit"
+  ],
+  "fixture_xz": [
+    500.0,
+    450.0
+  ],
+  "frames": [
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(500.7317, 101.6206, 376.2983)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000166482250207878
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 30,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000238580821765311
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 60,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000459939730745873
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 90,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000100605257458142
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000728332905097773
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.000000002286201672419
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.00000000256233190221167
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.00000000279244027900916
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.00000000195387150903059
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.00000000203125982700669
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.00000000131955446569521
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 0,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.00000000253298848562622
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 30,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.000000002964594569832
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 60,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000309919889751598
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 90,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000528407051447743
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.0000000023591086861785
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223947860256146
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223939422561159
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223932383747183
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223926521769613
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223921636788305
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 0,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 30,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 60,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 90,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 0,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 30,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 60,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 90,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 0,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 30,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 60,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 90,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 120,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": true,
+          "reason": "terrain_pose_requires_clearance"
+        }
+      ],
+      "frame": 150,
+      "position": "(500.7357, 101.6163, 376.1295)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.00000000223917573372034
+    }
+  ],
+  "landing_position": "(500.7317, 101.7376, 376.2983)",
+  "landing_ticks": 286,
+  "manual_override": false,
+  "maximum_overlap_count": 2,
+  "maximum_prop_overlap_count": 0,
+  "maximum_stance_slide_m": 0.0044593270868063,
+  "minimum_skin_terrain_clearance_m": -0.268877816461028,
+  "original_vertices_checked": 19099838,
+  "overlap_diagnostics": [
+    {
+      "frame": 30,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00649433583021164,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 60,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00693723000586033,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 90,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00730225536972284,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00761718163266778,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00792771577835083,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00787294376641512,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00794631335884333,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00792771577835083,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00801313109695911,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00793181546032429,
+          "hull": 7
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 0,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00806187372654676,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 30,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00829759705811739,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 60,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0085326824337244,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 90,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00873826816678047,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00899997260421515,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00919491425156593,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00913623068481684,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00918287876993418,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00919097289443016,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00922383368015289,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse"
+    },
+    {
+      "frame": 0,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00918287876993418,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 30,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00931912381201982,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 60,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00943674705922604,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 90,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00954020954668522,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0209340415894985,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0096465116366744,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0216306783258915,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00965634267777205,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0224080923944712,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00965634267777205,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0230679400265217,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00966234691441059,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0237717740237713,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00967436376959085,
+          "hull": 7
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 0,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0244684107601643,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00966835487633944,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 30,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0450453869998455,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00971708446741104,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 60,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0645789578557014,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0097461985424161,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 90,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0829096138477325,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00976195558905602,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.100218221545219,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00969240628182888,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.116269640624523,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00962781254202127,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.116791345179081,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00970723200589418,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.117367327213287,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00968432240188122,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.117834754288197,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00965251121670008,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.118373952805996,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0096196262165904,
+          "hull": 7
+        }
+      ],
+      "stage": "forward_after_turn"
+    },
+    {
+      "frame": 0,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.118841379880905,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00966234691441059,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 30,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.133669316768646,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00952217169106007,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 60,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.14715413749218,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00944343116134405,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 90,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.159483924508095,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00926438439637423,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.170472651720047,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00915110483765602,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.180167391896248,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00897332280874252,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.180417954921722,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00889329519122839,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.180689096450806,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00896388944238424,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.180999085307121,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00889047048985958,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    },
+    {
+      "frame": 150,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.181333512067795,
+          "hull": 6
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00890250969678164,
+          "hull": 7
+        }
+      ],
+      "stage": "reverse_after_turn"
+    }
+  ],
+  "source_after": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "651406486c380870604869b117aeb48bdd8d90a17a715f2569e7dff4aedeb660",
+    "res://scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "82d1e5bda66ffe4b1af05cc46bc41616060b1553fd6ab7e2ff78dc52bc370509",
+    "res://scripts/dragon_breath.gd": "2af876cc6191818d4dc125078bf08ad5809f82c9fa4f6462f84dee44d394484a",
+    "res://scripts/dragon_breath_modifier.gd": "ffea710b577c73ea6addc5747155b05bee1d60b291db19cc03d214d134aabbb2",
+    "res://scripts/dragon_controller.gd": "ffb943b865247f473c43b34760cea9d0251f98d9bacb24c2bcd9ac0998457836",
+    "res://scripts/dragon_ground_contact.gd": "d32898ac30ea9d3abb9c1fb40dac3bcbd2c30c7ad51386144c3eb215f68254e0",
+    "res://scripts/dragon_ground_pose.gd": "5fd8b2c42f3365ec67191b6ecbc9e6c4fee1a6b44bdc99f45b25f101dcc7cc88",
+    "res://scripts/dragon_head_pose.gd": "88ad9052c82bb2ff89bd8cf2170195cfcd470be739a2801c696ff422a198fbea",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "d40aa3a8c970a9ff3395890209ef34ffd2b4dad4702fad3a2e5da4251a1c0383",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b11a6fc0303ce458171aa147ed92178ceca743d22a280442b33f180f02be8606",
+    "res://scripts/terrain.gd": "a193093006a3c045918b135b874448d497605a537d1e9de2c9987389266a9a84"
+  },
+  "source_before": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "651406486c380870604869b117aeb48bdd8d90a17a715f2569e7dff4aedeb660",
+    "res://scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "82d1e5bda66ffe4b1af05cc46bc41616060b1553fd6ab7e2ff78dc52bc370509",
+    "res://scripts/dragon_breath.gd": "2af876cc6191818d4dc125078bf08ad5809f82c9fa4f6462f84dee44d394484a",
+    "res://scripts/dragon_breath_modifier.gd": "ffea710b577c73ea6addc5747155b05bee1d60b291db19cc03d214d134aabbb2",
+    "res://scripts/dragon_controller.gd": "ffb943b865247f473c43b34760cea9d0251f98d9bacb24c2bcd9ac0998457836",
+    "res://scripts/dragon_ground_contact.gd": "d32898ac30ea9d3abb9c1fb40dac3bcbd2c30c7ad51386144c3eb215f68254e0",
+    "res://scripts/dragon_ground_pose.gd": "5fd8b2c42f3365ec67191b6ecbc9e6c4fee1a6b44bdc99f45b25f101dcc7cc88",
+    "res://scripts/dragon_head_pose.gd": "88ad9052c82bb2ff89bd8cf2170195cfcd470be739a2801c696ff422a198fbea",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "d40aa3a8c970a9ff3395890209ef34ffd2b4dad4702fad3a2e5da4251a1c0383",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b11a6fc0303ce458171aa147ed92178ceca743d22a280442b33f180f02be8606",
+    "res://scripts/terrain.gd": "a193093006a3c045918b135b874448d497605a537d1e9de2c9987389266a9a84"
+  },
+  "stage_quality": {
+    "forward": {
+      "frames": 156,
+      "maximum_stance_slide_m": 0.0044593270868063,
+      "minimum_skin_terrain_clearance_m": 0.0241993012278954
+    },
+    "forward_after_turn": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.0000682393801980652,
+      "minimum_skin_terrain_clearance_m": -0.175482906512826
+    },
+    "left": {
+      "frames": 125,
+      "maximum_stance_slide_m": 0.00006103515625,
+      "minimum_skin_terrain_clearance_m": -0.035228816345267
+    },
+    "reverse": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.00013647876039613,
+      "minimum_skin_terrain_clearance_m": 0.0242161042988016
+    },
+    "reverse_after_turn": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.00006103515625,
+      "minimum_skin_terrain_clearance_m": -0.268877816461028
+    }
+  },
+  "stages": {
+    "forward": {
+      "horizontal_distance_m": 0.168899640440941,
+      "yaw_delta_deg": 0.000000170992204729499
+    },
+    "forward_after_turn": {
+      "horizontal_distance_m": 0.0,
+      "yaw_delta_deg": 0.0
+    },
+    "left": {
+      "horizontal_distance_m": 0.0,
+      "yaw_delta_deg": 0.0
+    },
+    "reverse": {
+      "horizontal_distance_m": 0.0,
+      "yaw_delta_deg": -0.000000203900220852261
+    },
+    "reverse_after_turn": {
+      "horizontal_distance_m": 0.0,
+      "yaw_delta_deg": 0.0
+    }
+  },
+  "teleports_after_initial_aerial_fixture": 0,
+  "worst_skin": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 0
+    },
+    "clearance": -0.268877816461028,
+    "physics_frame": 1370,
+    "process_frame": 1369,
+    "ray": "{ \"position\": (498.1098, 98.99743, 377.3987), \"normal\": (0.699742, 0.674281, 0.23602), \"face_index\": 141279, \"collider_id\": 40936408680, \"collider\": ErodedValleyGround_col:<StaticBody3D#40936408680>, \"shape\": 0, \"rid\": RID(639950127106) }",
+    "root": "(500.7357, 101.6163, 376.1295)",
+    "rotation": "(-0.024023, -0.0, -0.585946)",
+    "sample": "{ \"vertex\": (-2.526366, -1.450864, 2.383506), \"influence\": [{ \"bone\": 7, \"bind\": [X: (12.14776, 16.54311, -150.0238), Y: (-144.6204, -41.80497, -16.32025), Z: (-43.20219, 144.595, 12.44628), O: (-122.2358, -491.8637, -445.7352)], \"weight\": 1.0, \"key\": 2007 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": -1, \"limb_claw\": -1, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 2275 }",
+    "stage": "reverse_after_turn",
+    "tick": 150,
+    "world": "(498.1098, 98.72853, 377.3987)"
+  },
+  "worst_stance": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 0
+    },
+    "claw": 23,
+    "point": "(501.6011, 96.08069, 379.073)",
+    "previous": "(501.6013, 96.06225, 379.0775)",
+    "root": "(500.7357, 101.6175, 376.1295)",
+    "rotation": "(0.00624, -0.0, -0.558475)",
+    "sample": "{ \"vertex\": (-4.591046, -2.894905, 2.595331), \"influence\": [{ \"bone\": 33, \"bind\": [X: (114.8323, 82.01749, -54.9097), Y: (-80.71016, 126.5198, 20.19088), Z: (56.81624, 13.95589, 139.6647), O: (167.3499, 717.515, -575.5001)], \"weight\": 0.93725490570068, \"key\": 2033 }, { \"bone\": 34, \"bind\": [X: (91.35137, 107.5537, -54.9138), Y: (-109.1403, 103.005, 20.18463), Z: (51.69249, 27.40324, 139.664), O: (-43.51487, 728.8987, -575.5366)], \"weight\": 0.0627451017499, \"key\": 2034 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": 23, \"limb_claw\": 23, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 17209 }",
+    "slide": 0.0044593270868063,
+    "stage": "forward",
+    "tick": 8
+  }
+}

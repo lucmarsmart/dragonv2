@@ -1,0 +1,92 @@
+{
+  "verified_utc": "2026-10-05",
+  "github_mesh_commits": {
+    "SaschaWillems/Vulkan-Assets": "a27c0e584434d59b7c7a714e9180eefca6f0ec4b",
+    "Hidencod/tge-assets": "1f7dee9076ee848773f08fd632ab4e4e73357777"
+  },
+  "records": [
+    {
+      "path": "assets/characters/source/piacenti_github_armor.gltf",
+      "bytes": 1175006,
+      "sha256": "61096834b3b822a630a261230aada947fb68a33f09061463670f6e9d7c27654a"
+    },
+    {
+      "path": "assets/characters/source/piacenti_github_license.txt",
+      "bytes": 85,
+      "sha256": "3a9e2ad7ce210179d4c04034d9882feef31642c9051d0132adb766a3d1d48aed"
+    },
+    {
+      "path": "assets/characters/source/piacenti_armored_knight.zip",
+      "bytes": 17908633,
+      "sha256": "edea99305ea1dfffbe56434498693e325d909cf638845f1a473c6d0993aca100"
+    },
+    {
+      "path": "assets/characters/knight.glb",
+      "bytes": 38551772,
+      "sha256": "ff7418d0dcad2598b79874dcec44e0b49c5060101b2cc7c0bfaef9aed1567796",
+      "meshes": 2,
+      "triangles": 19217,
+      "animations": [
+        {
+          "name": "idle",
+          "duration_seconds": 2
+        },
+        {
+          "name": "walk_loop",
+          "duration_seconds": 1.1333333333333333
+        },
+        {
+          "name": "sword_attack",
+          "duration_seconds": 1.1333333333333333
+        },
+        {
+          "name": "hit_chest",
+          "duration_seconds": 0.4666666666666667
+        },
+        {
+          "name": "death",
+          "duration_seconds": 1.8
+        }
+      ]
+    },
+    {
+      "path": "assets/siege/weapons/source/kenney_ballista_github.glb",
+      "bytes": 72052,
+      "sha256": "3905ff533ad6d836cab57986871ff58938f5ec572cf8e5154b5651d4368de10f",
+      "meshes": 4,
+      "triangles": 676,
+      "animations": []
+    },
+    {
+      "path": "assets/siege/weapons/source/kenney_github_LICENSE.txt",
+      "bytes": 510,
+      "sha256": "6913dd72bdc20532b7f02d86469058f45d886c9dabf60831275ed16927aa523b"
+    },
+    {
+      "path": "assets/siege/weapons/source/wood060_2k.zip",
+      "bytes": 37500228,
+      "sha256": "54527fac1222a0d59c2a039f5ab83c84eec284936557fb2f87ee30c566594900"
+    },
+    {
+      "path": "assets/siege/weapons/source/kutejnikov_ballista_bolt.7z",
+      "bytes": 4322102,
+      "sha256": "a9dd81b97ffdd5ef0a75bcf8f98326a9caa1bb50d938285431035956bde29bdb"
+    },
+    {
+      "path": "assets/siege/weapons/ballista.glb",
+      "bytes": 24899044,
+      "sha256": "f284cbd3e22f0012ae8afd7cfd2c9c2e82c0097f152a3dbea373caaa1f797f22",
+      "meshes": 6,
+      "triangles": 47088,
+      "animations": []
+    },
+    {
+      "path": "assets/siege/weapons/bolt.glb",
+      "bytes": 1735120,
+      "sha256": "1b11ae36228533e415436b82d22ece363371f0109fbf5a8d0f003b66de197ca0",
+      "meshes": 1,
+      "triangles": 284,
+      "animations": []
+    }
+  ]
+}

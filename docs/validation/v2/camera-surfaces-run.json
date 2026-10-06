@@ -1,0 +1,27 @@
+{
+  "command": "./tools/godot.sh --headless --path . --script scripts/test_camera_surfaces.gd",
+  "engine": "Godot 4.7.2.stable.official.ed1daf0bf",
+  "exit_code": 0,
+  "engine_errors": [],
+  "checks_passed": 144,
+  "frames_inspected": 1845,
+  "case_windows": 132,
+  "oracle_totals": {
+    "nonfinite": 0,
+    "inside_box": 0,
+    "sphere_intersections": 0,
+    "pivot_segment_intersections": 0,
+    "interframe_sweep_intersections": 0
+  },
+  "production_camera_sha256": "2e737f1c4e1f26bb93b9b899421818d3c810dca44d1f99a598a05f19c3001abc",
+  "environment_sha256": "b11a6fc0303ce458171aa147ed92178ceca743d22a280442b33f180f02be8606",
+  "driver_sha256": "4a99c185215756d5e433753d051e900e3c3b257985cdc137d9cc5885a9151278",
+  "report_sha256": "25c5ab34b9fc093879749594f74eb19e1ceeb003d41d6950fd3a1d325979ee39",
+  "log_sha256": "bbb115f1923ef599bd5d94e493d646892f3e21b2d598426291009ed5e7cbe20d",
+  "native_rendering": false,
+  "runtime_edits": [],
+  "calibration_reds": [
+    "camera-fixture-calibration-red.json",
+    "camera-fixture-wall-name-red.json"
+  ]
+}

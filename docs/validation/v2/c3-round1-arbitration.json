@@ -1,0 +1,24 @@
+{
+  "round": 1,
+  "range": "161070425ce3dbd3905487d48901826fde76c59d..aca31ebd600c7e1bf1dd29fc850677c2c2800775",
+  "spec_model": "gpt-6.1-sol",
+  "spec_effort": "high",
+  "spec_verdict": "INCOMPLETO",
+  "rules_model": "gpt-6-astra",
+  "rules_effort": "high",
+  "rules_verdict": "APROBADO",
+  "blocker_root_causes": [
+    "D02 stride assertion aggregates legs instead of checking each at actual7.5m/s",
+    "D04/D10 actual camera wall-surface collision not asserted",
+    "D05 active AI acquisition/fire LOS not tested",
+    "D06 mouse click-to-present latency missing, measured Enter only",
+    "D08 gradual turn bank and recenter after release missing"
+  ],
+  "blocker_count": 5,
+  "dependent_uncovered": [
+    "D07"
+  ],
+  "runtime_regressions_observed": 0,
+  "arbitration": "Accepted as evidence-contract defects. Implement five meaningful checks, preserve runtime unless a defect is reproduced. No spec weakening. Round2 only after final source-bound execution and same-range double review.",
+  "nonexecuted_attempt": "Initial CLI without visual tool interrupted rc1/no verdict; not a review round."
+}
