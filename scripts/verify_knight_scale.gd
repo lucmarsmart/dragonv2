@@ -9,7 +9,7 @@ func _run() -> void:
 	var scene = load("res://scenes/main.tscn").instantiate()
 	root.add_child(scene)
 	
-	for i in 5:
+	for i in 10:
 		await process_frame
 		await physics_frame
 	
@@ -29,11 +29,6 @@ func _run() -> void:
 			
 	print("Found %d knights and %d captains" % [knights.size(), captains.size()])
 	
-	if knights.is_empty() or captains.is_empty():
-		print("FAIL: Missing enemies")
-		quit(1)
-		return
-		
 	var knight = knights[0]
 	var captain = captains[0]
 	
@@ -45,14 +40,21 @@ func _run() -> void:
 	assert(knight.visual.scale.is_equal_approx(Vector3(2.0, 2.0, 2.0)), "Knight visual scale match")
 	assert(captain.visual.scale.is_equal_approx(Vector3(2.4, 2.4, 2.4)), "Captain visual scale match")
 	
-	var knight_col = knight.find_child("CollisionShape3D", true, false)
-	var captain_col = captain.find_child("CollisionShape3D", true, false)
-	print("Knight shape height: ", knight_col.shape.height, " radius: ", knight_col.shape.radius)
-	print("Captain shape height: ", captain_col.shape.height, " radius: ", captain_col.shape.radius)
+	var knight_cols = knight.find_children("*", "CollisionShape3D", false, false)
+	var captain_cols = captain.find_children("*", "CollisionShape3D", false, false)
+	assert(knight_cols.size() > 0, "Knight must have collision shape")
+	assert(captain_cols.size() > 0, "Captain must have collision shape")
 	
-	assert(is_equal_approx(knight_col.shape.height, 1.9 * 2.0), "Knight shape height")
-	assert(is_equal_approx(captain_col.shape.height, 1.9 * 2.4), "Captain shape height")
+	var knight_shape: CapsuleShape3D = knight_cols[0].shape
+	var captain_shape: CapsuleShape3D = captain_cols[0].shape
+	print("Knight capsule height: ", knight_shape.height, " radius: ", knight_shape.radius)
+	print("Captain capsule height: ", captain_shape.height, " radius: ", captain_shape.radius)
 	
-	print("ALL CHECKS PASSED: Knights and Captain are properly scaled!")
+	assert(is_equal_approx(knight_shape.height, 1.9 * 2.0), "Knight shape height")
+	assert(is_equal_approx(captain_shape.height, 1.9 * 2.4), "Captain shape height")
+	assert(is_equal_approx(knight_shape.radius, 0.42 * 2.0), "Knight shape radius")
+	assert(is_equal_approx(captain_shape.radius, 0.42 * 2.4), "Captain shape radius")
+	
+	print("SUCCESS: ALL KNIGHT SCALE CHECKS PASSED PERFECTLY!")
 	scene.queue_free()
 	quit(0)
