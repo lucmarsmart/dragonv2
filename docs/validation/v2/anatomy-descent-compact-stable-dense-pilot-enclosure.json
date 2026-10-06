@@ -1,0 +1,829 @@
+{
+  "candidate_count": 1855,
+  "wing_partition": "rig-root96-120-boundary-v1",
+  "poses": 82,
+  "all_passed": true,
+  "maximum_outside_m": 0.0025191327887383874,
+  "checks": {
+    "compact_dense_1002": {
+      "max_signed_outside_m": [
+        2.071777359535787e-05,
+        0.001315682353256964
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1005": {
+      "max_signed_outside_m": [
+        2.0339747711206613e-05,
+        0.001299230884856506
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1014": {
+      "max_signed_outside_m": [
+        1.2098510895786063e-05,
+        0.001298885309031217
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1020": {
+      "max_signed_outside_m": [
+        1.9838791215143203e-05,
+        0.0013142092967588503
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1026": {
+      "max_signed_outside_m": [
+        1.5972213077475317e-05,
+        0.0013149704868329337
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1029": {
+      "max_signed_outside_m": [
+        1.648701301348865e-05,
+        0.0013153677331390057
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1038": {
+      "max_signed_outside_m": [
+        1.8935666903807657e-05,
+        0.0013147785952076774
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1041": {
+      "max_signed_outside_m": [
+        9.897361665345272e-06,
+        0.0013012767060454067
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_1053": {
+      "max_signed_outside_m": [
+        2.476654158245495e-05,
+        0.0013155396230009053
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_552": {
+      "max_signed_outside_m": [
+        2.1861775480580548e-05,
+        0.0013391810037446383
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_555": {
+      "max_signed_outside_m": [
+        1.7128393582810375e-05,
+        0.0013400669901311169
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_558": {
+      "max_signed_outside_m": [
+        1.9189397340468872e-05,
+        0.0013470342360255572
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_561": {
+      "max_signed_outside_m": [
+        1.4729412429304034e-05,
+        0.0009060524757762423
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_564": {
+      "max_signed_outside_m": [
+        2.397255132713383e-05,
+        1.8728085228403302e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_573": {
+      "max_signed_outside_m": [
+        2.1445584572177268e-05,
+        1.9098524442817677e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_576": {
+      "max_signed_outside_m": [
+        1.5812254762437306e-05,
+        1.572028758367594e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_579": {
+      "max_signed_outside_m": [
+        2.0941618299019638e-05,
+        2.1722642076227316e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_585": {
+      "max_signed_outside_m": [
+        1.5883594098653475e-05,
+        1.2735751526937733e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_588": {
+      "max_signed_outside_m": [
+        2.2827861489993495e-05,
+        2.1074779540164457e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_591": {
+      "max_signed_outside_m": [
+        1.1595995571767048e-05,
+        1.4207528474474707e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_597": {
+      "max_signed_outside_m": [
+        8.555539694476977e-06,
+        1.474804339629543e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_600": {
+      "max_signed_outside_m": [
+        1.4584690431251879e-05,
+        9.9343148098896e-06
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_606": {
+      "max_signed_outside_m": [
+        1.0559015772182434e-05,
+        1.5289191588663265e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_612": {
+      "max_signed_outside_m": [
+        2.3404554629902208e-05,
+        1.4033303123106577e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_615": {
+      "max_signed_outside_m": [
+        2.5704320356645383e-05,
+        2.275761222225725e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_621": {
+      "max_signed_outside_m": [
+        2.1029103331127175e-05,
+        1.3391406078921975e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_624": {
+      "max_signed_outside_m": [
+        8.74757914726132e-06,
+        2.0441885944105787e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_630": {
+      "max_signed_outside_m": [
+        1.074789591626324e-05,
+        1.33278058158659e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_633": {
+      "max_signed_outside_m": [
+        1.1731856748298242e-05,
+        1.5115819801625463e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_636": {
+      "max_signed_outside_m": [
+        1.918993977545469e-05,
+        1.727516835270393e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_639": {
+      "max_signed_outside_m": [
+        1.2719534566940638e-05,
+        1.0511013012859394e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_645": {
+      "max_signed_outside_m": [
+        1.2888760685836331e-05,
+        9.29771063695739e-06
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_648": {
+      "max_signed_outside_m": [
+        1.82880165119359e-05,
+        1.2456613614819645e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_651": {
+      "max_signed_outside_m": [
+        1.3136509904754234e-05,
+        1.66681093445864e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_654": {
+      "max_signed_outside_m": [
+        1.7888828543116686e-05,
+        2.2200570283140153e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_660": {
+      "max_signed_outside_m": [
+        1.7755113334572137e-05,
+        1.993081579243494e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_663": {
+      "max_signed_outside_m": [
+        2.995580234754769e-05,
+        2.6464482896226826e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_666": {
+      "max_signed_outside_m": [
+        1.0770479742572281e-05,
+        2.4263076130681682e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_669": {
+      "max_signed_outside_m": [
+        1.7203743590599174e-05,
+        1.507923096921715e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_675": {
+      "max_signed_outside_m": [
+        1.555391603336176e-05,
+        1.7622629737701345e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_681": {
+      "max_signed_outside_m": [
+        2.2645220596917426e-05,
+        2.411019972647921e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_684": {
+      "max_signed_outside_m": [
+        2.7099121711504637e-05,
+        2.3311314252261184e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_687": {
+      "max_signed_outside_m": [
+        1.62006920771951e-05,
+        2.043739139345746e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_693": {
+      "max_signed_outside_m": [
+        2.3109518664021778e-05,
+        2.3910454038489348e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_702": {
+      "max_signed_outside_m": [
+        1.6953065129943212e-05,
+        2.0989015480310513e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_714": {
+      "max_signed_outside_m": [
+        2.5358872651537467e-05,
+        2.2961021442391427e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_723": {
+      "max_signed_outside_m": [
+        2.1035987320283667e-05,
+        1.8735645615164387e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_735": {
+      "max_signed_outside_m": [
+        1.236925809644518e-05,
+        1.751253413573295e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_741": {
+      "max_signed_outside_m": [
+        1.699103298280491e-05,
+        1.3677905004838564e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_747": {
+      "max_signed_outside_m": [
+        2.7765598054063645e-05,
+        1.8410934699453207e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_750": {
+      "max_signed_outside_m": [
+        1.6428214171693156e-05,
+        1.458338964344108e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_759": {
+      "max_signed_outside_m": [
+        1.6179029186824678e-05,
+        2.1311160554038366e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_762": {
+      "max_signed_outside_m": [
+        1.5262001621607624e-05,
+        2.0507032311378737e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_771": {
+      "max_signed_outside_m": [
+        1.987988851004374e-05,
+        1.8672889087856248e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_774": {
+      "max_signed_outside_m": [
+        1.4402840000204975e-05,
+        1.0775449900565781e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_786": {
+      "max_signed_outside_m": [
+        1.64075524553553e-05,
+        1.7343723419660506e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_792": {
+      "max_signed_outside_m": [
+        1.9049811196714117e-05,
+        1.101909950174118e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_795": {
+      "max_signed_outside_m": [
+        1.112347527865154e-05,
+        1.8535289568966107e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_798": {
+      "max_signed_outside_m": [
+        1.8481059341546313e-05,
+        1.9341989158760953e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_807": {
+      "max_signed_outside_m": [
+        1.5091019012203333e-05,
+        1.631856756612038e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_813": {
+      "max_signed_outside_m": [
+        2.0645979759592592e-05,
+        2.2597533360091404e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_822": {
+      "max_signed_outside_m": [
+        2.7065027512040984e-05,
+        2.7880757546228097e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_831": {
+      "max_signed_outside_m": [
+        2.4864420152148625e-05,
+        1.752288108569644e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_840": {
+      "max_signed_outside_m": [
+        2.4292816369175796e-05,
+        2.591443710242558e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_843": {
+      "max_signed_outside_m": [
+        1.3834939128543056e-05,
+        1.548270592488521e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_846": {
+      "max_signed_outside_m": [
+        2.0958451406372092e-05,
+        2.3755443565587342e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_870": {
+      "max_signed_outside_m": [
+        0.0025191327887383874,
+        1.3664584194383878e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_882": {
+      "max_signed_outside_m": [
+        1.9966218686384707e-05,
+        1.8099280898464798e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_885": {
+      "max_signed_outside_m": [
+        1.4396759455248542e-05,
+        2.1060587548582532e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_897": {
+      "max_signed_outside_m": [
+        2.0026350974644558e-05,
+        1.8089714488016273e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_900": {
+      "max_signed_outside_m": [
+        1.0912345165259296e-05,
+        1.4355734352822225e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_909": {
+      "max_signed_outside_m": [
+        1.6338033716145617e-05,
+        1.6628013897457272e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_918": {
+      "max_signed_outside_m": [
+        1.4879905673392813e-05,
+        1.6876550960720493e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_927": {
+      "max_signed_outside_m": [
+        1.0326453170339533e-05,
+        1.2438101104295107e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_936": {
+      "max_signed_outside_m": [
+        1.52596279061612e-05,
+        1.29045682097928e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_945": {
+      "max_signed_outside_m": [
+        2.1517328234299526e-05,
+        2.9914604035674586e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_954": {
+      "max_signed_outside_m": [
+        1.696869529688172e-05,
+        2.1028159638891708e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "compact_dense_963": {
+      "max_signed_outside_m": [
+        1.4916661278618903e-05,
+        1.714845600808701e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_972": {
+      "max_signed_outside_m": [
+        2.6957222200252318e-05,
+        1.832765418141591e-05
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_981": {
+      "max_signed_outside_m": [
+        1.7596318427681723e-05,
+        0.0013186531246516253
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_984": {
+      "max_signed_outside_m": [
+        1.4297296925036562e-05,
+        0.001284495946979991
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "compact_dense_993": {
+      "max_signed_outside_m": [
+        1.8123996873509185e-05,
+        0.0013147727571856116
+      ],
+      "all_vertices": 5412,
+      "point_entries_with_boundary_duplicates": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    }
+  }
+}

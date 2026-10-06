@@ -1,0 +1,102 @@
+{
+  "checks": 11,
+  "failures": [],
+  "fixture": {
+    "direct_fixture_damage_calls": false,
+    "fixture_projectiles": false,
+    "other_enemies_disabled_for_attribution": true,
+    "positive_control": "remove_only_wall_without_repositioning_selected_enemy",
+    "selected_enemy_active": true,
+    "start_input": "ENTER",
+    "target_grounded": true,
+    "target_stationary": true,
+    "wall_layer": 2,
+    "wall_size": [
+      80,
+      20,
+      1
+    ]
+  },
+  "knight_blocked": {
+    "active_ai_frames": 360,
+    "aimed_frames": 0,
+    "attacks": 0,
+    "damage_events": 0,
+    "enemy_end_position": [
+      297.425598144531,
+      24.0008163452148,
+      130.309112548828
+    ],
+    "frames": 360,
+    "health_loss": 0.0,
+    "live_projectile_frames": 0,
+    "los_visible_frames": 0,
+    "shots": 0,
+    "states": {
+      "patrol": 360
+    },
+    "telegraphs": 0
+  },
+  "knight_clear": {
+    "active_ai_frames": 540,
+    "aimed_frames": 0,
+    "attacks": 4,
+    "damage_events": 4,
+    "enemy_end_position": [
+      299.915832519531,
+      23.9998035430908,
+      131.8681640625
+    ],
+    "frames": 540,
+    "health_loss": 28.0,
+    "live_projectile_frames": 0,
+    "los_visible_frames": 540,
+    "shots": 0,
+    "states": {
+      "chase": 276,
+      "windup": 264
+    },
+    "telegraphs": 0
+  },
+  "turret_blocked": {
+    "active_ai_frames": 360,
+    "aimed_frames": 0,
+    "attacks": 0,
+    "damage_events": 0,
+    "enemy_end_position": [
+      300.0,
+      24.0499992370605,
+      130.0
+    ],
+    "frames": 360,
+    "health_loss": 0.0,
+    "live_projectile_frames": 0,
+    "los_visible_frames": 0,
+    "shots": 0,
+    "states": {
+      "idle": 360
+    },
+    "telegraphs": 0
+  },
+  "turret_clear": {
+    "active_ai_frames": 660,
+    "aimed_frames": 660,
+    "attacks": 0,
+    "damage_events": 2,
+    "enemy_end_position": [
+      300.0,
+      24.0499992370605,
+      130.0
+    ],
+    "frames": 660,
+    "health_loss": 36.0,
+    "live_projectile_frames": 100,
+    "los_visible_frames": 660,
+    "shots": 3,
+    "states": {
+      "reload": 510,
+      "windup": 150
+    },
+    "telegraphs": 2
+  }
+}

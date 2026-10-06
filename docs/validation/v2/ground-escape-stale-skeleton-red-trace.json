@@ -1,0 +1,506 @@
+{
+ "articulation": {
+  "branch_recovered": 0,
+  "full_fallback": 338,
+  "rejected": 338,
+  "uncleared": 320
+ },
+ "failures": [
+  "Every observed final rendered hull stays outside real terrain and fortress surfaces",
+  "Every original skinned vertex is checked each observed frame against actual terrain, within existing 5cm limit",
+  "Original claw stance remains locked within existing 1.5cm limit"
+ ],
+ "frames": [
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(215.0, 27.5001, 204.995)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, -0.3)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(215.0, 27.5001, 202.625)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, -7.5)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.0, 27.5001, 198.875)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, -7.5)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "nonconvex_overlap_requires_clearance"
+    }
+   ],
+   "frame": 90,
+   "position": "(215.0, 27.5001, 197.3452)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "nonconvex_overlap_requires_clearance"
+    }
+   ],
+   "frame": 120,
+   "position": "(215.0, 27.5001, 197.3452)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "nonconvex_overlap_requires_clearance"
+    }
+   ],
+   "frame": 150,
+   "position": "(215.0, 27.5001, 197.3452)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "nonconvex_overlap_requires_clearance"
+    }
+   ],
+   "frame": 180,
+   "position": "(215.0, 27.5001, 197.3452)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "nonconvex_overlap_requires_clearance"
+    }
+   ],
+   "frame": 210,
+   "position": "(215.0, 27.5001, 197.3452)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "nonconvex_overlap_requires_clearance"
+    }
+   ],
+   "frame": 240,
+   "position": "(215.0, 27.5001, 197.3452)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "nonconvex_overlap_requires_clearance"
+    }
+   ],
+   "frame": 270,
+   "position": "(215.0, 27.5001, 197.3452)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(215.0, 27.5001, 197.3502)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.3)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(215.0, 27.5001, 199.1451)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 4.5)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.0, 27.5001, 201.3951)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 4.5)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(215.0, 27.5001, 203.645)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 4.5)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(215.0, 27.5001, 205.8949)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 4.5)",
+   "yaw": 0.0
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "swept"
+    }
+   ],
+   "frame": 150,
+   "position": "(215.0, 27.59212, 208.0049)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.215393, 0.53704)",
+   "yaw": 0.0
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.00154188368469477
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.00171657931059599
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": true,
+     "reason": "terrain_pose_requires_clearance"
+    }
+   ],
+   "frame": 60,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.00173176848329604
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": true,
+     "reason": "terrain_pose_requires_clearance"
+    }
+   ],
+   "frame": 90,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.00174695625901222
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.00019748872728087
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.301791250705719
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.651587247848511
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -1.00158643722534
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -1.35158622264862
+  },
+  {
+   "details": [],
+   "frame": 150,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -1.70158612728119
+  },
+  {
+   "details": [],
+   "frame": 180,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -2.05158638954163
+  },
+  {
+   "details": [],
+   "frame": 210,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -2.40158653259277
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left_return",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -2.77677273750305
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left_return",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -2.49463248252869
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left_return",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -2.14491844177246
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(215.0, 27.59465, 208.1245)",
+   "stage": "left_return",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -1.79491996765137
+  }
+ ],
+ "maximum_fire_head_error_deg": 0.0,
+ "maximum_fire_mouth_error_m": 0.0,
+ "maximum_head_step_deg": 4.00011138647537,
+ "maximum_overlap_count": 2,
+ "maximum_stance_slide_m": 0.234382882714272,
+ "minimum_skin_terrain_clearance_m": -1.28313827514648,
+ "original_vertices_checked": 24578880,
+ "overlap_diagnostics": [
+  {
+   "frame": 90,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/SiegeEnvironment/@MeshInstance3D@47/_MeshInstance3D_47_col"
+     ],
+     "depth": 0.00345720397308469,
+     "hull": 17
+    }
+   ],
+   "stage": "forward"
+  },
+  {
+   "frame": 120,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/SiegeEnvironment/@MeshInstance3D@47/_MeshInstance3D_47_col"
+     ],
+     "depth": 0.00701740710064769,
+     "hull": 17
+    }
+   ],
+   "stage": "forward"
+  },
+  {
+   "frame": 150,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/SiegeEnvironment/@MeshInstance3D@47/_MeshInstance3D_47_col"
+     ],
+     "depth": 0.00947215687483549,
+     "hull": 17
+    }
+   ],
+   "stage": "forward"
+  },
+  {
+   "frame": 180,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/SiegeEnvironment/@MeshInstance3D@47/_MeshInstance3D_47_col"
+     ],
+     "depth": 0.009822235442698,
+     "hull": 17
+    }
+   ],
+   "stage": "forward"
+  },
+  {
+   "frame": 210,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/SiegeEnvironment/@MeshInstance3D@47/_MeshInstance3D_47_col"
+     ],
+     "depth": 0.00826201122254133,
+     "hull": 17
+    }
+   ],
+   "stage": "forward"
+  },
+  {
+   "frame": 240,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/SiegeEnvironment/@MeshInstance3D@47/_MeshInstance3D_47_col"
+     ],
+     "depth": 0.00540958484634757,
+     "hull": 17
+    }
+   ],
+   "stage": "forward"
+  },
+  {
+   "frame": 270,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/SiegeEnvironment/@MeshInstance3D@47/_MeshInstance3D_47_col"
+     ],
+     "depth": 0.00216539856046438,
+     "hull": 17
+    }
+   ],
+   "stage": "forward"
+  },
+  {
+   "frame": 60,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+     ],
+     "depth": 0.0,
+     "hull": 2
+    }
+   ],
+   "stage": "left"
+  },
+  {
+   "frame": 90,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+     ],
+     "depth": 0.0,
+     "hull": 2
+    }
+   ],
+   "stage": "left"
+  }
+ ],
+ "retreat_fire_frames": 180,
+ "retreat_head_angles": [
+  15.0003355965052,
+  -14.999701987104
+ ],
+ "stages": {
+  "forward": {
+   "horizontal_distance_m": 7.65480041503906,
+   "yaw_delta_deg": 0.0
+  },
+  "left": {
+   "horizontal_distance_m": 0.0,
+   "yaw_delta_deg": 0.10009318728483
+  },
+  "left_return": {
+   "horizontal_distance_m": 0.0,
+   "yaw_delta_deg": 77.5277287403872
+  },
+  "reverse": {
+   "horizontal_distance_m": 10.779296875,
+   "yaw_delta_deg": 0.0
+  },
+  "right": {
+   "horizontal_distance_m": 0.0,
+   "yaw_delta_deg": -159.084999478703
+  }
+ }
+}

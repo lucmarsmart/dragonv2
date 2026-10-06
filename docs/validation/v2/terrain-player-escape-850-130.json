@@ -1,0 +1,689 @@
+{
+  "failures": [],
+  "fixture_xz": [
+    850.0,
+    130.0
+  ],
+  "frames": [
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(838.1879, 80.59825, 147.5166)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(837.6982, 80.87164, 149.6382)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-1.642354, 0.0, 7.312346)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "cast_budget_exhausted"
+        }
+      ],
+      "frame": 60,
+      "position": "(837.2592, 80.82317, 151.5458)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 90,
+      "position": "(836.7823, 80.74115, 153.6301)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-1.500991, -0.273432, 6.558628)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "cast_budget_exhausted"
+        }
+      ],
+      "frame": 120,
+      "position": "(836.3404, 80.63, 155.5612)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(836.1809, 80.60358, 156.2579)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-0.601942, -0.098435, 2.630204)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(836.1725, 80.61529, 156.2964)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-0.506225, 0.702718, 2.309625)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(836.1649, 80.62589, 156.3312)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-0.458339, 0.636244, 2.091147)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(836.158, 80.63539, 156.3624)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-0.410453, 0.569771, 1.872669)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(836.152, 80.64378, 156.39)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-0.362566, 0.503298, 1.654191)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(836.1467, 80.65105, 156.4139)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(-0.31468, 0.436825, 1.435713)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(836.1423, 80.65723, 156.4342)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-0.266794, 0.370351, 1.217235)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(836.4424, 80.63567, 155.1145)",
+      "stage": "reverse",
+      "turn_blocked": true,
+      "velocity": "(1.003237, 0.164059, -4.383674)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(836.9441, 80.71761, 152.9228)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(1.003237, 0.164059, -4.383674)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 90,
+      "position": "(837.1992, 80.79955, 151.8079)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.331486, 0.164059, -1.448439)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(837.5035, 80.85439, 150.4782)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(1.003237, 0.164059, -4.383674)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(837.7208, 80.91816, 149.4379)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.854024, 0.14915, -3.80242)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(837.7342, 80.92049, 149.3784)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.802929, 0.140226, -3.574925)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(837.7467, 80.92268, 149.3226)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.751833, 0.131303, -3.34743)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(837.7584, 80.92472, 149.2706)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.700738, 0.122379, -3.119934)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(837.7692, 80.92661, 149.2224)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.649642, 0.113456, -2.892439)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(837.7791, 80.92835, 149.1779)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(0.598547, 0.104532, -2.664944)",
+      "yaw": 2.92006230354309
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 0,
+      "position": "(837.7855, 80.92995, 149.1497)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.380342, 0.095609, -1.693418)",
+      "yaw": 2.92191576957703
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 3.07170271873474
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.869300365448
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.51933360099792
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16933369636536
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553592681885
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553592681885
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553592681885
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553592681885
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(837.8255, 80.93768, 148.9644)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553592681885
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(837.8297, 80.93768, 148.9672)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.248484, 0.000166, 0.168094)",
+      "yaw": -2.16553592681885
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 30,
+      "position": "(837.9385, 80.93788, 149.0408)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.000166, 0.0)",
+      "yaw": -2.16553568840027
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 60,
+      "position": "(838.0773, 80.94235, 149.1347)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.513276, 0.000831, 0.347218)",
+      "yaw": -2.16553544998169
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(840.0381, 82.0015, 150.4747)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(0.647051, 0.233016, 0.514778)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(841.0984, 82.3833, 151.3182)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(2.214738, 0.79757, 1.761991)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 150,
+      "position": "(842.1456, 82.79779, 152.1362)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.564104, 0.893593, 0.419639)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 150,
+      "position": "(842.1573, 82.81211, 152.1449)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.703486, 0.859252, 0.523325)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 150,
+      "position": "(842.1717, 82.82143, 152.1556)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.859006, 0.558992, 0.639017)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "swept"
+        }
+      ],
+      "frame": 150,
+      "position": "(842.1884, 82.82523, 152.1681)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.005215, 0.228236, 0.747782)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(842.1884, 82.82523, 152.1681)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(842.1884, 82.82523, 152.1681)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(842.1844, 82.8245, 152.1651)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-0.238081, -0.044153, -0.177109)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(840.8704, 82.41384, 151.1385)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-3.389475, -1.220616, -2.696583)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [
+        {
+          "pose_clearance": false,
+          "reason": "cast_budget_exhausted"
+        }
+      ],
+      "frame": 60,
+      "position": "(840.0867, 82.13177, 150.5154)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(839.9625, 82.08697, 150.4165)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-0.45193, -0.162749, -0.359544)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(839.8496, 82.04623, 150.3266)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-0.45193, -0.162749, -0.359544)",
+      "yaw": -2.16553521156311
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(839.77, 82.01746, 150.2646)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-0.231223, -0.083962, -0.171716)",
+      "yaw": -2.13153576850891
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(839.7691, 82.01714, 150.2639)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-0.051419, -0.018676, -0.038102)",
+      "yaw": -2.1306676864624
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(839.7691, 82.01714, 150.2639)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.12994432449341
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(839.7691, 82.01714, 150.2639)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.12934160232544
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(839.7691, 82.01714, 150.2639)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.1410083770752
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(839.7691, 82.01714, 150.2639)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.15267515182495
+    }
+  ],
+  "landing_position": "(838.1879, 80.61292, 147.5166)",
+  "landing_ticks": 725,
+  "manual_override": false,
+  "maximum_overlap_count": 2,
+  "maximum_prop_overlap_count": 0,
+  "maximum_stance_slide_m": 0.00207160180434585,
+  "minimum_skin_terrain_clearance_m": -0.030572006553399,
+  "original_vertices_checked": 19202250,
+  "overlap_diagnostics": [],
+  "source_after": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "651406486c380870604869b117aeb48bdd8d90a17a715f2569e7dff4aedeb660",
+    "res://scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "12b5fa896814d13e8f9685f8e1f474103ed0e029a39e3fff81301ed351aee362",
+    "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+    "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+    "res://scripts/dragon_controller.gd": "5c2fd046898bf82363e74f56dfccb298bf941e2b0fe3ea2077c2c7bd72ab23ef",
+    "res://scripts/dragon_ground_contact.gd": "d32898ac30ea9d3abb9c1fb40dac3bcbd2c30c7ad51386144c3eb215f68254e0",
+    "res://scripts/dragon_ground_pose.gd": "c38e0386f6011fe138098b0c13a49d866b612202ec6940d6dd581b3bba4b4f30",
+    "res://scripts/dragon_head_pose.gd": "ae6fe09711b88bb251d6033a4a95d2afcedb675c9921b4cae6926decd4960232",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "4730c75e620d65c3526be92aaae03c5151bc269981647d7ec731e430e4318c91",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b11a6fc0303ce458171aa147ed92178ceca743d22a280442b33f180f02be8606",
+    "res://scripts/terrain.gd": "065445c6ff25d284676f44e614ef3a00f7db0b6fcc294d595f92fdf8b5a0fe66"
+  },
+  "source_before": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "651406486c380870604869b117aeb48bdd8d90a17a715f2569e7dff4aedeb660",
+    "res://scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "12b5fa896814d13e8f9685f8e1f474103ed0e029a39e3fff81301ed351aee362",
+    "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+    "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+    "res://scripts/dragon_controller.gd": "5c2fd046898bf82363e74f56dfccb298bf941e2b0fe3ea2077c2c7bd72ab23ef",
+    "res://scripts/dragon_ground_contact.gd": "d32898ac30ea9d3abb9c1fb40dac3bcbd2c30c7ad51386144c3eb215f68254e0",
+    "res://scripts/dragon_ground_pose.gd": "c38e0386f6011fe138098b0c13a49d866b612202ec6940d6dd581b3bba4b4f30",
+    "res://scripts/dragon_head_pose.gd": "ae6fe09711b88bb251d6033a4a95d2afcedb675c9921b4cae6926decd4960232",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "4730c75e620d65c3526be92aaae03c5151bc269981647d7ec731e430e4318c91",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b11a6fc0303ce458171aa147ed92178ceca743d22a280442b33f180f02be8606",
+    "res://scripts/terrain.gd": "065445c6ff25d284676f44e614ef3a00f7db0b6fcc294d595f92fdf8b5a0fe66"
+  },
+  "stage_quality": {
+    "forward": {
+      "frames": 156,
+      "maximum_stance_slide_m": 0.00123925413936377,
+      "minimum_skin_terrain_clearance_m": 0.000437131375051081
+    },
+    "forward_after_turn": {
+      "frames": 156,
+      "maximum_stance_slide_m": 0.00158338889013976,
+      "minimum_skin_terrain_clearance_m": 0.000318552553622453
+    },
+    "left": {
+      "frames": 126,
+      "maximum_stance_slide_m": 0.00150745711289346,
+      "minimum_skin_terrain_clearance_m": 0.00378186542546644
+    },
+    "reverse": {
+      "frames": 156,
+      "maximum_stance_slide_m": 0.00192720373161137,
+      "minimum_skin_terrain_clearance_m": -0.030572006553399
+    },
+    "reverse_after_turn": {
+      "frames": 156,
+      "maximum_stance_slide_m": 0.00207160180434585,
+      "minimum_skin_terrain_clearance_m": 0.0212396142631803
+    }
+  },
+  "stages": {
+    "forward": {
+      "horizontal_distance_m": 9.12850952148438,
+      "yaw_delta_deg": 0.0
+    },
+    "forward_after_turn": {
+      "horizontal_distance_m": 5.41282320022583,
+      "yaw_delta_deg": 0.0000409811350200765
+    },
+    "left": {
+      "horizontal_distance_m": 0.218556582927704,
+      "yaw_delta_deg": 68.6166851010607
+    },
+    "reverse": {
+      "horizontal_distance_m": 7.41781949996948,
+      "yaw_delta_deg": 0.0
+    },
+    "reverse_after_turn": {
+      "horizontal_distance_m": 3.07876205444336,
+      "yaw_delta_deg": 0.736827147282636
+    }
+  },
+  "teleports_after_initial_aerial_fixture": 0,
+  "worst_skin": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 0
+    },
+    "clearance": -0.030572006553399,
+    "physics_frame": 1313,
+    "process_frame": 1312,
+    "ray": "{ \"position\": (839.6038, 77.81102, 150.6258), \"normal\": (-0.375049, 0.925518, 0.052481), \"face_index\": 118348, \"collider_id\": 48989472361, \"collider\": ErodedValleyGround_col:<StaticBody3D#48989472361>, \"shape\": 0, \"rid\": RID(5463198400514) }",
+    "root": "(837.2206, 80.80775, 151.7141)",
+    "rotation": "(-0.036467, 2.920062, 0.094285)",
+    "sample": "{ \"vertex\": (-2.474051, -2.890992, 4.799263), \"influence\": [{ \"bone\": 6, \"bind\": [X: (-16.13717, 12.67962, -150.024), Y: (37.07317, -145.9051, -16.31943), Z: (-145.9254, -38.47026, 12.44489), O: (685.2425, -138.1908, -445.7282)], \"weight\": 0.57647061347961, \"key\": 2006 }, { \"bone\": 5, \"bind\": [X: (17.78828, 10.24232, -150.0235), Y: (-149.2005, 20.04617, -16.3223), Z: (18.75705, 149.7407, 12.44702), O: (-20.93125, -584.1899, -445.7354)], \"weight\": 0.42352941632271, \"key\": 2005 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": -1, \"limb_claw\": -1, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 15669 }",
+    "stage": "reverse",
+    "tick": 93,
+    "world": "(839.6038, 77.78043, 150.6258)"
+  },
+  "worst_stance": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 0
+    },
+    "claw": 23,
+    "point": "(839.0873, 77.65413, 151.3959)",
+    "previous": "(839.0888, 77.65332, 151.3973)",
+    "root": "(840.1281, 82.1467, 150.5483)",
+    "rotation": "(0.289795, -2.165535, -0.268431)",
+    "sample": "{ \"vertex\": (-4.591046, -2.894905, 2.595331), \"influence\": [{ \"bone\": 33, \"bind\": [X: (114.8323, 82.01749, -54.9097), Y: (-80.71016, 126.5198, 20.19088), Z: (56.81624, 13.95589, 139.6647), O: (167.3499, 717.515, -575.5001)], \"weight\": 0.93725490570068, \"key\": 2033 }, { \"bone\": 34, \"bind\": [X: (91.35137, 107.5537, -54.9138), Y: (-109.1403, 103.005, 20.18463), Z: (51.69249, 27.40324, 139.664), O: (-43.51487, 728.8987, -575.5366)], \"weight\": 0.0627451017499, \"key\": 2034 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": 23, \"limb_claw\": 23, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 17209 }",
+    "slide": 0.00207160180434585,
+    "stage": "reverse_after_turn",
+    "tick": 53
+  }
+}

@@ -1,0 +1,135 @@
+{
+	"captain_dead": true,
+	"damage_api_calls": 0,
+	"damage_events": 21,
+	"failure": "",
+	"fire_hits": 674,
+	"health": 27.0,
+	"input_events": 2755,
+	"input_method": "Input.parse_input_event: Enter, T, L, W/A/S/D/Shift/E/F and mouse head-aim motion",
+	"max_physics_step_m": 1.47777104377747,
+	"pass": true,
+	"path_distance_m": 558.118620297173,
+	"performance": {
+		"by_phase_and_locomotion": {
+			"1/air": {
+				"elapsed_wall_s": 6.552143,
+				"fps_actual_wall": 60.5908631725529,
+				"frame_p95_ms": 20.786,
+				"frames": 397
+			},
+			"1/grounded": {
+				"elapsed_wall_s": 29.756626,
+				"fps_actual_wall": 41.4025434200773,
+				"frame_p95_ms": 25.621,
+				"frames": 1232
+			},
+			"2/grounded": {
+				"elapsed_wall_s": 5.761191,
+				"fps_actual_wall": 32.4585662929766,
+				"frame_p95_ms": 34.37,
+				"frames": 187
+			},
+			"3/grounded": {
+				"elapsed_wall_s": 38.267959,
+				"fps_actual_wall": 6.03638150652351,
+				"frame_p95_ms": 33.936,
+				"frames": 231
+			},
+			"4/grounded": {
+				"elapsed_wall_s": 17.113763,
+				"fps_actual_wall": 40.0262642412426,
+				"frame_p95_ms": 26.753,
+				"frames": 685
+			}
+		},
+		"capture_io_intervals_excluded": 8,
+		"device": "Apple M5 (Apple9)",
+		"measurement": "Time.get_ticks_usec deltas between process_frame signals; previous-frame phase and grounded state",
+		"movie_maker_enabled": false,
+		"post_warmup_all_intervals": {
+			"elapsed_wall_s": 101.301993,
+			"fps_actual_wall": 27.0478390291887,
+			"frame_p95_ms": 31.802,
+			"frames": 2740
+		},
+		"post_warmup_without_capture_io": {
+			"elapsed_wall_s": 97.4516819999999,
+			"fps_actual_wall": 28.0344058094349,
+			"frame_p95_ms": 31.731,
+			"frames": 2732
+		},
+		"reference_budget_met": false,
+		"reference_only": {
+			"fps": 60,
+			"frame_p95_ms": 25
+		},
+		"renderer_method": "forward_plus",
+		"valid_runtime_fps_measurement": true,
+		"viewport": [
+			1280,
+			720
+		],
+		"warmup_frames_excluded": 300,
+		"warmup_seconds_wall": 5.0
+	},
+	"phase": 5,
+	"phase_sequence": [
+		1,
+		2,
+		3,
+		4,
+		5
+	],
+	"renderer": "macOS",
+	"runtime_sources_sha256": {
+		"project.godot": "651406486c380870604869b117aeb48bdd8d90a17a715f2569e7dff4aedeb660",
+		"scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+		"scripts/combat/play_siege_validation.gd": "bf92536466184d3c5f142bd464aad2242c8ff2efad0d6b0cbd62bb7f31b9c34a",
+		"scripts/combat/siege_combat.gd": "87d8de83bb272177c7d6698bb349b010773b3c69daeaed78dfb0320e8efcb254",
+		"scripts/combat/siege_enemy.gd": "e945d302fcbd4536261fb2bcfa4435553b8233ee81d7f9f27f461afd21555d52",
+		"scripts/combat/siege_projectile.gd": "bbcda581159c1ecf55b5d2c453e3b40303e42ce1c3e1902c5b0806552e3c3289",
+		"scripts/combat/siege_ui.gd": "9b7284b7f10cef1ee023d85fc32292d39f0bc141426eb35bf3639ad52f583858",
+		"scripts/dragon_breath.gd": "ec562e2dd66fbdbd925b9791df37dcdf4b2ca99cc068aff0d58eb012f195cbd4",
+		"scripts/dragon_breath_modifier.gd": "aaa8b7c711aa1fb36b326ce191690baec57d3295b49bc6dd1a7c902ec95b2f70",
+		"scripts/dragon_controller.gd": "fca0de8352e4d2ad6af56a4b89ebafb605dff0ace3738ac56b595b9692070a32",
+		"scripts/dragon_ground_pose.gd": "7ce7d5a621a69b5a306039fe254230e076b74553b15eb6613ad0df6a8edbd443",
+		"scripts/dragon_head_pose.gd": "121826b3644dfc11e75856a3dc840cfbc870c0ba38136e46757383cb13fca93c",
+		"scripts/dragon_pose_probe.gd": "8786a7c7fab61cdf04365620b65b588d6934cb091e193ab12bdf80d341901344",
+		"scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+		"scripts/dragon_wing_contact.gd": "75cbba0a545ac90574bbf32b8ee869db9f9a8be1ab1fda0597de62307aed6cea",
+		"scripts/dragon_wing_extrema.json": "6b5bcdbc7e238be8d279643ab16349ba32940ef92958d3a8e7a0b7083ebcdf8c",
+		"scripts/siege_environment.gd": "2a4bd5a691732bcb7e2693a7bceeb621d87201a9bfec0a5b8c0827b2e2904659",
+		"scripts/terrain.gd": "c63fe70bcc2cd8624fd32081580ad6830eb69e57101b1302654074983dc2c2c8",
+		"shaders/dragon_wing.gdshader": "cdadc4e0ce4dfe8fce75fcb5d3a18196a59e2292f67a776fbe62e826ccff1855",
+		"shaders/flame.gdshader": "1d57c6f5107a85055470a53124e611b097457dcca6ce2b8bbbcfab83c9d98ddb",
+		"shaders/foliage.gdshader": "894d9e06e1adccbb07d65628e18ba10c0b8e32c9619b9c1995ae1fbd41f122f0",
+		"shaders/landscape_sky.gdshader": "ef21b5abeaca2ee6f8d4d9368f4159da93c80e161914d6515286d6c432c165dd",
+		"shaders/landscape_water.gdshader": "8837d2d27a80d33cf3aa72b13bbe1a3f8c7d0e6ae01836c18bc3cda5c2bd63b3",
+		"shaders/siege_egg.gdshader": "c060b1244f1827c50a71f8c07956a0b666a2da477d35428ce5d9be64913e7142",
+		"shaders/smoke.gdshader": "e06c2ebb57e650752ee5f5bc8254f13dbbc78fe1fefb78038794821deb8582a1",
+		"shaders/terrain.gdshader": "a6da0cc3ef71402c57cbc7454af652c7fbf5ceb80d0f7cae733480af6832fe5e"
+	},
+	"runtime_sources_unchanged_at_finish": true,
+	"runtime_state_overrides": 0,
+	"shots_fired": 15,
+	"snapshots": [
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-00000-briefing.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-00000-phase_1.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-00000-sequence.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-00600-sequence.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-01200-sequence.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-01800-sequence.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-01889-phase_2.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-02077-phase_3.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-02309-phase_4.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-02400-sequence.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-02996-phase_5.png",
+		"res://docs/validation/v2/anatomy-profile-playthrough-native-02997-victory.png"
+	],
+	"source_files_changed_during_run": [],
+	"start_via_enter": true,
+	"teleports_after_start": 0,
+	"time": 72.0999999999972,
+	"turrets_destroyed": 3
+}

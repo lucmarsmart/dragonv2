@@ -1,0 +1,314 @@
+[
+ {
+  "details": [],
+  "frame": 0,
+  "position": "(215.0, 27.50015, 204.995)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.3)",
+  "yaw": 0.0
+ },
+ {
+  "details": [],
+  "frame": 30,
+  "position": "(215.0, 27.50015, 202.625)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -7.5)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 60,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 90,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 120,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 150,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 180,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 210,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 240,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 270,
+  "position": "(215.0, 27.50015, 201.6317)",
+  "stage": "forward",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, -0.000183)",
+  "yaw": 0.0
+ },
+ {
+  "details": [],
+  "frame": 0,
+  "position": "(215.0, 27.50015, 201.6367)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.3)",
+  "yaw": 0.0
+ },
+ {
+  "details": [],
+  "frame": 30,
+  "position": "(215.0, 27.50015, 203.5066)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 4.5)",
+  "yaw": 0.0
+ },
+ {
+  "details": [],
+  "frame": 60,
+  "position": "(215.0, 27.50015, 205.7565)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 4.5)",
+  "yaw": 0.0
+ },
+ {
+  "details": [],
+  "frame": 90,
+  "position": "(215.0, 27.57757, 207.7664)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.028719, 0.599312)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": true,
+    "reason": "terrain_pose_requires_clearance"
+   }
+  ],
+  "frame": 120,
+  "position": "(215.0, 27.587, 207.9653)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.0
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": false,
+    "reason": "swept"
+   }
+  ],
+  "frame": 150,
+  "position": "(215.0, 27.59013, 208.0235)",
+  "stage": "reverse",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.028719, 0.224742)",
+  "yaw": 0.0
+ },
+ {
+  "details": [],
+  "frame": 0,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "left",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.00194444437511265
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": true,
+    "reason": "terrain_pose_requires_clearance"
+   }
+  ],
+  "frame": 30,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "left",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.00645364634692669
+ },
+ {
+  "details": [],
+  "frame": 60,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "left",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.00686379428952932
+ },
+ {
+  "details": [
+   {
+    "pose_clearance": true,
+    "reason": "terrain_pose_requires_clearance"
+   }
+  ],
+  "frame": 90,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "left",
+  "turn_blocked": true,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.00689416751265526
+ },
+ {
+  "details": [],
+  "frame": 0,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": 0.00495731085538864
+ },
+ {
+  "details": [],
+  "frame": 30,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": -0.308268874883652
+ },
+ {
+  "details": [],
+  "frame": 60,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": -0.658099114894867
+ },
+ {
+  "details": [],
+  "frame": 90,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": -1.00809812545776
+ },
+ {
+  "details": [],
+  "frame": 120,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": -1.35809803009033
+ },
+ {
+  "details": [],
+  "frame": 150,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": -1.70809805393219
+ },
+ {
+  "details": [],
+  "frame": 180,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": -2.05809831619263
+ },
+ {
+  "details": [],
+  "frame": 210,
+  "position": "(215.0, 27.59515, 208.1351)",
+  "stage": "right",
+  "turn_blocked": false,
+  "velocity": "(0.0, 0.0, 0.0)",
+  "yaw": -2.4080982208252
+ }
+]

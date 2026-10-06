@@ -1,0 +1,43 @@
+# Revisión visual del candidato de entorno y assets
+
+> REABIERTO por los fallos de descenso y atasco reportados por el usuario. Las inspecciones y cifras anteriores describen el candidato previo; faltan las capturas y mediciones nativas sobre la corrección actual. No acreditan el cierre de estos fallos.
+
+
+Revisor:agente raíz,5 octubre2026. Inspección directa de PNG producidos por Godot4.7.2/Metal4/Forward+ a1280×720; no se deduce calidad por número de polígonos. Fuentes fotográficas/PBR y derechos primarios: `environment-research.md`, `environment-assets.json`, `assets/LICENSES.md`; caballero y ballista: `docs/assets-siege.md`.
+
+| Criterio | Imágenes inspeccionadas | Observación concreta |
+|---|---|---|
+| D03 anatomía/armadura | `tests/artifacts/siege-assets/knight-idle.png`, `combat-knight-and-dragon.png` | Casco, placas articuladas, guanteletes, escudo/espada y tejidos diferenciados; reflejos metálicos y normales visibles. La marcha/ataque/muerte usan rig propio del derivado. Junto al dragón mantiene escala humana y materiales de juego detallados. |
+| D03 artillería | `tests/artifacts/siege-assets/ballista-closeup.png`, capturas del playthrough | Arco, cuerdas, guía del virote, herrajes, soportes y manivelas reconocibles; textura de madera y metal. Giro/elevación se verifica en el combate, no en esta imagen inmóvil. |
+| D03/D04 fortaleza | `environment-fortress.png`, `combat-knight-and-dragon.png` | Mampostería erosionada, almenas/torres/portón/linternas modelados; escala consistente. Suelo despejado permite leer blancos y caminar; no es una sustitución por cubos. |
+| D09 vegetación | `environment-pine.png`, `environment-fortress-air.png`, `environment-mountain.png` | Rechazado el atlas cruzado anterior por aspecto de recorte vertical. Candidato final mantiene tronco y ramitas tridimensionales incluso lejos; tamaños/distribución por grupos cambian la silueta. LOD lejano pierde agujas pequeñas; se ve vegetación de juego simplificada, no fotografía. |
+| D09 suelo/montaña | `environment-mountain.png`, `environment-fortress-air.png`, `environment-river.png` | Suelo fotográfico granular con mezcla de escalas; roca real erosionada en afloramientos, silueta de cordillera y niebla progresiva. Colinas cercanas siguen siendo relieve procedural suavizado; se eliminó homogeneidad verde saturada/picos blancos facetados. |
+| D09 agua/luz | `environment-river-close.png`, `environment-river.png`, `environment-fortress-air.png` | Cauce sinuoso, ribera irregular, fondo visible cerca, absorción, reflexión del cielo/sol y ondas en varias escalas. Sin borde de plano rectangular. Sombras de árboles/dragón/fortaleza coinciden con dirección del sol, contacto oscuro porSSAO y distancia porniebla. Reflexión por probe, sin SSR completo. |
+| D02/D08 pose | `anatomy-gait-0066.png`, `anatomy-gait-0168.png`, `anatomy-glide-0450.png`, `anatomy-land-0255.png` | Cabeza mira adelante, patas alternan extensión/apoyo, alas plegadas sobre el cuerpo durante marcha y antes de contacto. Vídeos laterales y tres vistas de planeo complementan estas imágenes. La cuantificación independiente está en anatomy-report.md. |
+| D06 interfaz | `ui-help-960.png`, `playthrough-metal-04252-victory.png` | Atajos/objetivo en español legibles; ayuda separa cuerpo/cabeza y no solapa salud/objetivo. Victoria legible, con botón y atajo para repetir. Se vuelve a verificar teclado y latencia tras el arreglo de foco. |
+
+Juicio del entorno final:D03/D09 aceptados como paisaje y modelos de juego con materiales fotográficos y mejora visible, conservando las limitaciones expuestas. No se afirma que todo el horizonte sea fotográfico ni que la naturalidad tenga una demostración numérica. La revisión adversarial final debe inspeccionar estas mismas imágenes y puede refutar este juicio.
+
+La grabación de misión positiva previa es baseline porque anatomía cambió después. El playthrough y benchmark definitivos se ejecutan sobre el freeze siguiente; esa vinculación aparece en el manifiesto final, no se inventa retrospectivamente.
+
+## Inspección final tras optimización de bosque
+Constructor volvió a abrir environment-fortress-air.png y environment-river-close.png después de freeze c63fe70b de terrain.gd. Copas mantienen volumen y sombras; agua refleja luz y deja ver fondo cerca de ribera. Las colinas y el patio conservan geometría procedural y simplificación a distancia: aceptados como juego PBR, no equivalentes a fotogrametría completa ni realismo absoluto. C3 debe inspeccionar imágenes y puede refutar esta evaluación.
+
+## Inspección posterior a FABRIK y soportes finales
+Root abrió directamente anatomy-gait-0066.png/0168.png y anatomy-land-0255.png/0453.png del nuevo capture Metal: codos/corvejones quedan sobre la superficie, patas alternan extensión y apoyo, cabeza adelante y alas recogidas durante contacto. Vídeos vigentes anatomy-gait-fabrik.mp4 y anatomy-land-fabrik.mp4; el planeo aéreo conserva su clip previo, con geometría revalidada en suite final. Root abrió también combat-knight-and-dragon.png/combat-aimed-fire.png posteriores al pase nativo: armadura/textura/sombra, proporción con dragón y chorro dirigido al enemigo reconocibles.
+
+## Revisión de roca y relieve después del escape rojo
+Root abrió personalmente environment-mountain.png, environment-fortress-air.png y environment-pine.png posteriores al nuevo relieve. Se rechazaron las laderas verdes uniformes y luego el mosaico visible de un parche del atlas del acantilado; aumentar PBR no los hacía naturales. El candidato actual usa Rock Face fotográfico 2K completo/repetible y relieve determinista de varias escalas: crestas múltiples, hombros irregulares, roca en pendientes y vegetación en bajos. La silueta central y fondo varían; desaparece la rejilla del atlas.
+
+Se acepta visualmente como paisaje de juego PBR con límites declarados, sujeto a comprobación física y C3. Conserva zonas jugables protegidas y algún relieve original junto al acceso; no es fotogrametría integral ni simulación física de erosión. El LOD lejano y la repetición fina de material son visibles, sin el mosaico rechazado. La física final y la misión nativa pasan; la inspección independiente C3 verifica suficiencia.
+
+## Captura del relieve y rig finales
+Root abrió anatomy-real-final-touchdown.png y anatomy-real-final-walk.png y cinco cuadros distribuidos del vídeo anatomy-real-final.mp4. Secuencia: aproximación con patas extendidas, alas recogidas antes de tocar, apoyo y marcha con cabeza elevada y fuego dirigido arriba. El árbol cercano y la ladera siguen presentes; no se limpiaron para la captura. La geometría continua se comprueba por separado sobre toda la piel. La lectura visual es de juego PBR: conserva relieve procedural y LOD visibles, sin afirmar equivalencia fotográfica. La misión nativa final y grabación pasan; C3 está pendiente.
+
+Root abrió de nuevo los modelos cercanos combat-knight-and-dragon/combat-aimed-fire, montaña y ribera, además de briefing/ayuda/créditos960. Abrió capturas recién producidas de la misión final: playthrough-metal-00600-sequence,02400-sequence,03199-phase_4 y04307-victory. Fuego orientado durante marcha, objetivos y resultado legibles; sombras coherentes visibles. Los límites de material repetido, laderas procedurales, LOD y simplificación del agua siguen declarados; no se afirma realismo fotográfico absoluto.
+
+Vista frontal en relieve: captura-real-front usa la regresión física íntegra y sólo cambia la cámara. Árboles y cresta ocultan parte de los pies; se declara esa limitación y se complementa con vista frontal del fixture llano, además del lateral sobre ladera y la comprobación continua de todos los vértices. No se retiraron props del escenario jugable para simular contacto correcto.
+
+Root abrió anatomy-flat-front-approach/touchdown/walk del runtime final: vista frontal despejada, patas extendidas en aproximación y apoyos al tocar/caminar; alas recogidas arriba. También abrió ambas tomas frontales de ladera, donde se mantiene y declara la oclusión física. Vídeo frontal llano producido con MovieMaker y regresión motion-only rc0, fuentes iguales. No se presenta el fixture llano como paisaje final.
+
+Ronda2: root abrió personalmente anatomy-bank-{left_turn,left_release,right_turn,right_release}.png nuevos, producidos por la misma prueba de locomoción con subclase sólo cámara/capturas; inclinación visible cambia de lado y se nivela al soltar. Actual UI960 briefing/help/credits también abiertos y legibles. Vídeos anteriores de aterrizaje/misión son históricos desde el cambio de anatomía y contacto. Se conservan sus receipts; la validación actual requiere regrabarlos con las fuentes corregidas.

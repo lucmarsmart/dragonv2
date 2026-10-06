@@ -1,0 +1,32 @@
+[
+  {
+    "receipt": "launcher-final-run.json",
+    "passed": true,
+    "current_source_mismatches": []
+  },
+  {
+    "receipt": "native-gates-run.json",
+    "passed": true,
+    "current_source_mismatches": []
+  },
+  {
+    "receipt": "playthrough-native-final-run.json",
+    "passed": true,
+    "current_source_mismatches": []
+  },
+  {
+    "receipt": "playthrough-metal-final-run.json",
+    "passed": true,
+    "current_source_mismatches": []
+  },
+  {
+    "receipt": "anatomy-real-front-final-run.json",
+    "passed": true,
+    "current_source_mismatches": []
+  },
+  {
+    "receipt": "anatomy-flat-front-final-run.json",
+    "passed": true,
+    "current_source_mismatches": []
+  }
+]

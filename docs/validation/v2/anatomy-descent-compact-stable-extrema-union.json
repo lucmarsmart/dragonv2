@@ -1,0 +1,26 @@
+{
+  "method": "Preserve1855IDs; add original extrema from stable rig-root partition construction only. Holdout2 never read.",
+  "previous_count": 1855,
+  "candidate_count": 1864,
+  "added_count": 9,
+  "added_ids": [
+    "Object_7:0:1016",
+    "Object_7:0:1172",
+    "Object_7:0:2158",
+    "Object_7:0:262",
+    "Object_7:0:3799",
+    "Object_7:0:5233",
+    "Object_7:0:5234",
+    "Object_7:0:5236",
+    "Object_7:0:5513"
+  ],
+  "stable_construction_poses": 152,
+  "unique_originals_per_pose": 5412,
+  "partition": "rig-root96-120-boundary-v1",
+  "construction_sha256": {
+    "docs/validation/v2/anatomy-descent-compact-stable-dense-final-poses.json.gz": "6e5efc1e5edc6035d524090c864a4b5eb2fb3bcd9857644c80c7565fea50c07a",
+    "docs/validation/v2/anatomy-descent-compact-stable-construction-poses.json": "67d5787c915fa565581cb138056813927ad8e7be082520f7186ef8f27ccefe5f"
+  },
+  "selection_sha256": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+  "ground_margin_m": 0.0
+}

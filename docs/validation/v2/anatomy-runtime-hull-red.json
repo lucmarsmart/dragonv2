@@ -1,0 +1,71 @@
+{
+  "candidate_count": 853,
+  "poses": 7,
+  "all_passed": false,
+  "maximum_outside_m": 0.41026629893488087,
+  "checks": {
+    "15deg_slope_stance": {
+      "max_signed_outside_m": [
+        0.056991559034822614,
+        0.41026629893488087
+      ],
+      "all_vertices": 5412,
+      "passed": false,
+      "runtime_query_margin_m": 0.25
+    },
+    "flat_land_stance": {
+      "max_signed_outside_m": [
+        1.3322676295501878e-15,
+        2.6645352591003757e-15
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.25
+    },
+    "flat_walk": {
+      "max_signed_outside_m": [
+        0.19312153209066482,
+        0.02619934076814048
+      ],
+      "all_vertices": 5412,
+      "passed": false,
+      "runtime_query_margin_m": 0.25
+    },
+    "frontal_prop": {
+      "max_signed_outside_m": [
+        0.2984313034503139,
+        0.25869340102112015
+      ],
+      "all_vertices": 5412,
+      "passed": false,
+      "runtime_query_margin_m": 1.2
+    },
+    "lateral_turn_prop": {
+      "max_signed_outside_m": [
+        1.9984014443252818e-15,
+        1.2434497875801753e-14
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "low_approach": {
+      "max_signed_outside_m": [
+        0.18045159404628008,
+        0.10929530254177917
+      ],
+      "all_vertices": 5412,
+      "passed": false,
+      "runtime_query_margin_m": 1.2
+    },
+    "neutral_glide": {
+      "max_signed_outside_m": [
+        1.7763568394002505e-15,
+        1.7763568394002505e-15
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "candidate_count": 1108,
+  "poses": 9,
+  "all_passed": false,
+  "maximum_outside_m": 0.2287355057681828,
+  "checks": {
+    "brake_approach_12": {
+      "max_signed_outside_m": [
+        0.07521074544577422,
+        0.2287355057681828
+      ],
+      "all_vertices": 5412,
+      "passed": false,
+      "runtime_query_margin_m": 1.2
+    },
+    "brake_approach_24": {
+      "max_signed_outside_m": [
+        0.10431419010098386,
+        0.16378549493831396
+      ],
+      "all_vertices": 5412,
+      "passed": false,
+      "runtime_query_margin_m": 1.2
+    },
+    "brake_approach_6": {
+      "max_signed_outside_m": [
+        0.15291729223187006,
+        0.19327658201235298
+      ],
+      "all_vertices": 5412,
+      "passed": false,
+      "runtime_query_margin_m": 1.2
+    },
+    "brake_descent_180": {
+      "max_signed_outside_m": [
+        2.541396531763329e-05,
+        1.8261332529523333e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "brake_descent_90": {
+      "max_signed_outside_m": [
+        3.668448226967769e-05,
+        3.236707951970175e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "brake_touchdown": {
+      "max_signed_outside_m": [
+        1.7218497176507697e-05,
+        0.007241426759342612
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    },
+    "dive_180": {
+      "max_signed_outside_m": [
+        2.5449318862724724e-05,
+        2.632492241305684e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "dive_90": {
+      "max_signed_outside_m": [
+        1.676707866193894e-05,
+        2.0027777082987086e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 1.2
+    },
+    "ground_compact": {
+      "max_signed_outside_m": [
+        1.2983888968420843e-05,
+        1.6635409130216772e-05
+      ],
+      "all_vertices": 5412,
+      "passed": true,
+      "runtime_query_margin_m": 0.0
+    }
+  }
+}

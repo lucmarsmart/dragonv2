@@ -1,0 +1,15 @@
+{
+  "combat_running_fraction": 1.0,
+  "device": "Apple M5 (Apple9)",
+  "draws_max": 368.0,
+  "elapsed_s": 60.018286,
+  "fire_active_fraction": 0.19772583701832,
+  "fps_average": 26.3752950225869,
+  "frame_p95_ms": 55.068,
+  "frames": 1583,
+  "health": 240.0,
+  "passed": false,
+  "renderer": "forward_plus",
+  "shots_fired": 40,
+  "viewport": "1280x720"
+}

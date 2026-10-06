@@ -1,0 +1,150 @@
+{
+	"captain_dead": true,
+	"damage_api_calls": 0,
+	"damage_events": 15,
+	"failure": "",
+	"fire_hits": 774,
+	"health": 80.0,
+	"input_events": 4183,
+	"input_method": "Input.parse_input_event: Enter, T, L, W/A/S/D/Shift/E/F and mouse head-aim motion",
+	"max_physics_step_m": 0.433219790458679,
+	"pass": true,
+	"path_distance_m": 695.124298920506,
+	"performance": {
+		"by_phase_and_locomotion": {
+			"1/air": {
+				"elapsed_wall_s": 21.655864,
+				"fps_actual_wall": 33.9399988843669,
+				"frame_p95_ms": 39.794,
+				"frames": 735,
+				"reference_budget_met": null
+			},
+			"1/grounded": {
+				"elapsed_wall_s": 100.794565,
+				"fps_actual_wall": 34.1189031372873,
+				"frame_p95_ms": 34.88,
+				"frames": 3439,
+				"reference_budget_met": null
+			},
+			"2/grounded": {
+				"elapsed_wall_s": 9.715786,
+				"fps_actual_wall": 35.7150723575015,
+				"frame_p95_ms": 29.344,
+				"frames": 347,
+				"reference_budget_met": null
+			},
+			"3/grounded": {
+				"elapsed_wall_s": 9.59609300000001,
+				"fps_actual_wall": 38.3489405532022,
+				"frame_p95_ms": 27.645,
+				"frames": 368,
+				"reference_budget_met": null
+			},
+			"4/grounded": {
+				"elapsed_wall_s": 31.5543220000001,
+				"fps_actual_wall": 35.6844935536881,
+				"frame_p95_ms": 29.238,
+				"frames": 1126,
+				"reference_budget_met": null
+			}
+		},
+		"capture_io_intervals_excluded": 14,
+		"device": "Apple M5 (Apple9)",
+		"engine_max_fps": 0,
+		"measurement": "Time.get_ticks_usec deltas between process_frame signals; previous-frame phase and grounded state",
+		"movie_maker_enabled": true,
+		"post_warmup_all_intervals": {
+			"elapsed_wall_s": 175.975715999999,
+			"fps_actual_wall": 34.260408975975,
+			"frame_p95_ms": 36.876,
+			"frames": 6029
+		},
+		"post_warmup_without_capture_io": {
+			"elapsed_wall_s": 173.316629999999,
+			"fps_actual_wall": 34.7052674633705,
+			"frame_p95_ms": 36.206,
+			"frames": 6015
+		},
+		"reference_budget_met": null,
+		"reference_only": {
+			"fps": 60,
+			"frame_p95_ms": 25
+		},
+		"renderer_method": "forward_plus",
+		"valid_runtime_fps_measurement": false,
+		"viewport": [
+			1280,
+			720
+		],
+		"vsync_mode": null,
+		"warmup_frames_excluded": 176,
+		"warmup_seconds_wall": 5.0
+	},
+	"phase": 5,
+	"phase_sequence": [
+		1,
+		2,
+		3,
+		4,
+		5
+	],
+	"renderer": "macOS",
+	"runtime_sources_sha256": {
+		"project.godot": "651406486c380870604869b117aeb48bdd8d90a17a715f2569e7dff4aedeb660",
+		"scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+		"scripts/combat/play_siege_validation.gd": "aef3d588c2d0513ffab40cb4c7d5b9212168f6099893c24cc9cf159ccf3935eb",
+		"scripts/combat/siege_combat.gd": "f5994c17375963ac182ae3e9862b61e35604caa1d9c00db1b7387efd3a89c92b",
+		"scripts/combat/siege_enemy.gd": "e945d302fcbd4536261fb2bcfa4435553b8233ee81d7f9f27f461afd21555d52",
+		"scripts/combat/siege_projectile.gd": "bbcda581159c1ecf55b5d2c453e3b40303e42ce1c3e1902c5b0806552e3c3289",
+		"scripts/combat/siege_ui.gd": "d683198f01e36ef90bff9f899671bda0f6975d4a33b6688a391c1168e565cb20",
+		"scripts/dragon_affine_support.json": "4b68d4acacb140a0eaedda975698da2a9bdd486d2b3f2a1c798b45e13cdf9871",
+		"scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+		"scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+		"scripts/dragon_controller.gd": "5c2fd046898bf82363e74f56dfccb298bf941e2b0fe3ea2077c2c7bd72ab23ef",
+		"scripts/dragon_ground_contact.gd": "d32898ac30ea9d3abb9c1fb40dac3bcbd2c30c7ad51386144c3eb215f68254e0",
+		"scripts/dragon_ground_pose.gd": "c38e0386f6011fe138098b0c13a49d866b612202ec6940d6dd581b3bba4b4f30",
+		"scripts/dragon_head_pose.gd": "ae6fe09711b88bb251d6033a4a95d2afcedb675c9921b4cae6926decd4960232",
+		"scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+		"scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+		"scripts/dragon_wing_contact.gd": "4730c75e620d65c3526be92aaae03c5151bc269981647d7ec731e430e4318c91",
+		"scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+		"scripts/siege_environment.gd": "b11a6fc0303ce458171aa147ed92178ceca743d22a280442b33f180f02be8606",
+		"scripts/terrain.gd": "065445c6ff25d284676f44e614ef3a00f7db0b6fcc294d595f92fdf8b5a0fe66",
+		"shaders/dragon_wing.gdshader": "cdadc4e0ce4dfe8fce75fcb5d3a18196a59e2292f67a776fbe62e826ccff1855",
+		"shaders/flame.gdshader": "df9f95aeb47f4f153fe08fcb971a6b21d34882fe2f3f732cc2cef0d27c109c2d",
+		"shaders/foliage.gdshader": "894d9e06e1adccbb07d65628e18ba10c0b8e32c9619b9c1995ae1fbd41f122f0",
+		"shaders/landscape_sky.gdshader": "ef21b5abeaca2ee6f8d4d9368f4159da93c80e161914d6515286d6c432c165dd",
+		"shaders/landscape_water.gdshader": "8837d2d27a80d33cf3aa72b13bbe1a3f8c7d0e6ae01836c18bc3cda5c2bd63b3",
+		"shaders/siege_egg.gdshader": "c060b1244f1827c50a71f8c07956a0b666a2da477d35428ce5d9be64913e7142",
+		"shaders/smoke.gdshader": "edae2a32ee577f8db044de6e870b19a3bf111803b5525af1bae45bf694026a5f",
+		"shaders/terrain.gdshader": "1879eb4be9971a4b19fe3a37a3b2bd8492ea131ce1d7e484f3b772ab1cd7779d"
+	},
+	"runtime_sources_unchanged_at_finish": true,
+	"runtime_state_overrides": 0,
+	"shots_fired": 13,
+	"snapshots": [
+		"res://docs/validation/v2/playthrough-metal-00000-briefing.png",
+		"res://docs/validation/v2/playthrough-metal-00000-phase_1.png",
+		"res://docs/validation/v2/playthrough-metal-00000-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-00600-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-01200-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-01800-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-02400-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-03000-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-03600-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-04200-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-04355-phase_2.png",
+		"res://docs/validation/v2/playthrough-metal-04703-phase_3.png",
+		"res://docs/validation/v2/playthrough-metal-04800-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-05073-phase_4.png",
+		"res://docs/validation/v2/playthrough-metal-05400-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-06000-sequence.png",
+		"res://docs/validation/v2/playthrough-metal-06202-phase_5.png",
+		"res://docs/validation/v2/playthrough-metal-06203-victory.png"
+	],
+	"source_files_changed_during_run": [],
+	"start_via_enter": true,
+	"teleports_after_start": 0,
+	"time": 103.449999999995,
+	"turrets_destroyed": 3
+}

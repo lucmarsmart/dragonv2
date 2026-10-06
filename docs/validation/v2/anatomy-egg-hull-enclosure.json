@@ -1,0 +1,18 @@
+{
+  "source_sha256": "e55f2604e97445cd432e0ffb6479f4f23fc0c2a6d06439f94cd260e77b41b942",
+  "egg_triangles": 6144,
+  "all_unique_source_vertices": 3010,
+  "collider_input_points": 272,
+  "convex_hull_vertices": 240,
+  "maximum_original_vertex_outside_collider_m": 0.0,
+  "maximum_radial_expansion_bound_m": 0.0313493329132255,
+  "world_float_tolerance_m": 0.0001,
+  "certified_surface_expansion_bound_m": 0.031449332913225506,
+  "allowed_surface_deviation_m": 0.05,
+  "passed": true,
+  "all_dragon_skin_vertices": 25603,
+  "skin_vertices_inside_convex_egg": 0,
+  "skin_vertices_inside_over5cm": 0,
+  "maximum_skin_inside_plane_depth_m": 0.0,
+  "method": "All visual vertices certify every triangle inside convex collider; circumradius minus source inradius at union of all source/collider ring heights bounds expansion of the complete piecewise-linear radial surfaces; 0.1mm world-float allowance"
+}

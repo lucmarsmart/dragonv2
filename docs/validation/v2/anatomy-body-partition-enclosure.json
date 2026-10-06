@@ -1,0 +1,123 @@
+{
+  "body_touching_complete_triangles": 19993,
+  "poses": 14,
+  "coordinate_tolerance_m": 0.001,
+  "maximum_outside_m": 0.00011094996212819043,
+  "negative_translated_hull_rejected": true,
+  "all_passed": true,
+  "source_sha256": "321186cb01d81d55404c72429e2955843a0aa88e8f3ee1e0e77033c03d323e4d",
+  "checks": {
+    "real_cliff_flight_120": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 3.88114859175559e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_cliff_flight_230": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 3.598442376517852e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_cliff_flight_30": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 4.642624846118437e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_escarpment_flight_100": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 0.00011094996212819043,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_escarpment_flight_170": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 7.260100213213327e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_escarpment_flight_30": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 7.981754944130781e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_escarpment_initial_clear": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 9.945782480635934e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_hill_low_approach": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 2.4529778609228003e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_hill_stance": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 5.0279554627552514e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_hill_walk": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 5.3873401913477614e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_second_hill_low_approach": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 7.620249444761917e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_second_hill_stance": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 9.378962426165316e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_second_hill_walk": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 0.00010787119702770909,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    },
+    "real_tree_reverse_contact": {
+      "original_vertices": 25603,
+      "triangles": 19993,
+      "maximum_outside_m": 6.024212111865879e-05,
+      "missing_corners": 0,
+      "outside_corners": 0,
+      "passed": true
+    }
+  }
+}

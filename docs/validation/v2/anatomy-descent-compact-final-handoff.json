@@ -1,0 +1,120 @@
+{
+  "date_utc": "2026-10-05T14:33:16.667210+00:00",
+  "source_freeze": {
+    "scripts/dragon_controller.gd": "72ba92ce1745d2b838f2ece3064a658e454362d5c6c3911f96aa0ccde9ef33c9",
+    "scripts/dragon_ground_pose.gd": "7b05013c6ed1ecc7b66ff746342a1856a3936b911168a44e7f41c7c5f1fd36d4",
+    "scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "scripts/dragon_wing_contact.gd": "beeca64d7ce66f35e558dbbf9dc969d628e5812ba75de4e9ae4b061cab32392b",
+    "scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "scripts/anatomy_descent_compact_repro.gd": "354fcbeb02aa2f98b1fdc9fadbb9b1137837b0daff469d80bf312d51765e8530",
+    "scripts/test_dragon_anatomy.gd": "28ae6595ef910f6f268ac7154e969485338a20d58206129b3f34837c7b962e6a",
+    "scripts/combat/test_ground_escape.gd": "95785291f0f59a1420291cdb0ee8a7535bd6e0b8774d9418c2f1a99aaf8f1556"
+  },
+  "files_sha256": {
+    "docs/validation/v2/anatomy-descent-compact-stable-dense-validation-poses.json.gz": "c04af3198078b4db66494fd00a44222ca3dec680973ed65f0fea1cad4c761c3f",
+    "docs/validation/v2/anatomy-descent-compact-stable-fixture-validation-poses.json": "6523202cb3ecc2b405af0f1e9312d47ece2b428f0ddd240f7b9d438b2158e76a",
+    "docs/validation/v2/anatomy-descent-compact-stable-holdout3-dense-poses.json.gz": "1a586f25f79ceb7afc7da1f015fda33da663f68beada915c85fe1ad642a43d33",
+    "docs/validation/v2/anatomy-descent-compact-stable-holdout3-poses.json": "23af72a5efda9261dd0fc844744043d73994dfad6e31d45181a0a918b7a834c0",
+    "docs/validation/v2/anatomy-descent-compact-stable-construction-runtime-enclosure.json": "c74962efb51b924fcc37776169b866a06e48e4f1c266f4004ff2b727c53518ce",
+    "docs/validation/v2/anatomy-descent-compact-stable-holdout3-runtime-enclosure.json": "caa6d2cf6ea5d309532dc8c908d58b8babfc9b56c04d6df5a844bb801e505e84",
+    "docs/validation/v2/anatomy-descent-compact-stable-extrema-union.json": "56b5f984604d8921448a06b6b974346d8efb97cea9ade980bb38a19547177d80",
+    "docs/validation/v2/anatomy-descent-compact-stable-final.log": "1675ce21094eaa26bf86c9111f35029d9d028b15afcf49d198cc46d130cdf750",
+    "docs/validation/v2/anatomy-descent-compact-holdout3-final.log": "7a70575a773c81002e22cb16e4cc1f667fbb60181d6002e093d2f00e5e0d4120",
+    "docs/validation/v2/ground-escape-1864-final-green.log": "c7e2f5783f844e78a22c6452d7fb6b03ccdfd35ba35caa275bade065f06a7a1f",
+    "docs/validation/v2/ground-escape-1864-final-green-trace.json": "ae0612ff4e9d85ac325f6355ea2a959ee0968f44f936eb990b69b579e3be845f"
+  },
+  "selected_original_wing_ids": 1864,
+  "partition": "rig-root96-120-boundary-v1",
+  "unique_wing_vertices_per_pose": 5412,
+  "wing_entries_per_pose": 5412,
+  "construction_selection": {
+    "poses": 152,
+    "base_original_ids": 1855,
+    "added_original_ids": 9,
+    "method": "anatomy-descent-compact-stable-extrema-union.json",
+    "holdout_used": false
+  },
+  "finite_current_validation": {
+    "construction_validation_poses": 160,
+    "construction_max_outside_m": 0.040260591973710014,
+    "independent_holdout3_poses": 162,
+    "holdout3_max_outside_m": 0.03535640661929684,
+    "namespace_disjoint": true,
+    "tolerance_m": 0.05,
+    "source_note": "Both clouds were emitted before the final local witness-normal patch. Hull generation, skinning, selector, poses and boundaries are unchanged; the patched fallback is inactive in these unobstructed floor fixtures. Parent revalidates source-bound operational clouds after the complete launcher."
+  },
+  "commands": [
+    {
+      "command": "tools/godot.sh --headless --fixed-fps 60 --path . --script scripts/anatomy_descent_compact_repro.gd -- --construction-dense",
+      "rc": 0,
+      "log": "anatomy-descent-compact-stable-final.log"
+    },
+    {
+      "command": "tools/godot.sh --headless --fixed-fps 60 --path . --script scripts/anatomy_descent_compact_repro.gd -- --construction-dense --holdout3",
+      "rc": 0,
+      "log": "anatomy-descent-compact-holdout3-final.log"
+    },
+    {
+      "command": "tools/godot.sh --headless --fixed-fps 60 --path . --script scripts/combat/test_ground_escape.gd -- --wing-tangency-diagnostic",
+      "rc": 0,
+      "log": "ground-escape-1864-final-green.log"
+    }
+  ],
+  "corridor_final": {
+    "failures": [],
+    "sources_unchanged": true,
+    "articulation": {
+      "body_compensated": 33,
+      "folded": 29,
+      "restored": 383,
+      "uncleared": 0
+    },
+    "maximum_prop_overlap_count": 0,
+    "observed_final_frames": 1176,
+    "original_vertices_checked": 30109128,
+    "minimum_skin_terrain_clearance_m": 0.0190773010253906,
+    "maximum_stance_slide_m": 0.00526755396276712,
+    "maximum_head_step_deg": 4.00011138647537,
+    "maximum_wing_step_deg": 4.00056516716835,
+    "maximum_fire_head_error_deg": 0.0,
+    "maximum_fire_mouth_error_m": 0.0,
+    "retreat_fire_frames": 180,
+    "stages": {
+      "forward": {
+        "horizontal_distance_m": 28.931266784668,
+        "yaw_delta_deg": 0.0
+      },
+      "forward_after_turn": {
+        "horizontal_distance_m": 6.56690549850464,
+        "yaw_delta_deg": 0.0
+      },
+      "left": {
+        "horizontal_distance_m": 0.369319081306458,
+        "yaw_delta_deg": 14.353702304937
+      },
+      "left_return": {
+        "horizontal_distance_m": 0.0,
+        "yaw_delta_deg": 62.2020418514595
+      },
+      "reverse": {
+        "horizontal_distance_m": 10.6812286376953,
+        "yaw_delta_deg": 0.0
+      },
+      "reverse_after_turn": {
+        "horizontal_distance_m": 6.08869028091431,
+        "yaw_delta_deg": 0.0
+      },
+      "right": {
+        "horizontal_distance_m": 0.0,
+        "yaw_delta_deg": -65.9714806741906
+      }
+    }
+  },
+  "limits": [
+    "No native FPS measured in this campaign; parent executes native gates after launcher.",
+    "No claim of universal enclosure across future poses.",
+    "Historical sign-X clouds are excluded from current stable-partition counts.",
+    "No new holdout3 points were used in the selection.",
+    "Original fixed60 traces retain all first-W/S skin and target observations; ordinary walking angular maximum is recorded separately from <=5deg transition."
+  ]
+}

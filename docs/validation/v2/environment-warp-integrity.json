@@ -1,0 +1,122 @@
+{
+  "scope": "deterministic procedural terrain silhouette candidate; protected surfaces exact; root visual acceptance subject to anatomy/nativeC3",
+  "trees": 2728,
+  "tree_budget": 2771,
+  "grid": 320,
+  "files": [
+    {
+      "file": "scripts/terrain.gd",
+      "bytes": 21276,
+      "sha256": "a193093006a3c045918b135b874448d497605a537d1e9de2c9987389266a9a84"
+    },
+    {
+      "file": "shaders/terrain.gdshader",
+      "bytes": 5086,
+      "sha256": "1879eb4be9971a4b19fe3a37a3b2bd8492ea131ce1d7e484f3b772ab1cd7779d"
+    },
+    {
+      "file": "docs/validation/v2/environment-warp-check.gd",
+      "bytes": 4680,
+      "sha256": "6aa4ca9d12b13dbdf2ad3474e99d22c58a645ccc9435d7db3eb0f6f7b1766d87"
+    },
+    {
+      "file": "scripts/verify_siege_environment.gd",
+      "bytes": 3034,
+      "sha256": "799f403c2c4ac95e84cfbbcb37f24028a1e074080deefed9d58a8e6c766d2d4e"
+    }
+  ],
+  "captures": [
+    {
+      "file": "docs/validation/v2/environment-fortress-air-before-rock-exposure.png",
+      "bytes": 1137424,
+      "sha256": "a9d5a1f4012c9051909fd0d4dba98c9afaffa68eec6394b6fcbb0a7e6e035874"
+    },
+    {
+      "file": "docs/validation/v2/environment-fortress-air-before-warp.png",
+      "bytes": 1177723,
+      "sha256": "44900deabfce08e934d1b71bcd2d00ab930f77f05857cc0773d75baa327add16"
+    },
+    {
+      "file": "docs/validation/v2/environment-fortress-air.png",
+      "bytes": 1192619,
+      "sha256": "7e601a7c45345e3657f7e06143bcdf8f5ac86026777440d79f178ddef73548b8"
+    },
+    {
+      "file": "docs/validation/v2/environment-fortress-before-rock-exposure.png",
+      "bytes": 1297466,
+      "sha256": "ce8551923eb0def78bb3eea1381d545dead7126d93d1f5b4a5046b382c56f638"
+    },
+    {
+      "file": "docs/validation/v2/environment-fortress-before-warp.png",
+      "bytes": 1323128,
+      "sha256": "db894b19273223d153eed9a8a2f1ffe8358cb05da6940436a85bb12e365b04b1"
+    },
+    {
+      "file": "docs/validation/v2/environment-fortress.png",
+      "bytes": 1303170,
+      "sha256": "403238315c15243c5bf064c52901e31c98865594ccddfd13b19ac56e87fa32be"
+    },
+    {
+      "file": "docs/validation/v2/environment-mountain-before-rock-exposure.png",
+      "bytes": 864450,
+      "sha256": "f45f1414263b832ac18cb24c3f4aacb48260d2c0ebe9ba28d201e42664255a00"
+    },
+    {
+      "file": "docs/validation/v2/environment-mountain-before-warp.png",
+      "bytes": 898033,
+      "sha256": "2f1a91218dbe81cff35b35273b944982f4eefd30a160e91084043bd46afa24ca"
+    },
+    {
+      "file": "docs/validation/v2/environment-mountain.png",
+      "bytes": 934604,
+      "sha256": "2fceddf1a7d6782506c9ecf1e54b31e5e3860bdca05e4ffb7ee26c4546a09a4d"
+    },
+    {
+      "file": "docs/validation/v2/environment-nest-captive.png",
+      "bytes": 1415503,
+      "sha256": "3e379b94c799815ebc992a0de952ed735f8a3d2d8c3e7c5c8f1cbde81bd1a1ef"
+    },
+    {
+      "file": "docs/validation/v2/environment-nest-free.png",
+      "bytes": 1402422,
+      "sha256": "6578aa06b980245e2e30c7cc058ea4a5878045f3c8c0044e7c4856ef727af2bc"
+    },
+    {
+      "file": "docs/validation/v2/environment-pine-before-rock-exposure.png",
+      "bytes": 1216812,
+      "sha256": "f3c6054ad78b3655c384dc5facfa44b964cd3814e98e88d4d231882dc0e9b727"
+    },
+    {
+      "file": "docs/validation/v2/environment-pine-before-warp.png",
+      "bytes": 1274682,
+      "sha256": "79f8021d43ecb617ca91ae3aacaa472f18f30d6ec6d69f3389607dc0a2ffe7ad"
+    },
+    {
+      "file": "docs/validation/v2/environment-pine.png",
+      "bytes": 1359862,
+      "sha256": "b5607760d888b74f5e30d74ccf5b6a1b9f57a5a2aa2e2282a1f77465cca5b14b"
+    },
+    {
+      "file": "docs/validation/v2/environment-river-close.png",
+      "bytes": 670454,
+      "sha256": "1896b90acb5e48df46e73c9b730c0f980b0e420ce8d839aa8b393c1d8d9466ac"
+    },
+    {
+      "file": "docs/validation/v2/environment-river.png",
+      "bytes": 1300894,
+      "sha256": "0ac5ebb33f1f0a2d49609c5c967e2279caf6955c08a5b37caebb190025b72046"
+    }
+  ],
+  "checks": [
+    {
+      "file": "docs/validation/v2/environment-physics.json",
+      "bytes": 185,
+      "sha256": "a29dfb9fa5857cc4e1e9da3015f3b5d21a9ada6e861184311e8246bf8bb3b88a"
+    },
+    {
+      "file": "docs/validation/v2/environment-warp-physics.json",
+      "bytes": 2031,
+      "sha256": "72f59e0bc54f6fbfddb2cd9d307793f0d9493832a5ce5f0e71c3db66c4210fc5"
+    }
+  ]
+}

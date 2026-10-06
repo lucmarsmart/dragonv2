@@ -1,0 +1,26 @@
+{
+  "draw_calls": 196.898550724638,
+  "elapsed_s": 10.003271,
+  "fire": true,
+  "fps": 55.1819499841602,
+  "lod_counts": {
+    "LOD0": 0,
+    "LOD1": 17,
+    "LOD2": 50,
+    "LOD3": 1705
+  },
+  "p95_ms": 19.452,
+  "physics_ms": 2.40789311594203,
+  "pipeline_compilations": {
+    "PIPELINE_COMPILATIONS_CANVAS": 2.0,
+    "PIPELINE_COMPILATIONS_DRAW": 0.0,
+    "PIPELINE_COMPILATIONS_MESH": 39.0,
+    "PIPELINE_COMPILATIONS_SPECIALIZATION": 94.0,
+    "PIPELINE_COMPILATIONS_SURFACE": 95.0
+  },
+  "primitives": 10002764.6811594,
+  "process_ms": 19.6840634057971,
+  "render_cpu_ms": 0.282134058034938,
+  "render_gpu_ms": 0.0,
+  "variant": "optimized-1"
+}

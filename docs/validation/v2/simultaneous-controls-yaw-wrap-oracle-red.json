@@ -1,0 +1,298 @@
+{
+  "cases": [
+    {
+      "aim_keys": [],
+      "body_yaw_change_deg": 0.0,
+      "emitter_frames": 120,
+      "end_position": [
+        0.0,
+        203.5,
+        86.5
+      ],
+      "fire_input": "F",
+      "firing_frames": 120,
+      "frames": 120,
+      "fuel_used": 0.379999999999998,
+      "label": "ground_forward_mouse_fire",
+      "locomotion_states": {
+        "2": 120
+      },
+      "maximum_fire_to_rendered_head_error_deg": 0.0,
+      "maximum_mouth_attachment_error_m": 0.0,
+      "maximum_relative_rendered_head_change_deg": 19.9522546883402,
+      "mouse_relative_per_six_ticks": [
+        -10.0,
+        -2.0
+      ],
+      "mouth_world_displacement_m": 13.2422218322754,
+      "movement_frames": 120,
+      "movement_keys": [
+        87
+      ],
+      "path_m": 13.5,
+      "pose_turn_blocked_frames": 0,
+      "predictive_contact_frames": 0,
+      "shoreline_blocked_frames": 0,
+      "signed_forward_displacement_m": 13.5,
+      "simultaneous_real_input_frames": 120,
+      "start_position": [
+        0.0,
+        203.5,
+        100.0
+      ]
+    },
+    {
+      "aim_keys": [
+        4194321
+      ],
+      "body_yaw_change_deg": 76.8718256743909,
+      "emitter_frames": 120,
+      "end_position": [
+        0.0,
+        203.5,
+        100.0
+      ],
+      "fire_input": "F",
+      "firing_frames": 120,
+      "frames": 120,
+      "fuel_used": 0.379999999999998,
+      "label": "ground_turn_arrow_fire",
+      "locomotion_states": {
+        "2": 120
+      },
+      "maximum_fire_to_rendered_head_error_deg": 0.0,
+      "maximum_mouth_attachment_error_m": 0.0,
+      "maximum_relative_rendered_head_change_deg": 45.7976956303103,
+      "mouse_relative_per_six_ticks": [
+        0.0,
+        0.0
+      ],
+      "mouth_world_displacement_m": 7.08324527740479,
+      "movement_frames": 0,
+      "movement_keys": [
+        65
+      ],
+      "path_m": 0.0,
+      "pose_turn_blocked_frames": 0,
+      "predictive_contact_frames": 0,
+      "shoreline_blocked_frames": 0,
+      "signed_forward_displacement_m": 0.0,
+      "simultaneous_real_input_frames": 120,
+      "start_position": [
+        0.0,
+        203.5,
+        100.0
+      ]
+    },
+    {
+      "aim_keys": [],
+      "body_yaw_change_deg": 0.0,
+      "emitter_frames": 120,
+      "end_position": [
+        0.0,
+        203.5,
+        108.474678039551
+      ],
+      "fire_input": "F",
+      "firing_frames": 120,
+      "frames": 120,
+      "fuel_used": 0.379999999999998,
+      "label": "ground_reverse_mouse_fire",
+      "locomotion_states": {
+        "2": 120
+      },
+      "maximum_fire_to_rendered_head_error_deg": 0.0,
+      "maximum_mouth_attachment_error_m": 0.0,
+      "maximum_relative_rendered_head_change_deg": 19.8887492969847,
+      "mouse_relative_per_six_ticks": [
+        10.0,
+        -2.0
+      ],
+      "mouth_world_displacement_m": 8.53836631774902,
+      "movement_frames": 120,
+      "movement_keys": [
+        83
+      ],
+      "path_m": 8.47467803955078,
+      "pose_turn_blocked_frames": 0,
+      "predictive_contact_frames": 0,
+      "shoreline_blocked_frames": 0,
+      "signed_forward_displacement_m": -8.47467803955078,
+      "simultaneous_real_input_frames": 120,
+      "start_position": [
+        0.0,
+        203.5,
+        100.0
+      ]
+    },
+    {
+      "aim_keys": [
+        4194319
+      ],
+      "body_yaw_change_deg": -76.8718256743909,
+      "emitter_frames": 120,
+      "end_position": [
+        -4.93261384963989,
+        203.5,
+        106.13907623291
+      ],
+      "fire_input": "F",
+      "firing_frames": 120,
+      "frames": 120,
+      "fuel_used": 0.379999999999998,
+      "label": "ground_reverse_turn_arrow_fire",
+      "locomotion_states": {
+        "2": 120
+      },
+      "maximum_fire_to_rendered_head_error_deg": 0.0,
+      "maximum_mouth_attachment_error_m": 0.0,
+      "maximum_relative_rendered_head_change_deg": 45.9953134935663,
+      "mouse_relative_per_six_ticks": [
+        0.0,
+        0.0
+      ],
+      "mouth_world_displacement_m": 9.8022403717041,
+      "movement_frames": 120,
+      "movement_keys": [
+        83,
+        68
+      ],
+      "path_m": 8.47500186599791,
+      "pose_turn_blocked_frames": 0,
+      "predictive_contact_frames": 0,
+      "shoreline_blocked_frames": 0,
+      "signed_forward_displacement_m": -6.13907623291016,
+      "simultaneous_real_input_frames": 120,
+      "start_position": [
+        0.0,
+        203.5,
+        100.0
+      ]
+    },
+    {
+      "aim_keys": [],
+      "body_yaw_change_deg": -129.384478353227,
+      "emitter_frames": 120,
+      "end_position": [
+        -27.2395935058594,
+        340.0,
+        0.858229160308838
+      ],
+      "fire_input": "F",
+      "firing_frames": 120,
+      "frames": 120,
+      "fuel_used": 0.379999999999998,
+      "label": "air_move_turn_mouse_fire",
+      "locomotion_states": {
+        "0": 120
+      },
+      "maximum_fire_to_rendered_head_error_deg": 0.0,
+      "maximum_mouth_attachment_error_m": 0.0,
+      "maximum_relative_rendered_head_change_deg": 16.581674153702,
+      "mouse_relative_per_six_ticks": [
+        -10.0,
+        -2.0
+      ],
+      "mouth_world_displacement_m": 34.0849533081055,
+      "movement_frames": 120,
+      "movement_keys": [
+        87,
+        65
+      ],
+      "path_m": 47.5864203870296,
+      "pose_turn_blocked_frames": 0,
+      "predictive_contact_frames": 0,
+      "shoreline_blocked_frames": 0,
+      "signed_forward_displacement_m": 33.7082824707031,
+      "simultaneous_real_input_frames": 120,
+      "start_position": [
+        0.0,
+        340.0,
+        34.5665130615234
+      ]
+    },
+    {
+      "aim_keys": [],
+      "body_yaw_change_deg": 0.0,
+      "emitter_frames": 120,
+      "end_position": [
+        0.0,
+        203.5,
+        86.5
+      ],
+      "fire_input": "LEFT_MOUSE",
+      "firing_frames": 120,
+      "frames": 120,
+      "fuel_used": 0.379999999999998,
+      "label": "ground_forward_mouse_left_click",
+      "locomotion_states": {
+        "2": 120
+      },
+      "maximum_fire_to_rendered_head_error_deg": 0.0,
+      "maximum_mouth_attachment_error_m": 0.0,
+      "maximum_relative_rendered_head_change_deg": 17.7438342560743,
+      "mouse_relative_per_six_ticks": [
+        -10.0,
+        -2.0
+      ],
+      "mouth_world_displacement_m": 13.2324981689453,
+      "movement_frames": 120,
+      "movement_keys": [
+        87
+      ],
+      "path_m": 13.5,
+      "pose_turn_blocked_frames": 0,
+      "predictive_contact_frames": 0,
+      "shoreline_blocked_frames": 0,
+      "signed_forward_displacement_m": 13.5,
+      "simultaneous_real_input_frames": 120,
+      "start_position": [
+        0.0,
+        203.5,
+        100.0
+      ]
+    }
+  ],
+  "checks": 43,
+  "failures": [
+    "Flight W+A advances and turns while mouse aims and F fires"
+  ],
+  "fixture": {
+    "direct_movement_aim_or_fire_api_calls": false,
+    "display_server": "headless",
+    "flat_ground_size_m": [
+      500,
+      1,
+      500
+    ],
+    "manual_fire_override": false,
+    "manual_move_override": false,
+    "native_fps_claimed": false,
+    "physical_flat_ground_y_m": 200,
+    "placements_only_before_each_observation": true,
+    "production_dragon_and_breath": true,
+    "real_enemy_damage_validated_here": false
+  },
+  "source_hashes_after": {
+    "res://scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+    "res://scripts/combat/test_simultaneous_controls.gd": "51052f0742d7ef98f91796456f650552150912121529627c4c5dcecfe2cd9ce0",
+    "res://scripts/dragon_breath.gd": "ec562e2dd66fbdbd925b9791df37dcdf4b2ca99cc068aff0d58eb012f195cbd4",
+    "res://scripts/dragon_breath_modifier.gd": "aaa8b7c711aa1fb36b326ce191690baec57d3295b49bc6dd1a7c902ec95b2f70",
+    "res://scripts/dragon_controller.gd": "10c6cc56df31395f2032382dc7abd827c50a4f85e148755b0544b159c6709773",
+    "res://scripts/dragon_ground_pose.gd": "fd50ede482da3ec922cf33984f77eafbbb738b8ea7c790d7bd29b11ffe4a2611",
+    "res://scripts/dragon_head_pose.gd": "88ad9052c82bb2ff89bd8cf2170195cfcd470be739a2801c696ff422a198fbea",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "dbe8db17b2f859e3a3db2c5624448bbea71915dcc678a18310e928044229ec9b"
+  },
+  "source_hashes_before": {
+    "res://scenes/main.tscn": "30338337a2eb78aa451cf708f653875b9d5b8930308bc13b988ab1bc7e5e1887",
+    "res://scripts/combat/test_simultaneous_controls.gd": "51052f0742d7ef98f91796456f650552150912121529627c4c5dcecfe2cd9ce0",
+    "res://scripts/dragon_breath.gd": "ec562e2dd66fbdbd925b9791df37dcdf4b2ca99cc068aff0d58eb012f195cbd4",
+    "res://scripts/dragon_breath_modifier.gd": "aaa8b7c711aa1fb36b326ce191690baec57d3295b49bc6dd1a7c902ec95b2f70",
+    "res://scripts/dragon_controller.gd": "10c6cc56df31395f2032382dc7abd827c50a4f85e148755b0544b159c6709773",
+    "res://scripts/dragon_ground_pose.gd": "fd50ede482da3ec922cf33984f77eafbbb738b8ea7c790d7bd29b11ffe4a2611",
+    "res://scripts/dragon_head_pose.gd": "88ad9052c82bb2ff89bd8cf2170195cfcd470be739a2801c696ff422a198fbea",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "dbe8db17b2f859e3a3db2c5624448bbea71915dcc678a18310e928044229ec9b"
+  }
+}

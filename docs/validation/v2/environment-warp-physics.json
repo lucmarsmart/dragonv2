@@ -1,0 +1,96 @@
+{
+	"baseline_terrain_sha256": "a17cc68d679c7f4e9586552eb65780d419338f8e83fec576465cf756aa9d33b3",
+	"failures": [],
+	"grid_resolution": 320,
+	"maximum_changed_height_m": 116.116870880127,
+	"maximum_protected_grid_error_m": 0.0,
+	"new_walk_sample": {
+		"height_m": 132.909729003906,
+		"normal": [
+			0.108191587030888,
+			0.971826136112213,
+			-0.209400534629822
+		],
+		"previous_height_m": 124.779457092285,
+		"ray_error_m": 0.00006103515625,
+		"slope_degrees": 13.6328228198442,
+		"x": 600.0,
+		"z": -450.0
+	},
+	"protected_counts": {
+		"access": 675,
+		"changed_outside": 90706,
+		"court": 2115,
+		"river": 9721
+	},
+	"shader_sha256": "1879eb4be9971a4b19fe3a37a3b2bd8492ea131ce1d7e484f3b772ab1cd7779d",
+	"surface_samples": [
+		{
+			"height_m": 66.6376953125,
+			"normal": [
+				-0.313059151172638,
+				0.944130957126617,
+				0.103008471429348
+			],
+			"previous_height_m": 66.5769424438477,
+			"ray_error_m": 0.000146484375008527,
+			"slope_degrees": 19.2427106344692,
+			"x": 450.0,
+			"z": 220.0
+		},
+		{
+			"height_m": 118.4453125,
+			"normal": [
+				-0.257665067911148,
+				0.68706214427948,
+				0.679377973079681
+			],
+			"previous_height_m": 164.763061523438,
+			"ray_error_m": 0.00002288818359375,
+			"slope_degrees": 46.6020003048376,
+			"x": 650.0,
+			"z": -300.0
+		},
+		{
+			"height_m": 24.0,
+			"normal": [
+				0.0,
+				1.0,
+				0.0
+			],
+			"previous_height_m": 24.0,
+			"ray_error_m": 0.0,
+			"slope_degrees": 0.0,
+			"x": 300.0,
+			"z": 275.0
+		},
+		{
+			"height_m": 24.0,
+			"normal": [
+				0.0,
+				1.0,
+				0.0
+			],
+			"previous_height_m": 24.0,
+			"ray_error_m": 0.0,
+			"slope_degrees": 0.0,
+			"x": 300.0,
+			"z": 82.0
+		},
+		{
+			"height_m": 38.9578247070312,
+			"normal": [
+				-0.0795970037579536,
+				0.975836217403412,
+				0.203489616513252
+			],
+			"previous_height_m": 38.9577980041504,
+			"ray_error_m": 0.000026702880859375,
+			"slope_degrees": 12.621137747894,
+			"x": 300.0,
+			"z": 400.0
+		}
+	],
+	"terrain_sha256": "a193093006a3c045918b135b874448d497605a537d1e9de2c9987389266a9a84",
+	"trees": 2728
+}

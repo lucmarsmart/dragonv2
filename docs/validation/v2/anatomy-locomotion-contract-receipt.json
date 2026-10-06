@@ -1,0 +1,37 @@
+{
+  "generated_utc": "2026-10-05T10:55:49.602436+00:00",
+  "command": "./tools/godot.sh --headless --path . --script scripts/test_dragon_anatomy.gd -- --locomotion-contract",
+  "return_code": 0,
+  "checks_passed": 24,
+  "checks_failed": 0,
+  "check_only_command": "./tools/godot.sh --headless --path . --script scripts/test_dragon_anatomy.gd --check-only",
+  "check_only_return_code": 0,
+  "check_only_log_no_script_errors": true,
+  "runtime_unchanged_from_anatomy_validation_receipt": true,
+  "source_sha256_at_freeze": {
+    "scripts/dragon_affine_support.json": "4b68d4acacb140a0eaedda975698da2a9bdd486d2b3f2a1c798b45e13cdf9871",
+    "scripts/dragon_breath.gd": "ec562e2dd66fbdbd925b9791df37dcdf4b2ca99cc068aff0d58eb012f195cbd4",
+    "scripts/dragon_breath_modifier.gd": "aaa8b7c711aa1fb36b326ce191690baec57d3295b49bc6dd1a7c902ec95b2f70",
+    "scripts/dragon_controller.gd": "10c6cc56df31395f2032382dc7abd827c50a4f85e148755b0544b159c6709773",
+    "scripts/dragon_ground_contact.gd": "cc2d3e9fa94b81ac15f5721874b77853541aa338c4db89490cca42c1c75e287c",
+    "scripts/dragon_ground_pose.gd": "fd50ede482da3ec922cf33984f77eafbbb738b8ea7c790d7bd29b11ffe4a2611",
+    "scripts/dragon_head_pose.gd": "88ad9052c82bb2ff89bd8cf2170195cfcd470be739a2801c696ff422a198fbea",
+    "scripts/dragon_pose_probe.gd": "e9f2ffc19dbd94d531a5564eedff9e279cc1a881f077824d373e2735956105ef",
+    "scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "scripts/dragon_surface_materials.gd": "24af925fdf57cd1725831d3ecf6b43c5dccf02d5c6a5b17776aa9c693a3e4144",
+    "scripts/dragon_wing_contact.gd": "dbe8db17b2f859e3a3db2c5624448bbea71915dcc678a18310e928044229ec9b",
+    "scripts/dragon_wing_extrema.json": "e2dffc6c0f7f8e41126927d9c0e5ae343ee6d3a82cd55bb57c48e898bcd2f45c",
+    "scripts/test_dragon_anatomy.gd": "af087672eacee898a91ed87502b3aca1fe38a76f8278154ee618578c73c0a4bc"
+  },
+  "artifact_sha256": {
+    "anatomy-locomotion-contract-green.log": "414bc463bab5377d0053bea7f4ded83479c3b130f42970827367e98a3a597387",
+    "anatomy-locomotion-contract-standalone-green.json": "a3364be5520a6f14ab0bb8f64768d1dbe2c8e40d68482ad844796d7228154538",
+    "anatomy-stride-pooled-logic-red.json": "a5862052692d41f4f5265693ffc28ccf03f4c3b40598db50a07511e0f1971286",
+    "anatomy-locomotion-contract-time-oracle-red.log": "a37aae18b1de874cd9ca8a6510ce114dc1009318629a6ebe84ee5b1af07b49de",
+    "anatomy-locomotion-contract-time-oracle-red.json": "27edcad7d15911d20e61ca45ed72d3a5eecf15ddcf3dc542ae7762dc4cb09ad9",
+    "anatomy-locomotion-contract-axis-fixture-red.log": "9b885122c7a63be107ac0b533c1942da3e57b5338a91e19373e65182dc6da14d",
+    "anatomy-locomotion-contract-parse-red.log": "dd13eaa87754ac7ec2f7ab6b6da3d2360a663e3154d5f3f8b9967868e64ccc62",
+    "anatomy-locomotion-check-only.log": "6d1c065383a27c36804949b6ffa4b09714470b112e5dacc0bd5aeb7b9c147c4e"
+  },
+  "scope": "Tests only; headless60Hz. No native/GPU benchmark or new visual capture. Initial fixture placements permitted; turn/release sequence never resets roll. No runtime changes."
+}

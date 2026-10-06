@@ -21,6 +21,7 @@ enum ViewPreset { BACK, FRONT, RIGHT, LEFT }
 
 # Rango de zoom interactivo con la rueda del ratón
 var target_distance: float = 16.0
+var zoom_offset: float = 0.0
 var min_distance: float = 5.0
 var max_distance: float = 24.0
 
@@ -32,6 +33,29 @@ var orbit_yaw: float = 0.0
 var orbit_pitch: float = 0.0
 var orbiting: bool = false
 var return_timer: float = -1.0
+var head_follow_blend := 0.0
+var collision_probe := SphereShape3D.new()
+var collision_pivot_world := Vector3.ZERO
+
+func _sweep_camera(from: Vector3, to: Vector3, excluded: Array[RID]) -> Vector3:
+	# Keep the whole near-camera volume clear during the smoothed transition.
+	if from.distance_squared_to(to) < 0.000001:
+		return to
+	collision_probe.radius = 0.2
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = collision_probe
+	query.transform = Transform3D(Basis.IDENTITY, from)
+	query.exclude = excluded
+	query.collision_mask = 3
+	query.margin = 0.0
+	# An invalid old pose is repaired by the pivot ray below, rather than retained.
+	if not get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
+		return to
+	query.motion = to - from
+	var fractions := get_world_3d().direct_space_state.cast_motion(query)
+	if fractions.size() == 2 and fractions[0] < 1.0:
+		return from + query.motion * maxf(0.0, fractions[0] - 0.002)
+	return to
 
 const PRESET_YAW = {
 	ViewPreset.BACK: 0.0,
@@ -65,9 +89,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		# Ajuste dinámico de distancia con la rueda del ratón (Zoom In / Out)
 		if event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			target_distance = clamp(target_distance - 1.0, min_distance, max_distance)
+			zoom_offset = clampf(zoom_offset - 1.0, min_distance - 16.0, max_distance - 16.0)
 		elif event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			target_distance = clamp(target_distance + 1.0, min_distance, max_distance)
+			zoom_offset = clampf(zoom_offset + 1.0, min_distance - 16.0, max_distance - 16.0)
 		# Clic derecho: órbita libre (el cursor se oculta mientras se arrastra)
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			orbiting = event.pressed
@@ -109,8 +133,13 @@ func _physics_process(delta: float) -> void:
 	# Interpolar suavemente zoom y ángulos de órbita
 	# Adaptación dinámica de altura y distancia al estar en tierra
 	var is_ground = target_node and "locomotion_state" in target_node and target_node.locomotion_state == 2 # GROUNDED
+	var is_landing = "locomotion_state" in target_node and target_node.locomotion_state == 1
+	var attack_view: bool = "attack_mode_active" in target_node and target_node.attack_mode_active
+	var head_view = attack_view or ((is_ground or is_landing) and view_preset == ViewPreset.BACK and not orbiting)
+	var back_amount = 1.0 - clampf((absf(orbit_yaw) + absf(orbit_pitch)) / 0.6, 0.0, 1.0)
+	head_follow_blend = lerpf(head_follow_blend, (1.0 if attack_view else back_amount) if head_view else 0.0, 1.0 - exp(-4.0 * delta))
 	var target_h = 3.2 if is_ground else 5.0
-	var target_d = 12.0 if is_ground else 16.0
+	var target_d = clampf((14.0 if is_ground else 18.0) + zoom_offset, min_distance, max_distance)
 	height = lerp(height, target_h, 3.0 * delta)
 	target_distance = lerp(target_distance, target_d, 3.0 * delta)
 
@@ -126,6 +155,7 @@ func _physics_process(delta: float) -> void:
 	
 	# 2. Punto pivote: la cruz / montura del dragón (entre las alas)
 	var saddle = target_node.global_position + (up * 0.5)
+	collision_pivot_world = saddle
 	
 	# 3. Dirección de cámara: parte desde "detrás" y se orbita (giro sobre el eje arriba y luego elevación)
 	var back_dir = -forward
@@ -133,10 +163,23 @@ func _physics_process(delta: float) -> void:
 	var orbit_right = right.rotated(up, orbit_yaw)
 	orbit_dir = orbit_dir.rotated(orbit_right, -orbit_pitch)
 	var desired_pos = saddle + (orbit_dir * distance) + (up * height * cos(orbit_pitch))
+	var chase_target = saddle + (forward * 20.0) + (up * 0.2)
+	var breath = target_node.get_node_or_null("DragonBreath")
+	if breath and head_follow_blend > 0.001 and breath.mouth_pose_cached:
+		# Stay above the front of the skull: the old shoulder position let the
+		# folded or beating wings cover soldiers while retreating or attacking.
+		var mouth: Vector3 = target_node.to_global(breath.mouth_actor_local)
+		var head_direction: Vector3 = (target_node.global_basis*breath.direction_actor_local).normalized()
+		var skull_back := clampf(0.7 + zoom_offset * 0.15, 0.25, 1.9)
+		var skull_height := clampf(2.2 + zoom_offset * 0.12, 1.5, 3.2)
+		var head_camera: Vector3 = mouth - head_direction * skull_back + Vector3.UP * skull_height
+		desired_pos = desired_pos.lerp(head_camera, head_follow_blend)
+		chase_target = chase_target.lerp(mouth + head_direction * 14.0, head_follow_blend)
+		collision_pivot_world = saddle.lerp(mouth + Vector3.UP * 0.2, head_follow_blend)
 	
 	# 4. Prevención de colisión con el terreno (No atravesar montañas ni suelo)
 	var space_state = get_world_3d().direct_space_state
-	var ray_query = PhysicsRayQueryParameters3D.create(saddle, desired_pos)
+	var ray_query = PhysicsRayQueryParameters3D.create(collision_pivot_world, desired_pos, 3)
 	if target_node is CollisionObject3D:
 		ray_query.exclude = [(target_node as CollisionObject3D).get_rid()]
 	
@@ -147,17 +190,26 @@ func _physics_process(delta: float) -> void:
 	# Clamp de altura mínima sobre el suelo absoluto
 	desired_pos.y = max(desired_pos.y, 2.0)
 	
-	global_position = global_position.lerp(desired_pos, follow_smoothness * delta)
+	var excluded: Array[RID] = []
+	excluded.assign(ray_query.exclude)
+	desired_pos = _sweep_camera(collision_pivot_world, desired_pos, excluded)
+	var previous := global_position
+	global_position = _sweep_camera(previous, previous.lerp(desired_pos, 1.0 - exp(-follow_smoothness * delta)), excluded)
+	# Recheck the smoothed path: the interpolation itself must not cut through hills.
+	var final_ray = PhysicsRayQueryParameters3D.create(collision_pivot_world, global_position, 3)
+	final_ray.exclude = ray_query.exclude
+	var final_hit = space_state.intersect_ray(final_ray)
+	if final_hit:
+		global_position = final_hit.position + final_hit.normal * 0.8
 	
 	# 5. Orientación: en la vista trasera mira al horizonte; al orbitar mira al dragón
-	var chase_target = saddle + (forward * 20.0) + (up * 0.2)
-	var orbit_amount = clamp((absf(orbit_yaw) + absf(orbit_pitch)) / 0.6, 0.0, 1.0)
+	var orbit_amount = 0.0 if attack_view else clamp((absf(orbit_yaw) + absf(orbit_pitch)) / 0.6, 0.0, 1.0)
 	var look_target = chase_target.lerp(saddle, orbit_amount)
 	
 	# El vector UP de la cámara acompaña el alabeo (bank roll) del dragón para un manejo intuitivo
 	var pitch_steepness = clamp(absf(forward.y), 0.0, 1.0)
 	var cam_up = up.lerp(Vector3.UP, lerp(0.35, 0.90, pitch_steepness)).normalized()
-	if absf(orbit_pitch) > 0.5 or cam_up.length_squared() < 0.5:
+	if attack_view or absf(orbit_pitch) > 0.5 or cam_up.length_squared() < 0.5:
 		cam_up = Vector3.UP
 	
 	var current_transform = global_transform
@@ -167,7 +219,7 @@ func _physics_process(delta: float) -> void:
 		if absf(cam_up.dot(look_dir)) > 0.92 or cam_up.length_squared() < 0.1:
 			cam_up = Vector3.UP if absf(look_dir.y) < 0.95 else Vector3.FORWARD
 		var target_transform = current_transform.looking_at(look_target, cam_up)
-		global_transform = current_transform.interpolate_with(target_transform, rotation_smoothness * delta)
+		global_transform = current_transform.interpolate_with(target_transform, 1.0 - exp(-rotation_smoothness * delta))
 	
 	# 6. Efecto dinámico de FOV según velocidad
 	if target_node and "current_speed" in target_node:

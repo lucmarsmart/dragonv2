@@ -1,0 +1,343 @@
+{
+  "display_server": "headless",
+  "failures": [],
+  "measurements": [
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 2,
+      "panel": "[P: (240.0, 125.0), S: (800.0, 469.0)]",
+      "popup_bounded": true,
+      "state": "briefing",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "font_families": [
+        "Open Sans SemiBold"
+      ],
+      "font_sizes": [
+        14,
+        32,
+        18,
+        16
+      ],
+      "keyboard_focus_expected": 2,
+      "keyboard_focus_reached": 2,
+      "state": "briefing",
+      "ui_colors": [
+        "03050694",
+        "070b0cf0",
+        "b38c47cc",
+        "f0b650ff",
+        "030505e6",
+        "f0f0deff",
+        "24302bff",
+        "667a66ff"
+      ],
+      "viewport": "(1280, 720)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 8,
+      "panel": "[P: (240.0, 94.0), S: (800.0, 531.0)]",
+      "popup_bounded": true,
+      "state": "credits",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "font_families": [
+        "Open Sans SemiBold"
+      ],
+      "font_sizes": [
+        14,
+        32,
+        18,
+        16
+      ],
+      "keyboard_focus_expected": 8,
+      "keyboard_focus_reached": 8,
+      "state": "credits",
+      "ui_colors": [
+        "03050694",
+        "070b0cf0",
+        "b38c47cc",
+        "f0b650ff",
+        "030505e6",
+        "f0f0deff",
+        "24302bff",
+        "667a66ff"
+      ],
+      "viewport": "(1280, 720)"
+    },
+    {
+      "dispatch_latency_ms": 0.001,
+      "input_method": "KEY_ENTER",
+      "latency_ms": 15.932,
+      "state": "start_keyboard",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 7,
+      "panel": "[P: (240.0, 125.0), S: (800.0, 469.0)]",
+      "popup_bounded": true,
+      "state": "active",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "font_families": [
+        "Open Sans SemiBold"
+      ],
+      "font_sizes": [
+        22,
+        20,
+        18,
+        14,
+        16,
+        15,
+        26
+      ],
+      "keyboard_focus_expected": 7,
+      "keyboard_focus_reached": 7,
+      "state": "active",
+      "ui_colors": [
+        "f2f0d9ff",
+        "040608b3",
+        "040505f2",
+        "f2b64eff",
+        "e6e1b8ff",
+        "090e11de",
+        "5966618c",
+        "131b1cf2",
+        "475752ff",
+        "000000ff",
+        "f0f0deff",
+        "030505e6",
+        "141413cc",
+        "404d47ff",
+        "a63d1aff",
+        "d97333ff",
+        "f0b650ff"
+      ],
+      "viewport": "(1280, 720)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 7,
+      "panel": "[P: (240.0, 125.0), S: (800.0, 469.0)]",
+      "popup_bounded": true,
+      "state": "aim",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 7,
+      "panel": "[P: (240.0, 125.0), S: (800.0, 469.0)]",
+      "popup_bounded": true,
+      "state": "help",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 2,
+      "panel": "[P: (240.0, 169.0), S: (800.0, 382.0)]",
+      "popup_bounded": true,
+      "state": "defeat",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "combat_running": true,
+      "dispatch_latency_ms": 0.05,
+      "first_frame_presented": false,
+      "input_method": "Viewport.push_input: actual left-button press/release",
+      "latency_ms": 7.301,
+      "overlay_visible": false,
+      "state": "start_click",
+      "threshold_ms": 100,
+      "viewport": "(1280, 720)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 2,
+      "panel": "[P: (240.0, 183.0), S: (800.0, 353.0)]",
+      "popup_bounded": true,
+      "state": "victory",
+      "viewport": "(1280, 720)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 2,
+      "panel": "[P: (80.0, 52.0), S: (800.0, 436.0)]",
+      "popup_bounded": true,
+      "state": "briefing",
+      "viewport": "(960, 540)"
+    },
+    {
+      "font_families": [
+        "Open Sans SemiBold"
+      ],
+      "font_sizes": [
+        14,
+        28,
+        16
+      ],
+      "keyboard_focus_expected": 2,
+      "keyboard_focus_reached": 2,
+      "state": "briefing",
+      "ui_colors": [
+        "03050694",
+        "070b0cf0",
+        "b38c47cc",
+        "f0b650ff",
+        "030505e6",
+        "f0f0deff",
+        "24302bff",
+        "667a66ff"
+      ],
+      "viewport": "(960, 540)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 8,
+      "panel": "[P: (80.0, 18.0), S: (800.0, 504.0)]",
+      "popup_bounded": true,
+      "state": "credits",
+      "viewport": "(960, 540)"
+    },
+    {
+      "font_families": [
+        "Open Sans SemiBold"
+      ],
+      "font_sizes": [
+        14,
+        28,
+        16
+      ],
+      "keyboard_focus_expected": 8,
+      "keyboard_focus_reached": 8,
+      "state": "credits",
+      "ui_colors": [
+        "03050694",
+        "070b0cf0",
+        "b38c47cc",
+        "f0b650ff",
+        "030505e6",
+        "f0f0deff",
+        "24302bff",
+        "667a66ff"
+      ],
+      "viewport": "(960, 540)"
+    },
+    {
+      "dispatch_latency_ms": 0.001,
+      "input_method": "KEY_ENTER",
+      "latency_ms": 7.244,
+      "state": "start_keyboard",
+      "viewport": "(960, 540)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 7,
+      "panel": "[P: (80.0, 52.0), S: (800.0, 436.0)]",
+      "popup_bounded": true,
+      "state": "active",
+      "viewport": "(960, 540)"
+    },
+    {
+      "font_families": [
+        "Open Sans SemiBold"
+      ],
+      "font_sizes": [
+        22,
+        20,
+        18,
+        14,
+        16,
+        15,
+        26
+      ],
+      "keyboard_focus_expected": 7,
+      "keyboard_focus_reached": 7,
+      "state": "active",
+      "ui_colors": [
+        "f2f0d9ff",
+        "040608b3",
+        "040505f2",
+        "f2b64eff",
+        "e6e1b8ff",
+        "090e11de",
+        "5966618c",
+        "131b1cf2",
+        "475752ff",
+        "000000ff",
+        "f0f0deff",
+        "030505e6",
+        "141413cc",
+        "404d47ff",
+        "a63d1aff",
+        "d97333ff",
+        "f0b650ff"
+      ],
+      "viewport": "(960, 540)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 7,
+      "panel": "[P: (80.0, 52.0), S: (800.0, 436.0)]",
+      "popup_bounded": true,
+      "state": "aim",
+      "viewport": "(960, 540)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 7,
+      "panel": "[P: (80.0, 52.0), S: (800.0, 436.0)]",
+      "popup_bounded": true,
+      "state": "help",
+      "viewport": "(960, 540)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 2,
+      "panel": "[P: (80.0, 91.0), S: (800.0, 358.0)]",
+      "popup_bounded": true,
+      "state": "defeat",
+      "viewport": "(960, 540)"
+    },
+    {
+      "combat_running": true,
+      "dispatch_latency_ms": 0.056,
+      "first_frame_presented": false,
+      "input_method": "Viewport.push_input: actual left-button press/release",
+      "latency_ms": 7.46,
+      "overlay_visible": false,
+      "state": "start_click",
+      "threshold_ms": 100,
+      "viewport": "(960, 540)"
+    },
+    {
+      "buttons_outside": 0,
+      "buttons_small": 0,
+      "buttons_visible": 2,
+      "panel": "[P: (80.0, 104.0), S: (800.0, 332.0)]",
+      "popup_bounded": true,
+      "state": "victory",
+      "viewport": "(960, 540)"
+    }
+  ],
+  "passed": true,
+  "renderer": "forward_plus",
+  "scope": "UI state/input gate; win/lose presentation fixtures, not mission acceptance"
+}
