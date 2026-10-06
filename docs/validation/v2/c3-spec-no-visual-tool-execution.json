@@ -1,8 +1,0 @@
-{
-  "returncode": 1,
-  "model_requested": "gpt-6.1-sol",
-  "reasoning_effort_requested": "high",
-  "range": "161070425ce3dbd3905487d48901826fde76c59d..aca31ebd600c7e1bf1dd29fc850677c2c2800775",
-  "output": "c3-spec-gate.txt",
-  "log": "c3-spec-run.log"
-}

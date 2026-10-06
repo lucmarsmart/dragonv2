@@ -1,5 +1,0 @@
-{
-	"checks": "terrain-triangles,8-knights,3-platforms,gate,wall,mountain,nest-access,nest-release,nest-reset",
-	"failures": [],
-	"maximum_terrain_height_error_m": 0.000200975490747268
-}
