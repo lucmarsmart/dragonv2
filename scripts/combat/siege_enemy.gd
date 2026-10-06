@@ -23,9 +23,16 @@ var facing_yaw := 0.0
 var last_anim := ""
 var burning := 0.0
 var patrol_clock := 0.0
+var knight_scale := 1.0
 const Projectile = preload("res://scripts/combat/siege_projectile.gd")
 
 func _ready() -> void:
+	if kind == "captain":
+		knight_scale = 2.4
+	elif kind == "knight":
+		knight_scale = 2.0
+	else:
+		knight_scale = 1.0
 	collision_layer = 4 if kind == "knight" else 6
 	collision_mask = 3
 	floor_snap_length = 0.6
@@ -43,22 +50,22 @@ func _ready() -> void:
 		collision.position.y = 1.75
 	else:
 		var shape := CapsuleShape3D.new()
-		shape.radius = 0.42
-		shape.height = 1.9
+		shape.radius = 0.42 * knight_scale
+		shape.height = 1.9 * knight_scale
 		collision.shape = shape
-		collision.position.y = 0.95
+		collision.position.y = 0.95 * knight_scale
 	add_child(collision)
 	_load_visual()
 	warning = OmniLight3D.new()
-	warning.omni_range = 7
+	warning.omni_range = 7.0 * (knight_scale if kind != "turret" else 1.0)
 	warning.light_color = Color(1,0.24,0.07)
 	warning.light_energy = 0
-	warning.position.y = 2.0
+	warning.position.y = 1.2 * knight_scale if kind != "turret" else 2.0
 	add_child(warning)
 	label = Label3D.new()
-	label.font_size = 36
+	label.font_size = 40 if kind == "captain" else 36
 	label.pixel_size = 0.01
-	label.position.y = 4.2 if kind == "turret" else 2.7
+	label.position.y = 4.2 if kind == "turret" else (1.9 * knight_scale + 0.8)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.no_depth_test = false
 	label.modulate = Color(1,0.76,0.45)
@@ -74,6 +81,8 @@ func _load_visual() -> void:
 		return
 	visual = load(path).instantiate()
 	visual.name = "EnemyModel"
+	if kind != "turret":
+		visual.scale = Vector3.ONE * knight_scale
 	add_child(visual)
 	# Models are normalized by the asset pipeline; preserve their authored rig and material.
 	for player: AnimationPlayer in visual.find_children("*","AnimationPlayer",true,false):
@@ -116,7 +125,7 @@ func _die() -> void:
 	label.text = "DESTRUIDA" if kind == "turret" else ""
 	_play("death")
 	combat.enemy_defeated(self)
-	combat.spawn_impact(global_position + Vector3.UP, Vector3.UP, true)
+	combat.spawn_impact(global_position + Vector3.UP * (0.95 * knight_scale if kind != "turret" else 1.0), Vector3.UP, true)
 	if kind == "turret" and visual:
 		var tween := create_tween()
 		tween.tween_property(visual,"rotation:z",0.12,0.5)
@@ -143,7 +152,8 @@ func _physics_process(delta: float) -> void:
 		if state_time >= 0.68 and not attack_delivered:
 			attack_delivered = true
 			attacks += 1
-			if grounded and range_to_target < 6.5 and _line_of_sight(target,[get_rid(),dragon.get_rid()]):
+			var melee_range := 6.5 + (knight_scale - 1.0) * 1.5
+			if grounded and range_to_target < melee_range and _line_of_sight(target,[get_rid(),dragon.get_rid()]):
 				combat.damage_dragon(12 if kind == "captain" else 7,"Golpe de caballero")
 		if state_time >= 1.14:
 			state = "chase"
@@ -153,7 +163,8 @@ func _physics_process(delta: float) -> void:
 		var wanted := Vector3.ZERO
 		if grounded and visible_target:
 			state = "chase"
-			if range_to_target < 6.2 and cooldown <= 0:
+			var windup_range := 6.2 + (knight_scale - 1.0) * 1.5
+			if range_to_target < windup_range and cooldown <= 0:
 				state = "windup"
 				state_time = 0
 				attack_delivered = false
@@ -174,7 +185,9 @@ func _physics_process(delta: float) -> void:
 			wanted = wanted.normalized() * 1.4
 		# A probe gives blocked patrols a local detour instead of walking through masonry.
 		if wanted.length_squared() > 0.1:
-			var probe := PhysicsRayQueryParameters3D.create(global_position+Vector3.UP,global_position+Vector3.UP+wanted.normalized()*2.0,2)
+			var probe_y := 1.0 * knight_scale if kind != "turret" else 1.0
+			var probe_dist := 1.5 * knight_scale if kind != "turret" else 2.0
+			var probe := PhysicsRayQueryParameters3D.create(global_position+Vector3.UP*probe_y,global_position+Vector3.UP*probe_y+wanted.normalized()*probe_dist,2)
 			if not get_world_3d().direct_space_state.intersect_ray(probe).is_empty():
 				wanted = wanted.rotated(Vector3.UP,PI/2)
 			facing_yaw = atan2(-wanted.x,-wanted.z)
@@ -193,7 +206,8 @@ func _physics_process(delta: float) -> void:
 		animator.speed_scale = 1.0
 
 func _line_of_sight(target: Vector3, excluded: Array[RID]) -> bool:
-	var query := PhysicsRayQueryParameters3D.create(global_position+Vector3.UP*1.8,target,3)
+	var eye_height := 1.7 * knight_scale if kind != "turret" else 1.8
+	var query := PhysicsRayQueryParameters3D.create(global_position+Vector3.UP*eye_height,target,3)
 	query.exclude = excluded
 	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 

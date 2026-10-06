@@ -590,8 +590,18 @@ func _sample_ground() -> void:
 	if ground_contact:
 		ground_normal = ground_contact.normal
 
+func _get_water_height() -> float:
+	if is_instance_valid(landscape) and landscape.has_method("get_water_level"):
+		return landscape.get_water_level()
+	return 0.7
+
 func _over_water() -> bool:
 	return is_instance_valid(landscape) and landscape.has_method("is_water_at") and landscape.is_water_at(global_position)
+
+func _is_in_water() -> bool:
+	if not _over_water():
+		return false
+	return global_position.y <= _get_water_height() + 1.2
 
 func _ground_is_walkable() -> bool:
 	return not ground_contact.is_empty() and ground_contact.normal.dot(Vector3.UP) >= cos(floor_max_angle) and not _over_water()
@@ -678,16 +688,42 @@ func _calculate_flight_physics(delta: float) -> void:
 			target_speed = min_stall_speed
 			acceleration = air_brake_decel
 		FlightMode.NORMAL:
-			target_speed = max_flap_speed if w_boost else cruise_speed
+			var pitch_speed_mod := -forward_dir.y * 8.0
+			var base_speed := max_flap_speed if w_boost else cruise_speed
+			target_speed = clampf(base_speed + pitch_speed_mod, min_stall_speed, dive_terminal_speed)
 	current_speed = move_toward(current_speed, target_speed, acceleration * delta)
 	current_speed = clampf(current_speed, min_stall_speed, dive_terminal_speed)
+
+	# Resistencia hidrodinámica al entrar en agua
+	if _is_in_water():
+		target_speed = minf(target_speed, 9.0)
+		current_speed = move_toward(current_speed, target_speed, 22.0 * delta)
+		if current_mode == FlightMode.DIVE or is_diving:
+			ui_dive_active = false
+			is_diving = false
+			current_mode = FlightMode.NORMAL
+
 	var wanted_velocity := forward_dir * current_speed
 	if current_mode == FlightMode.GLIDE:
 		wanted_velocity.y -= 1.0
 	if current_mode == FlightMode.CLIMB:
 		# Thrust follows body pitch instead of adding a second full climb velocity.
 		wanted_velocity.y = maxf(wanted_velocity.y, climb_vertical_rate * climb_blend)
-	if ground_proximity < 10.0 and _ground_is_walkable():
+
+	# Amortiguación de proximidad y flotabilidad en agua vs tierra firme
+	if _is_in_water():
+		var water_surface := _get_water_height() + 0.3
+		if global_position.y < water_surface:
+			var depth := water_surface - global_position.y
+			wanted_velocity.y = maxf(wanted_velocity.y, depth * 6.0)
+	elif _over_water() and global_position.y < _get_water_height() + 4.0:
+		if velocity.y < -2.0:
+			wanted_velocity.y = maxf(wanted_velocity.y, -1.0)
+			if current_mode == FlightMode.DIVE:
+				ui_dive_active = false
+				is_diving = false
+				current_mode = FlightMode.NORMAL
+	elif ground_proximity < 10.0 and _ground_is_walkable():
 		if velocity.y < -1.0:
 			target_pitch = maxf(target_pitch, deg_to_rad(10.0))
 			wanted_velocity.y = maxf(wanted_velocity.y, 3.0)
@@ -723,11 +759,17 @@ func _handle_terrain_collisions(delta: float) -> void:
 		landing_target_active = false
 		return
 	for i in range(get_slide_collision_count()):
-		var n := get_slide_collision(i).get_normal()
+		var col := get_slide_collision(i)
+		var n := col.get_normal()
+		var impact_speed := -velocity.dot(n)
 		velocity = velocity.slide(n)
-		current_speed = move_toward(current_speed, min_stall_speed, 25.0 * delta)
-		if n.y >= cos(floor_max_angle):
-			target_pitch = maxf(target_pitch, deg_to_rad(12.0))
+		if impact_speed > 2.0:
+			current_speed = maxf(min_stall_speed, current_speed - impact_speed * 0.35)
+		else:
+			current_speed = move_toward(current_speed, min_stall_speed, 20.0 * delta)
+		if n.y >= cos(floor_max_angle) and not _over_water() and not _is_in_water():
+			if velocity.y < -0.5:
+				target_pitch = maxf(target_pitch, deg_to_rad(6.0))
 
 # --- Suavizado de Rotaciones Globales ---
 func _apply_smooth_rotations(delta: float) -> void:

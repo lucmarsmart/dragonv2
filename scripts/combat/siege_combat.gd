@@ -214,13 +214,15 @@ func _damage_with_breath(delta: float) -> void:
 	for enemy in enemies:
 		if not is_instance_valid(enemy) or enemy.dead:
 			continue
-		var center := enemy.global_position + Vector3.UP * (1.8 if enemy.kind == "turret" else 1.0)
+		var k_scale: float = enemy.knight_scale if ("knight_scale" in enemy) else 1.0
+		var center := enemy.global_position + Vector3.UP * (1.8 if enemy.kind == "turret" else (0.95 * k_scale))
 		var offset := center-origin
 		var along := offset.dot(direction)
 		if along < 0 or along > breath.max_reach:
 			continue
 		var lateral := (offset-direction*along).length()
-		if lateral > 0.55 + along * tan(deg_to_rad(7.0)) + (1.3 if enemy.kind == "turret" else 0.4):
+		var enemy_radius := 1.3 if enemy.kind == "turret" else (0.42 * k_scale)
+		if lateral > 0.55 + along * tan(deg_to_rad(7.0)) + enemy_radius:
 			continue
 		# Check the specific target. A nearby floor/other target must never authorize damage through a wall.
 		var ray := PhysicsRayQueryParameters3D.create(origin,center,7)

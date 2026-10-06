@@ -166,6 +166,9 @@ func is_water_at(world_position: Vector3) -> bool:
 	var p := to_local(world_position)
 	return absf(p.z) < MAP_EDGE and absf(p.x - river_center(p.z)) < river_width(p.z) + 32.0 and ground_height(p.x, p.z) < WATER_LEVEL
 
+func get_water_level() -> float:
+	return WATER_LEVEL
+
 func ground_surface(world_position: Vector3) -> Dictionary:
 	var p := world_position
 	var query := PhysicsRayQueryParameters3D.create(p + Vector3.UP * 1000.0, p - Vector3.UP * 1500.0, 1)
@@ -262,14 +265,23 @@ func _build_distant_ridges() -> void:
 func _build_water() -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	const W_SEGS := 16
 	for i in 400:
-		var z := -MAP_EDGE + i * 5.0
-		var points: Array[Vector3] = []
-		for k in [Vector2(0, -1), Vector2(1, -1), Vector2(0, 1), Vector2(1, 1)]:
-			var zz: float = z + k.x * 5.0
-			points.append(Vector3(river_center(zz) + k.y * (river_width(zz) + 32.0), WATER_LEVEL, zz))
-		_triangle(st, points[0], points[1], points[2])
-		_triangle(st, points[2], points[1], points[3])
+		var z0 := -MAP_EDGE + float(i) * 5.0
+		var z1 := z0 + 5.0
+		var rc0 := river_center(z0)
+		var rw0 := river_width(z0) + 32.0
+		var rc1 := river_center(z1)
+		var rw1 := river_width(z1) + 32.0
+		for w in W_SEGS:
+			var ky0 := lerpf(-1.0, 1.0, float(w) / float(W_SEGS))
+			var ky1 := lerpf(-1.0, 1.0, float(w + 1) / float(W_SEGS))
+			var p0 := Vector3(rc0 + ky0 * rw0, WATER_LEVEL, z0)
+			var p1 := Vector3(rc1 + ky0 * rw1, WATER_LEVEL, z1)
+			var p2 := Vector3(rc0 + ky1 * rw0, WATER_LEVEL, z0)
+			var p3 := Vector3(rc1 + ky1 * rw1, WATER_LEVEL, z1)
+			_triangle(st, p0, p1, p2)
+			_triangle(st, p2, p1, p3)
 	st.index()
 	st.generate_normals()
 	var water := MeshInstance3D.new()
@@ -389,6 +401,17 @@ func _build_forest() -> void:
 		var h := ground_height(x, z)
 		if h > 1.0:
 			grasses.append(Transform3D(Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * _rng.randf_range(0.8, 1.4)), Vector3(x, h, z)))
+	# River stones and boulders along the river channel and shorelines (matching alpine river reference)
+	for i in 320:
+		var z := _rng.randf_range(-950.0, 950.0)
+		var offset := _rng.randf_range(-1.0, 1.0) * (river_width(z) + _rng.randf_range(-6.0, 18.0))
+		var x := river_center(z) + offset
+		var h := ground_height(x, z)
+		if h >= -2.2 and h <= 2.2:
+			var s_xz := _rng.randf_range(1.1, 3.6)
+			var s_y := _rng.randf_range(0.55, 2.0)
+			var b := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3(s_xz, s_y, s_xz))
+			rocks.append(Transform3D(b, Vector3(x, h - _rng.randf_range(0.06, 0.30), z)))
 	for lod in 4:
 		for cz in 4:
 			for cx in 4:
