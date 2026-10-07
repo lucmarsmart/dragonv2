@@ -1,0 +1,11 @@
+{
+  "checks": 19,
+  "failures": [
+    "Player aimed breath damages the actual knight through real input/pose/LOS",
+    "Sustained aimed fire kills knight and plays death with corpse nonblocking",
+    "Unobstructed physical projectile damages dragon",
+    "Aim arrows move head independently of body while on ground",
+    "P opens actual pause"
+  ],
+  "shots_observed": 22
+}

@@ -18,6 +18,7 @@ const PoseProbe = preload("res://scripts/dragon_pose_probe.gd")
 var glide_pose_probe = PoseProbe.new()
 const WingContact = preload("res://scripts/dragon_wing_contact.gd")
 var wing_contact = WingContact.new()
+const CollisionEffects = preload("res://scripts/collision_effects.gd")
 var contact_fold_requested := 0.0
 var has_head_pose_driver := true
 var head_pose_blocked := false
@@ -31,18 +32,185 @@ var head_aim_pitch := 0.0
 var head_requested_yaw := 0.0
 var head_requested_pitch := 0.0
 
+# --- Sistema de Fijación de Objetivo (Inspirado en Pokémon Leyendas: Arceus) ---
+var locked_target: CharacterBody3D = null
+var lock_on_enabled: bool = true
+var target_occlusion_timer: float = 0.0
+var lock_on_distance: float = 0.0
+var lock_sound_player: AudioStreamPlayer = null
+var breath: Node = null
+
+func get_locked_target() -> CharacterBody3D:
+	return locked_target if (is_instance_valid(locked_target) and not locked_target.dead and locked_target.is_inside_tree()) else null
+
+func _get_target_aim_point(enemy: Node3D) -> Vector3:
+	if not is_instance_valid(enemy):
+		return Vector3.ZERO
+	var kind: String = enemy.kind if "kind" in enemy else ""
+	var k_scale: float = enemy.knight_scale if "knight_scale" in enemy else 1.0
+	var y_offset: float = 1.8 if kind == "turret" else (0.95 * k_scale)
+	return enemy.global_position + Vector3.UP * y_offset
+
+func _play_lock_cue() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	if not lock_sound_player:
+		lock_sound_player = AudioStreamPlayer.new()
+		lock_sound_player.name = "LockOnSound"
+		var stream := AudioStreamWAV.new()
+		stream.format = AudioStreamWAV.FORMAT_16_BITS
+		stream.mix_rate = 22050
+		stream.stereo = false
+		var sample_count := 2600
+		var pcm := PackedByteArray()
+		pcm.resize(sample_count * 2)
+		for i in sample_count:
+			var t := float(i) / 22050.0
+			var freq := 920.0 if t < 0.05 else 1380.0
+			var env := exp(-t * 26.0) * (1.0 if t < 0.05 else exp(-(t - 0.05) * 36.0))
+			var sample := int(sin(t * TAU * freq) * env * 12000.0)
+			pcm.encode_s16(i * 2, sample)
+		stream.data = pcm
+		lock_sound_player.stream = stream
+		lock_sound_player.volume_db = -10.0
+		add_child(lock_sound_player)
+	if lock_sound_player and not lock_sound_player.playing:
+		lock_sound_player.play()
+
+func cycle_locked_target() -> void:
+	var enemies := get_tree().get_nodes_in_group("siege_enemy")
+	var valid_enemies: Array[CharacterBody3D] = []
+	var mouth_pos: Vector3 = breath.mouth_position if is_instance_valid(breath) and breath.mouth_pose_cached else global_position + Vector3.UP * 1.5
+	for node in enemies:
+		var e := node as CharacterBody3D
+		if is_instance_valid(e) and not e.dead and e.is_inside_tree() and mouth_pos.distance_to(_get_target_aim_point(e)) < 65.0:
+			valid_enemies.append(e)
+	if valid_enemies.size() <= 1:
+		return
+	var current_idx := valid_enemies.find(locked_target)
+	var next_idx := (current_idx + 1) % valid_enemies.size()
+	locked_target = valid_enemies[next_idx]
+	target_occlusion_timer = 0.0
+	_play_lock_cue()
+
+func _update_target_lock(delta: float) -> void:
+	if not lock_on_enabled:
+		locked_target = null
+		return
+	
+	var combat_node: Node = get_tree().get_first_node_in_group("siege_combat")
+	var combat_active: bool = is_instance_valid(combat_node) and combat_node.has_method("is_running") and combat_node.is_running()
+	var breath_firing: bool = is_instance_valid(breath) and breath.is_firing
+	var should_lock: bool = combat_active or attack_mode_active or head_aim_active or breath_firing
+	
+	if not should_lock:
+		locked_target = null
+		return
+	
+	var mouth_pos: Vector3 = breath.mouth_position if is_instance_valid(breath) and breath.mouth_pose_cached else global_position + Vector3.UP * 1.5
+	var fwd: Vector3 = -global_basis.z.normalized()
+	
+	# 1. Validar objetivo actual
+	if is_instance_valid(locked_target):
+		if locked_target.dead or not locked_target.is_inside_tree():
+			locked_target = null
+		else:
+			var target_pos := _get_target_aim_point(locked_target)
+			var dist := mouth_pos.distance_to(target_pos)
+			var to_target := (target_pos - mouth_pos).normalized()
+			var angle := fwd.angle_to(to_target)
+			
+			# Romper fijación si se aleja demasiado (hasta que este se aleja) o queda atrás
+			if dist > 68.0 or angle > deg_to_rad(105.0):
+				locked_target = null
+			else:
+				var space := get_world_3d().direct_space_state
+				var ray := PhysicsRayQueryParameters3D.create(mouth_pos, target_pos, 3)
+				ray.exclude = [get_rid(), locked_target.get_rid()]
+				var hit := space.intersect_ray(ray)
+				if not hit.is_empty():
+					target_occlusion_timer += delta
+					if target_occlusion_timer > 0.8:
+						locked_target = null
+				else:
+					target_occlusion_timer = 0.0
+	
+	# 2. Buscar nuevo objetivo si no hay ninguno fijado
+	if not is_instance_valid(locked_target):
+		var enemies := get_tree().get_nodes_in_group("siege_enemy")
+		var best_enemy: CharacterBody3D = null
+		var best_score := INF
+		var space := get_world_3d().direct_space_state
+		
+		for node in enemies:
+			var enemy := node as CharacterBody3D
+			if not is_instance_valid(enemy) or enemy.dead or not enemy.is_inside_tree():
+				continue
+			var target_pos := _get_target_aim_point(enemy)
+			var dist := mouth_pos.distance_to(target_pos)
+			if dist > 54.0:
+				continue
+			var to_target := (target_pos - mouth_pos).normalized()
+			var angle := fwd.angle_to(to_target)
+			if angle > deg_to_rad(75.0):
+				continue
+			
+			var ray := PhysicsRayQueryParameters3D.create(mouth_pos, target_pos, 3)
+			ray.exclude = [get_rid(), enemy.get_rid()]
+			var hit := space.intersect_ray(ray)
+			if not hit.is_empty():
+				continue
+			
+			var score := dist + (angle / deg_to_rad(75.0)) * 14.0
+			if score < best_score:
+				best_score = score
+				best_enemy = enemy
+		
+		if best_enemy != null:
+			locked_target = best_enemy
+			target_occlusion_timer = 0.0
+			_play_lock_cue()
+	
+	if is_instance_valid(locked_target):
+		lock_on_distance = mouth_pos.distance_to(_get_target_aim_point(locked_target))
+	else:
+		lock_on_distance = 0.0
+
 func set_head_aim(yaw: float, pitch: float) -> void:
 	head_aim_active = true
 	head_requested_yaw = clampf(yaw, -PI / 4.0, PI / 4.0)
 	head_requested_pitch = clampf(pitch, -PI / 6.0, PI / 6.0)
 
 func _update_head_aim(delta: float) -> void:
-	if head_aim_active and not manual_input_override:
+	_update_target_lock(delta)
+	
+	if is_instance_valid(locked_target) and not locked_target.dead:
+		var mouth_pos: Vector3 = breath.mouth_position if is_instance_valid(breath) and breath.mouth_pose_cached else global_position + Vector3.UP * 1.5
+		var target_pos := _get_target_aim_point(locked_target)
+		var dir_to_target := (target_pos - mouth_pos).normalized()
+		var local: Vector3 = global_basis.inverse() * dir_to_target
+		var desired_yaw := atan2(-local.x, -local.z)
+		var desired_pitch := asin(clampf(local.y, -1.0, 1.0))
+		
+		var neck_yaw := clampf(desired_yaw, -PI / 4.0, PI / 4.0)
+		var neck_pitch := clampf(desired_pitch, -PI / 6.0, PI / 6.0)
+		
+		head_requested_yaw = lerp_angle(head_requested_yaw, neck_yaw, 1.0 - exp(-16.0 * delta))
+		head_requested_pitch = lerpf(head_requested_pitch, neck_pitch, 1.0 - exp(-16.0 * delta))
+		
+		var overflow := desired_yaw - neck_yaw
+		if absf(overflow) > 0.04 and not manual_input_override:
+			var assist_rate := 2.0
+			if locomotion_state == LocomotionState.GROUNDED:
+				target_yaw = rotation.y + overflow * delta * assist_rate
+			elif locomotion_state == LocomotionState.FLYING:
+				target_yaw += overflow * delta * assist_rate
+	elif head_aim_active and not manual_input_override:
 		var horizontal := float(Input.is_key_pressed(KEY_LEFT)) - float(Input.is_key_pressed(KEY_RIGHT))
 		var vertical := float(Input.is_key_pressed(KEY_UP)) - float(Input.is_key_pressed(KEY_DOWN))
 		set_head_aim(head_requested_yaw + horizontal * delta * 0.9, head_requested_pitch + vertical * delta * 0.9)
-	var yaw := head_requested_yaw if head_aim_active else sin(tail_wave_time * 0.43) * deg_to_rad(2.2) + smoothed_turn_rate * 0.12
-	var pitch := head_requested_pitch if head_aim_active else deg_to_rad(3.0) + sin(tail_wave_time * 0.68) * deg_to_rad(1.4)
+	var yaw := head_requested_yaw if (head_aim_active or is_instance_valid(locked_target)) else sin(tail_wave_time * 0.43) * deg_to_rad(2.2) + smoothed_turn_rate * 0.12
+	var pitch := head_requested_pitch if (head_aim_active or is_instance_valid(locked_target)) else deg_to_rad(3.0) + sin(tail_wave_time * 0.68) * deg_to_rad(1.4)
 	var response := 1.0 - exp(-9.0 * delta)
 	var head_step := (Vector2(yaw, pitch) - Vector2(head_aim_yaw, head_aim_pitch)) * response
 	head_step = head_step.limit_length(deg_to_rad(240.0) * delta)
@@ -199,6 +367,9 @@ var tail_wave_time: float = 0.0
 # Detección de suelo y efecto suelo aerodinámico
 var ground_proximity: float = 999.0
 var is_touching_ground: bool = false
+var _surface_wash_timer: float = 0.0
+var _step_dust_timer: float = 0.0
+var _was_in_water: bool = false
 
 # Estabilizador dinámico de orientación y anclaje (Jonathan Symmonds & Dragontwin)
 var smoothed_anchor_offset: Vector3 = Vector3.ZERO
@@ -208,6 +379,18 @@ var stabilizer_initialized: bool = false
 @onready var anim_player: AnimationPlayer = null
 @onready var visual_root: Node3D = $VisualModel
 var skeleton: Skeleton3D = null
+var flight_camera = null
+
+func _get_flight_camera():
+	if not is_instance_valid(flight_camera):
+		var cam = get_viewport().get_camera_3d() if get_viewport() else null
+		if cam and cam.has_method("add_trauma"):
+			flight_camera = cam
+		elif get_parent():
+			var c = get_parent().get_node_or_null("FlightCamera")
+			if c and c.has_method("add_trauma"):
+				flight_camera = c
+	return flight_camera
 
 # Índices de huesos
 var bone_pelvis: int = -1
@@ -255,6 +438,8 @@ func _ready() -> void:
 	floor_snap_length = 1.2
 	floor_max_angle = deg_to_rad(50.0)
 	floor_stop_on_slope = true
+	safe_margin = 0.15
+	max_slides = 6
 	
 	target_yaw = rotation.y
 	target_pitch = rotation.x
@@ -318,6 +503,11 @@ func _input(event: InputEvent) -> void:
 		attack_mode_active = head_aim_active
 		mouse_captured = head_aim_active
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if head_aim_active else Input.MOUSE_MODE_VISIBLE)
+		return
+
+	# TAB: cambiar objetivo fijado si hay varios enemigos cercanos
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_TAB:
+		cycle_locked_target()
 		return
 	if event is InputEventMouseMotion and head_aim_active:
 		var wanted_yaw:float=head_requested_yaw-event.relative.x*mouse_sensitivity
@@ -389,10 +579,14 @@ func _physics_process(delta: float) -> void:
 		wing_contact.constrain(self,delta)
 	PoseProbe.record("wing_constrain",constrain_started)
 	ground_guard_motion = velocity*delta if grounded_before_move else Vector3.ZERO
+	var pre_slide_velocity := velocity
 	move_and_slide()
 	ground_executed_motion = global_position-position_before_move if grounded_before_move else Vector3.ZERO
 	ground_guard_snap_delta = ground_executed_motion-ground_guard_motion
-	_handle_terrain_collisions(delta)
+	_handle_terrain_collisions(delta, pre_slide_velocity)
+	_prevent_terrain_penetration()
+	_check_water_entry_impact(pre_slide_velocity)
+	_update_surface_effects(delta)
 	if grounded_before_move and locomotion_state == LocomotionState.GROUNDED:
 		var actual_motion := global_position - position_before_move
 		var heading := -Basis(Vector3.UP, rotation.y).z
@@ -400,8 +594,11 @@ func _physics_process(delta: float) -> void:
 		var distance_walked := Vector2(actual_motion.x, actual_motion.z).length()
 		if (is_on_wall() or wing_contact.predictive_contact) and absf(ground_motion_speed) < 0.1:
 			current_speed = 0.0
-		if distance_walked > 0.001 or absf(ground_yaw_motion) > 0.0001:
-			walk_cycle_phase += (distance_walked + absf(ground_yaw_motion) * 4.0) * TAU / 3.5
+		var move_req := absf(manual_move_input) if manual_input_override else (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_S)) else 0.0)
+		var nominal_advance := move_req * walk_speed * delta
+		var effective_advance := maxf(distance_walked, nominal_advance * 0.8) if (move_req > 0.01 or absf(current_speed) > 0.1) else distance_walked
+		if effective_advance > 0.0005 or absf(ground_yaw_motion) > 0.0001:
+			walk_cycle_phase += (effective_advance + absf(ground_yaw_motion) * 4.0) * TAU / 3.5
 	_update_animations()
 
 # --- Entrada de Teclado y Control de Modos ---
@@ -694,14 +891,12 @@ func _calculate_flight_physics(delta: float) -> void:
 	current_speed = move_toward(current_speed, target_speed, acceleration * delta)
 	current_speed = clampf(current_speed, min_stall_speed, dive_terminal_speed)
 
-	# Resistencia hidrodinámica al entrar en agua
+	# Resistencia fluida al atravesar el agua (Water traversal / hydrodynamic drag)
 	if _is_in_water():
-		target_speed = minf(target_speed, 9.0)
-		current_speed = move_toward(current_speed, target_speed, 22.0 * delta)
-		if current_mode == FlightMode.DIVE or is_diving:
-			ui_dive_active = false
-			is_diving = false
-			current_mode = FlightMode.NORMAL
+		# El agua reduce la velocidad máxima por fricción hidrodinámica, pero permite atravesarla libremente
+		var max_water_speed := 14.0 if is_diving else 10.0
+		target_speed = minf(target_speed, max_water_speed)
+		current_speed = move_toward(current_speed, target_speed, 16.0 * delta)
 
 	var wanted_velocity := forward_dir * current_speed
 	if current_mode == FlightMode.GLIDE:
@@ -710,27 +905,14 @@ func _calculate_flight_physics(delta: float) -> void:
 		# Thrust follows body pitch instead of adding a second full climb velocity.
 		wanted_velocity.y = maxf(wanted_velocity.y, climb_vertical_rate * climb_blend)
 
-	# Amortiguación de proximidad y flotabilidad en agua vs tierra firme
+	# Dinámica en agua: permite sumergirse y nadar; flotabilidad suave solo si no está en picada activa
 	if _is_in_water():
-		var water_surface := _get_water_height() + 0.3
-		if global_position.y < water_surface:
-			var depth := water_surface - global_position.y
-			wanted_velocity.y = maxf(wanted_velocity.y, depth * 6.0)
-	elif _over_water() and global_position.y < _get_water_height() + 4.0:
-		if velocity.y < -2.0:
-			wanted_velocity.y = maxf(wanted_velocity.y, -1.0)
-			if current_mode == FlightMode.DIVE:
-				ui_dive_active = false
-				is_diving = false
-				current_mode = FlightMode.NORMAL
-	elif ground_proximity < 10.0 and _ground_is_walkable():
-		if velocity.y < -1.0:
-			target_pitch = maxf(target_pitch, deg_to_rad(10.0))
-			wanted_velocity.y = maxf(wanted_velocity.y, 3.0)
-			if current_mode == FlightMode.DIVE:
-				ui_dive_active = false
-				is_diving = false
-				current_mode = FlightMode.NORMAL
+		if not is_diving:
+			var water_surface := _get_water_height()
+			if global_position.y < water_surface:
+				# Flotabilidad hidrostática suave (sin rebotar artificialmente)
+				wanted_velocity.y = maxf(wanted_velocity.y, 1.5)
+
 	velocity = velocity.move_toward(wanted_velocity, (28.0 if current_mode == FlightMode.DIVE else 22.0) * delta)
 
 	var centrifugal_accel = -smoothed_turn_rate * (current_speed / cruise_speed) * weight_sway_strength * 3.0
@@ -740,7 +922,7 @@ func _calculate_flight_physics(delta: float) -> void:
 	sway_offset_x = clamp(sway_offset_x, -1.8, 1.8)
 
 # --- Respuesta Físico-Colisional con el Terreno ---
-func _handle_terrain_collisions(delta: float) -> void:
+func _handle_terrain_collisions(delta: float, pre_slide_vel: Vector3 = Vector3.ZERO) -> void:
 	is_touching_ground = is_on_floor()
 	if locomotion_state == LocomotionState.GROUNDED:
 		ground_air_timer = 0.0 if is_on_floor() else ground_air_timer + delta
@@ -755,21 +937,153 @@ func _handle_terrain_collisions(delta: float) -> void:
 		current_speed = Vector2(velocity.x, velocity.z).length()
 		target_pitch = 0.0
 		target_roll = 0.0
-		# Keep contacts calibrated during the landing approach.
+		# Consecuencia de aterrizaje: levantamiento de polvo o agua
+		var land_norm := get_floor_normal()
+		var land_pos := global_position + Vector3.DOWN * (ground_proximity * 0.5)
+		CollisionEffects.spawn_impact(get_parent(), land_pos, land_norm, 1.8, false, landscape)
+		var cam = _get_flight_camera()
+		if cam:
+			cam.add_trauma(0.4)
 		landing_target_active = false
 		return
-	for i in range(get_slide_collision_count()):
-		var col := get_slide_collision(i)
-		var n := col.get_normal()
-		var impact_speed := -velocity.dot(n)
-		velocity = velocity.slide(n)
-		if impact_speed > 2.0:
-			current_speed = maxf(min_stall_speed, current_speed - impact_speed * 0.35)
+	var collision_count := get_slide_collision_count()
+	if collision_count > 0:
+		var incident_vel := pre_slide_vel if pre_slide_vel.length_squared() > 0.01 else velocity
+		var max_impact_speed := 0.0
+		var primary_normal := Vector3.UP
+		var impact_pos := global_position
+		for i in range(collision_count):
+			var col := get_slide_collision(i)
+			var n := col.get_normal()
+			var impact_speed := -incident_vel.dot(n)
+			if impact_speed > max_impact_speed:
+				max_impact_speed = impact_speed
+				primary_normal = n
+				impact_pos = col.get_position()
+
+		if max_impact_speed > 1.5:
+			# Solicitar repliegue de alas por impacto
+			contact_fold_requested = 1.0
+
+			# Consecuencias de impacto: levantamiento de polvo o agua según la superficie
+			var severity := clampf(max_impact_speed / 6.5, 0.7, 3.5)
+			CollisionEffects.spawn_impact(get_parent(), impact_pos, primary_normal, severity, false, landscape)
+
+			# Sacudida visceral de cámara (Screen Shake)
+			var cam = _get_flight_camera()
+			if cam:
+				var trauma_val := clampf(max_impact_speed / 16.0, 0.35, 1.0)
+				cam.add_trauma(trauma_val)
+
+			if max_impact_speed >= 7.0:
+				# --- IMPACTO SEVERO / CHOQUE CONTRA ROCAS O TIERRA ---
+				var in_water := _is_in_water() or _over_water()
+				var is_walkable_ground := primary_normal.y >= cos(floor_max_angle)
+				var is_hard_downward := incident_vel.y < -8.0 or incident_vel.dot(primary_normal) < -12.0
+
+				# Si el choque es violento contra suelo transitable en caída/picada (Crash Landing)
+				if is_walkable_ground and is_hard_downward and not in_water:
+					# Aterrizaje forzoso / caída por choque contra tierra firme
+					locomotion_state = LocomotionState.GROUNDED
+					current_mode = FlightMode.NORMAL
+					current_speed = 0.0
+					velocity = Vector3.ZERO
+					ground_air_timer = 0.0
+					target_pitch = 0.0
+					target_roll = 0.0
+					is_diving = false
+					ui_dive_active = false
+					ground_pose.reset()
+					CollisionEffects.spawn_impact(get_parent(), global_position, primary_normal, 2.8, false, landscape)
+					return
+				else:
+					# --- CHOQUE INELÁSTICO CONTRA ROCAS / MONTAÑAS (REALISMO PURO, CERO TRAMPOLÍN) ---
+					var v_dot_n := incident_vel.dot(primary_normal)
+					var v_normal := primary_normal * v_dot_n
+					var v_tangent := incident_vel - v_normal
+
+					# Restitución inelástica real de impacto biológico/roca (~12% en aire, ~4% en agua)
+					var restitution := 0.04 if in_water else 0.12
+					# Fricción cinética severa: el raspado disipa el 65% de la velocidad tangencial
+					var friction_retained := 0.35
+					var normal_sep := 0.2 if in_water else 0.8
+
+					var v_rebound_normal := -v_normal * restitution + primary_normal * normal_sep
+					var v_scraped_tangent := v_tangent * friction_retained
+
+					velocity = v_scraped_tangent + v_rebound_normal
+					current_speed = maxf(min_stall_speed, velocity.length())
+
+					# Pérdida de sustentación y caída por gravedad tras el golpe contra la roca
+					if not in_water:
+						velocity.y -= 2.5
+						target_pitch = lerp(target_pitch, deg_to_rad(-12.0), 0.4)
+
+					# Desestabilización angular visceral tras el golpe
+					target_pitch += randf_range(-0.35, 0.35)
+					target_roll += randf_range(-0.5, 0.5)
+			else:
+				# --- ROCE / COLISIÓN LEVE O MODERADA ---
+				velocity = velocity.slide(primary_normal) + primary_normal * 1.0
+				current_speed = maxf(min_stall_speed, current_speed - max_impact_speed * 0.45)
+				if primary_normal.y >= cos(floor_max_angle) and not _over_water() and not _is_in_water():
+					if velocity.y < -0.5:
+						target_pitch = maxf(target_pitch, deg_to_rad(4.0))
+
+func _prevent_terrain_penetration() -> void:
+	if not is_instance_valid(landscape) or not landscape.has_method("ground_height"):
+		return
+	var ground_h: float = landscape.ground_height(global_position.x, global_position.z)
+	var min_safe_y: float = ground_h + 3.8 # Radio del cuerpo es 4.0m
+	if global_position.y < min_safe_y:
+		global_position.y = min_safe_y
+		if velocity.y < 0.0:
+			velocity.y = 0.0
+		if locomotion_state == LocomotionState.GROUNDED:
+			ground_air_timer = 0.0
 		else:
-			current_speed = move_toward(current_speed, min_stall_speed, 20.0 * delta)
-		if n.y >= cos(floor_max_angle) and not _over_water() and not _is_in_water():
-			if velocity.y < -0.5:
-				target_pitch = maxf(target_pitch, deg_to_rad(6.0))
+			current_speed = maxf(min_stall_speed, current_speed * 0.6)
+
+func _check_water_entry_impact(pre_slide_vel: Vector3) -> void:
+	var in_water_now := _is_in_water()
+	if in_water_now and not _was_in_water:
+		var entry_speed := pre_slide_vel.length()
+		if entry_speed > 3.5:
+			var w_y := _get_water_height()
+			var splash_pos := Vector3(global_position.x, w_y, global_position.z)
+			var severity := clampf(entry_speed / 7.0, 1.2, 4.0)
+			CollisionEffects.spawn_impact(get_parent(), splash_pos, Vector3.UP, severity, true, landscape)
+			var cam = _get_flight_camera()
+			if cam:
+				cam.add_trauma(clampf(entry_speed / 20.0, 0.35, 0.85))
+	elif not in_water_now and _was_in_water:
+		var exit_speed := velocity.length()
+		if exit_speed > 5.0:
+			var w_y := _get_water_height()
+			CollisionEffects.spawn_surface_wash(get_parent(), Vector3(global_position.x, w_y + 0.05, global_position.z), velocity, true)
+	_was_in_water = in_water_now
+
+func _update_surface_effects(delta: float) -> void:
+	if locomotion_state == LocomotionState.FLYING:
+		if current_speed > 10.0:
+			_surface_wash_timer += delta
+			if _surface_wash_timer >= 0.08:
+				_surface_wash_timer = 0.0
+				if _over_water():
+					var w_y := _get_water_height()
+					var dist_to_water := global_position.y - w_y
+					if dist_to_water > -0.5 and dist_to_water < 5.0:
+						CollisionEffects.spawn_surface_wash(get_parent(), Vector3(global_position.x, w_y + 0.05, global_position.z), velocity, true)
+				elif ground_proximity < 4.2 and not ground_contact.is_empty():
+					CollisionEffects.spawn_surface_wash(get_parent(), ground_contact.position + Vector3.UP * 0.08, velocity, false)
+	elif locomotion_state == LocomotionState.GROUNDED:
+		if absf(ground_motion_speed) > 1.2:
+			_step_dust_timer += delta
+			if _step_dust_timer >= 0.32:
+				_step_dust_timer = 0.0
+				var step_pos := global_position + Vector3.DOWN * 0.1
+				var on_water := _is_in_water() or _over_water()
+				CollisionEffects.spawn_surface_wash(get_parent(), step_pos, velocity, on_water)
 
 # --- Suavizado de Rotaciones Globales ---
 func _apply_smooth_rotations(delta: float) -> void:
@@ -1090,6 +1404,8 @@ func _find_and_setup_skeleton(node: Node) -> void:
 	if node is Skeleton3D:
 		skeleton = node
 		bone_pelvis = skeleton.find_bone("Bip001_03")
+		if bone_pelvis != -1:
+			_cache_bone_relative_axes(bone_pelvis)
 		bone_l_thigh = skeleton.find_bone("Bip001-L-Thigh_0115")
 		bone_r_thigh = skeleton.find_bone("Bip001-R-Thigh_0130")
 		bone_l_calf = skeleton.find_bone("Bip001-L-Calf_0116")
@@ -1202,14 +1518,15 @@ func _process(delta: float) -> void:
 		
 	if visual_root:
 		var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
-		var lateral_sway = sway_offset_x * 0.30 * flight_factor + sin(walk_cycle_phase) * 0.045 * step_weight * ground_blend
-		var surge_basis = Basis.from_euler(Vector3(pitch_surge, 0.0, climb_roll_wobble))
+		var lateral_sway = sway_offset_x * 0.30 * flight_factor + sin(walk_cycle_phase) * 0.14 * step_weight * ground_blend
+		var ground_pitch_bob = -sin(walk_cycle_phase * 2.0) * deg_to_rad(2.6) * step_weight * ground_blend
+		var surge_basis = Basis.from_euler(Vector3(pitch_surge + ground_pitch_bob, 0.0, climb_roll_wobble))
 		visual_root.basis = surge_basis * _offset_basis() * calib_basis
 		
 		if skeleton and bone_pelvis != -1:
 			# Centrar suavemente el núcleo del cuerpo sobre el CharacterBody3D sin interferir en los virajes
 			var anchor_world = _body_core_world()
-			var y_offset = lerp(-0.3 + heave, -0.65 + cos(walk_cycle_phase * 2.0) * 0.025 * step_weight, ground_blend)
+			var y_offset = lerp(-0.3 + heave, -0.65 + cos(walk_cycle_phase * 2.0) * 0.16 * step_weight, ground_blend)
 			var target_center = global_position + Vector3(lateral_sway, y_offset+body_clearance_lift*ground_blend, 0.0)
 			var desired_offset = target_center - anchor_world
 			if not stabilizer_initialized:
@@ -1243,14 +1560,34 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	var turn = smoothed_turn_rate
 	var flight_factor = clamp(1.0 - ground_blend, 0.0, 1.0)
 	
-	# 2. COLUMNA DORSAL (Arco orgánico continuo en virajes)
+	# 1. PELVIS / CADERA (Oscilación rítmica de transferencia de peso en marcha terrestre)
+	if bone_pelvis != -1 and ground_blend > 0.01:
+		var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+		var cycle := walk_cycle_phase
+		var pel_yaw = sin(cycle) * deg_to_rad(7.5) * step_weight * ground_blend
+		var pel_roll = cos(cycle) * deg_to_rad(4.0) * step_weight * ground_blend
+		var pel_rot = Quaternion(bone_yaw_axes[bone_pelvis], pel_yaw) if bone_yaw_axes.has(bone_pelvis) else Quaternion(Vector3.UP, pel_yaw)
+		var roll_axis = bone_roll_axes[bone_pelvis] if bone_roll_axes.has(bone_pelvis) else Vector3.FORWARD
+		pel_rot = Quaternion(roll_axis, pel_roll) * pel_rot
+		sk.set_bone_pose_rotation(bone_pelvis, pel_rot * sk.get_bone_pose_rotation(bone_pelvis))
+
+	# 2. COLUMNA DORSAL (Arco orgánico en virajes aéreos + Ondulación serpentina en S con onda viajera en tierra)
 	var spine_weights = [0.08, 0.14, 0.18]
 	for i in range(bone_spine_indices.size()):
 		var b = bone_spine_indices[i]
 		if b != -1 and bone_yaw_axes.has(b):
-			var spine_yaw = Quaternion(bone_yaw_axes[b], turn * spine_curve_strength * spine_weights[i] * flight_factor)
-			var spine_pitch = Quaternion(bone_pitch_axes[b], ((brake_blend * 0.12) - (climb_blend * 0.08)) * flight_factor)
-			sk.set_bone_pose_rotation(b, spine_yaw * spine_pitch * sk.get_bone_pose_rotation(b))
+			var flight_yaw = turn * spine_curve_strength * spine_weights[min(i, spine_weights.size() - 1)] * flight_factor
+			var flight_pitch = ((brake_blend * 0.12) - (climb_blend * 0.08)) * flight_factor
+			
+			var ground_wave_phase = walk_cycle_phase - float(i) * 0.40
+			var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+			var ground_spine_yaw = -sin(ground_wave_phase) * deg_to_rad(6.5) * step_weight * ground_blend
+			var ground_spine_roll = -cos(ground_wave_phase) * deg_to_rad(3.0) * step_weight * ground_blend
+			
+			var spine_yaw_q = Quaternion(bone_yaw_axes[b], flight_yaw + ground_spine_yaw)
+			var spine_pitch_q = Quaternion(bone_pitch_axes[b], flight_pitch)
+			var spine_roll_q = Quaternion(bone_roll_axes[b], ground_spine_roll) if bone_roll_axes.has(b) else Quaternion.IDENTITY
+			sk.set_bone_pose_rotation(b, spine_yaw_q * spine_roll_q * spine_pitch_q * sk.get_bone_pose_rotation(b))
 
 	# 3. ALAS: ASIMETRÍA EN VIRAJES + PLANEO DIEDRO + PLEGADO EN PICADA + APERTURA EN TREPADA
 	var fold = clamp(dive_fold_blend, 0.0, 1.0) * (1.0 - ground_blend)
@@ -1321,22 +1658,32 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	# A folded wing doubles back at the elbow and long finger joints.
 	# Directions are measured on the live rig, independent of imported bone axes.
 
-	# 4. COLA MULTIVERTEBRAL (8 Vértebras con propagación de látigo fluido)
+	# 4. COLA MULTIVERTEBRAL (8 Vértebras: látigo en virajes + contrapeso inercial fluido en marcha terrestre)
 	for i in range(bone_tail_indices.size()):
 		var b = bone_tail_indices[i]
 		if b != -1 and bone_yaw_axes.has(b):
 			var idx_ratio = float(i + 1) / float(bone_tail_indices.size())
-			var tail_lag_yaw = -turn * (0.08 * (i + 1)) * tail_lag_strength * (1.0 - ground_blend * 0.5)
-			var wave_amp = 0.040 * (i + 1) * (0.12 if fold > 0.5 else 1.0)
+			var tail_lag_yaw = -turn * (0.022 + 0.018 * idx_ratio) * tail_lag_strength * flight_factor
+			var wave_amp = (0.015 + 0.020 * idx_ratio) * (0.12 if fold > 0.5 else 1.0) * flight_factor
 			var tail_wave_yaw = sin(tail_wave_time - (i * 0.45)) * wave_amp
-			var tail_flap_lag = sin(flap_cycle_phase - (i + 1) * 0.5) * deg_to_rad(2.5) * (i + 1) * climb_blend * flight_factor
-			var tail_pitch = ((climb_blend * -0.22 * idx_ratio) + \
-							 (brake_blend * -0.20 * idx_ratio) + \
-							 (dive_fold_blend * 0.05 * idx_ratio) + \
-							 (glide_blend * 0.05 * idx_ratio)) * flight_factor + \
-							 (ground_blend * -0.12 * idx_ratio)
-			var t_rot = Quaternion(bone_yaw_axes[b], tail_lag_yaw + tail_wave_yaw) * \
-						Quaternion(bone_pitch_axes[b], tail_pitch + tail_flap_lag)
+			var tail_flap_lag = sin(flap_cycle_phase - (i + 1) * 0.5) * deg_to_rad(1.2 + idx_ratio * 1.5) * climb_blend * flight_factor
+			var tail_flight_pitch = ((climb_blend * -0.16 * idx_ratio) + \
+							 (brake_blend * -0.14 * idx_ratio) + \
+							 (dive_fold_blend * 0.04 * idx_ratio) + \
+							 (glide_blend * 0.04 * idx_ratio)) * flight_factor
+
+			# Onda serpentina inercial en marcha terrestre: amplitud natural anatómica
+			var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+			var ground_tail_phase = walk_cycle_phase - float(i) * 0.55
+			var ground_tail_yaw = sin(ground_tail_phase) * deg_to_rad(1.5 + idx_ratio * 3.5) * step_weight * ground_blend
+			var ground_tail_pitch = (ground_blend * -0.08 * idx_ratio) + cos(walk_cycle_phase * 2.0 - float(i) * 0.3) * deg_to_rad(1.8) * step_weight * ground_blend
+
+			# Límites fisiológicos intervertebrales (rango de movimiento según osteología caudal)
+			var final_tail_yaw = clampf(tail_lag_yaw + tail_wave_yaw + ground_tail_yaw, -deg_to_rad(4.5), deg_to_rad(4.5))
+			var final_tail_pitch = clampf(tail_flight_pitch + tail_flap_lag + ground_tail_pitch, -deg_to_rad(5.5), deg_to_rad(5.5))
+
+			var t_rot = Quaternion(bone_yaw_axes[b], final_tail_yaw) * \
+						Quaternion(bone_pitch_axes[b], final_tail_pitch)
 			sk.set_bone_pose_rotation(b, t_rot * sk.get_bone_pose_rotation(b))
 
 	# Recover parents before solving any descendant pose or stance contact.
@@ -1351,9 +1698,10 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	var rear_preparation := maxf(brake_blend,landing_blend) if locomotion_state in [LocomotionState.FLYING,LocomotionState.LANDING] else 0.0
 	var support_ik := locomotion_state == LocomotionState.GROUNDED or ground_blend > 0.01 or (locomotion_state == LocomotionState.LANDING and ground_proximity < 12.0)
 	# Retain the authored airborne kick when it is not preparing a landing.
-	if not support_ik and rear_preparation<=.01:
+	if not support_ik and rear_preparation <= 0.01:
 		var flap_leg_kick = sin((anim_player.current_animation_position / 3.0) * TAU * 2.0) * deg_to_rad(3.5) if (is_flapping and anim_player) else 0.0
-		var leg_pitch = (dive_fold_blend * -0.45) + (climb_blend * -0.25) + (glide_blend * -0.10) + flap_leg_kick
+		# En vuelo y picada, las patas traseras se perfilan hacia atrás de forma hidrodinámica/aerodinámica, sin perforar el abdomen o el lomo
+		var leg_pitch = clampf((dive_fold_blend * 0.18) + (climb_blend * -0.12) + (glide_blend * -0.05) + flap_leg_kick, -deg_to_rad(10.0), deg_to_rad(12.0))
 		if bone_l_thigh != -1 and bone_pitch_axes.has(bone_l_thigh):
 			sk.set_bone_pose_rotation(bone_l_thigh, Quaternion(bone_pitch_axes[bone_l_thigh], leg_pitch) * sk.get_bone_pose_rotation(bone_l_thigh))
 		if bone_r_thigh != -1 and bone_pitch_axes.has(bone_r_thigh):
@@ -1412,21 +1760,23 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	PoseProbe.record("wing_total",sample_started)
 
 func _refit_compact_wings(sk: Skeleton3D) -> void:
-	var compact_blend := maxf(wing_fold_blend,dive_fold_blend)
-	if compact_blend<=0.01: return
-	var narrow := wing_fold_blend if locomotion_state in [LocomotionState.LANDING,LocomotionState.GROUNDED] else ground_blend
-	# Digital flexors gather the membrane before the elbow and shoulder tuck;
-	# opening follows the reverse order. The same original final pose is kept.
-	var digit_fold:float=smoothstep(0.0,.65,compact_blend)
-	var elbow_fold:float=smoothstep(.08,.82,compact_blend)
-	var shoulder_fold:float=smoothstep(.18,.95,compact_blend)
+	# El plegado completo compacto es EXCLUSIVO de suelo/aterrizaje; en picada aérea
+	# las alas ya usan la postura delta halcón sin deformar huesos
+	var compact_blend := wing_fold_blend if locomotion_state in [LocomotionState.LANDING, LocomotionState.GROUNDED] else 0.0
+	if compact_blend <= 0.01: return
+	var narrow := wing_fold_blend if locomotion_state in [LocomotionState.LANDING, LocomotionState.GROUNDED] else ground_blend
+	var digit_fold: float = smoothstep(0.0, 0.65, compact_blend)
+	var elbow_fold: float = smoothstep(0.08, 0.82, compact_blend)
+	var shoulder_fold: float = smoothstep(0.18, 0.95, compact_blend)
 	for side in [[96,97,104,108,98,102,111,115,-1.0],[120,121,128,132,122,126,135,139,1.0]]:
 		var sign_side: float = side[8]
-		_aim_bone_direction(sk,side[0],side[1],global_basis*Vector3(sign_side*lerpf(1.0,.12,narrow),1.0,2.2),shoulder_fold)
-		_aim_bone_direction(sk,side[1],side[2],global_basis*Vector3(sign_side*lerpf(.7,.0,narrow),.4,3.6),elbow_fold)
-		_aim_bone_direction(sk,side[2],side[3],global_basis*Vector3(sign_side*lerpf(.1,.0,narrow),.7,-5.5),digit_fold)
-		_aim_bone_direction(sk,side[4],side[5],global_basis*Vector3(sign_side*lerpf(.2,.0,narrow),.6,-5.0),digit_fold)
-		_aim_bone_direction(sk,side[6],side[7],global_basis*Vector3(sign_side*lerpf(.2,.0,narrow),.8,-4.8),digit_fold)
+		# Mantener separación lateral para que las alas izquierda y derecha nunca se crucen ni converjan a X=0
+		var flank_clearance: float = sign_side * lerpf(0.55, 0.22, narrow)
+		_aim_bone_direction(sk, side[0], side[1], global_basis * Vector3(sign_side * lerpf(1.0, 0.18, narrow), 1.0, 2.2), shoulder_fold)
+		_aim_bone_direction(sk, side[1], side[2], global_basis * Vector3(sign_side * lerpf(0.7, 0.12, narrow), 0.4, 3.6), elbow_fold)
+		_aim_bone_direction(sk, side[2], side[3], global_basis * Vector3(flank_clearance, 0.7, -4.5), digit_fold)
+		_aim_bone_direction(sk, side[4], side[5], global_basis * Vector3(flank_clearance * 1.1, 0.6, -4.2), digit_fold)
+		_aim_bone_direction(sk, side[6], side[7], global_basis * Vector3(flank_clearance * 1.1, 0.8, -4.0), digit_fold)
 
 func _aim_bone_skin_point(sk: Skeleton3D, bone: int, current_world: Vector3, desired_world: Vector3) -> void:
 	var pose := sk.get_bone_global_pose(bone)

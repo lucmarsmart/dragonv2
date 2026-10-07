@@ -16,7 +16,8 @@ extends CanvasLayer
 @onready var btn_fire: Button = $ActionBar/HBoxContainer/BtnFire
 var breath: DragonBreath
 var btn_aim: Button
-var reticle: Label
+const ArceusReticle = preload("res://scripts/combat/arceus_reticle.gd")
+var reticle: ArceusReticle
 var aim_preview_point := Vector3.ZERO
 var aim_preview_distance := 26.0
 var aim_preview_collider_id := 0
@@ -43,12 +44,8 @@ func _ready() -> void:
 		release_event.physical_keycode = KEY_T
 		release_event.pressed = false
 		Input.parse_input_event(release_event))
-	reticle = Label.new()
-	reticle.text = "+"
-	reticle.add_theme_font_size_override("font_size",28)
-	reticle.add_theme_color_override("font_color",GOLD)
-	reticle.add_theme_constant_override("outline_size",4)
-	reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	reticle = ArceusReticle.new()
+	reticle.name = "ArceusReticle"
 	add_child(reticle)
 	btn_normal.pressed.connect(dragon.trigger_normal)
 	btn_climb.pressed.connect(dragon.trigger_climb)
@@ -86,8 +83,8 @@ func _ready() -> void:
 	$HintLabel.add_theme_color_override("font_color", TEXT)
 	$HintLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
 	$HintLabel.add_theme_constant_override("shadow_offset_y",2)
-	$HintLabel.text = "T activa/desactiva ataque · W/S mover · Ratón apuntar y girar · Clic izquierdo fuego · L aterrizar/despegar · H ayuda · P pausa"
-	$ControlsPanel/MarginContainer/HelpLabel.text = "ATAQUE\nPulsa T una vez para entrar o salir; no hace falta mantenerla\nW/S avanzar/retroceder · Ratón apuntar y girar · Clic izquierdo fuego\nLa cabeza apunta libre hasta su límite; al seguir moviendo el ratón gira el cuerpo\nCámara sobre la cabeza en tierra y durante ataque en vuelo\n\nVUELO\nW/Shift acelerar · S frenar · Espacio/R subir · C/Ctrl picada · G planear\nL aterrizar/cancelar/despegar\n\nOTROS CONTROLES\nA/D girar · Flechas apuntar · F exhalar · Shift correr en tierra\n\nCÁMARA Y MISIÓN\nV/1–4 vista · Botón derecho orbitar · Rueda zoom · E liberar nido\nH/F1 ayuda · P pausa · Esc alterna cursor"
+	$HintLabel.text = "Auto-fijación de enemigos estilo Arceus · TAB cambiar objetivo · T ataque · F fuego · W/S mover · L aterrizar · H ayuda"
+	$ControlsPanel/MarginContainer/HelpLabel.text = "SISTEMA DE BATALLA Y FIJACIÓN (ESTILO POKÉMON LEYENDAS: ARCEUS)\n• La mira se fija automáticamente en el enemigo más cercano en combate y lo sigue\n• TAB: Alternar / cambiar al siguiente enemigo cercano\n• El dragón orienta su cabeza y fuego hacia el objetivo fijado hasta que este se aleja o muere\n• T: Activar / desactivar modo ataque libre y rotación con ratón\n• F o Clic izquierdo: Exhalar fuego directo al objetivo\n\nVUELO\nW/Shift acelerar · S frenar · Espacio/R subir · C/Ctrl picada · G planear\nL aterrizar/cancelar/despegar\n\nOTROS CONTROLES\nA/D girar · Flechas apuntar · Shift correr en tierra\n\nCÁMARA Y MISIÓN\nV/1–4 vista · Botón derecho orbitar · Rueda zoom · E liberar nido\nH/F1 ayuda · P pausa · Esc alterna cursor"
 	get_viewport().size_changed.connect(_resize)
 	_resize()
 
@@ -183,13 +180,22 @@ func _process(_delta: float) -> void:
 		active.modulate = GOLD
 	btn_fire.modulate = GOLD if breath.is_firing else TEXT
 	btn_aim.modulate = GOLD if dragon.head_aim_active else TEXT
-	reticle.visible = dragon.head_aim_active and not controls_panel.visible
+	var combat_node: Node = get_parent().get_node_or_null("SiegeCombat")
+	var in_combat: bool = is_instance_valid(combat_node) and combat_node.has_method("is_running") and combat_node.is_running()
+	reticle.visible = (dragon.head_aim_active or dragon.attack_mode_active or in_combat) and not controls_panel.visible
 	if reticle.visible:
 		var camera := get_viewport().get_camera_3d()
+		var locked_enemy: CharacterBody3D = dragon.get_locked_target() if dragon.has_method("get_locked_target") else null
 		var target: Vector3 = aim_preview_point
+		var target_dist: float = aim_preview_distance
+		if is_instance_valid(locked_enemy):
+			target = dragon._get_target_aim_point(locked_enemy) if dragon.has_method("_get_target_aim_point") else (locked_enemy.global_position + Vector3.UP)
+			var mouth: Vector3 = breath.mouth_position if (breath and breath.mouth_pose_cached) else dragon.global_position
+			target_dist = mouth.distance_to(target)
 		if camera and not camera.is_position_behind(target):
-			reticle.position = camera.unproject_position(target)-Vector2(8,18)
+			var screen_pos := camera.unproject_position(target)
+			reticle.update_tracking(screen_pos, locked_enemy, breath.is_firing if breath else false, target_dist, _delta)
 			var contact := instance_from_id(aim_preview_collider_id) if aim_preview_collider_id else null
-			reticle.modulate = Color(1.0, 0.35, 0.16) if is_instance_valid(contact) and contact.is_in_group("siege_enemy") else Color.WHITE
+			reticle.modulate = Color(1.0, 0.45, 0.16) if (is_instance_valid(contact) and contact.is_in_group("siege_enemy")) or is_instance_valid(locked_enemy) else Color.WHITE
 		else:
 			reticle.visible = false

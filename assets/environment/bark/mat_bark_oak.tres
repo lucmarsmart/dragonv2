@@ -1,0 +1,22 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/realistic_bark.gdshader" id="1_rfr12"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_oak_diff_2k.png" id="2_noued"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_oak_ao_2k.png" id="3_gnpeq"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_oak_nor_gl_2k.png" id="4_jcjxi"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_oak_rough_2k.png" id="5_6gx2y"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_rfr12")
+shader_parameter/albedo_tex = ExtResource("2_noued")
+shader_parameter/normal_tex = ExtResource("4_jcjxi")
+shader_parameter/roughness_tex = ExtResource("5_6gx2y")
+shader_parameter/ao_tex = ExtResource("3_gnpeq")
+shader_parameter/species_type = 0
+shader_parameter/uv_scale = Vector2(2.4, 5)
+shader_parameter/normal_scale = 2.8
+shader_parameter/moss_color = Color(0.24, 0.36, 0.16, 1)
+shader_parameter/moss_amount = 0.38
+shader_parameter/wetness_at_base = 0.48
+shader_parameter/trunk_tint = Color(0.96, 0.94, 0.9, 1)

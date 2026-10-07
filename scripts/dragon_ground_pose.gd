@@ -2,6 +2,7 @@ extends RefCounted
 # World-space planted feet; FABRIK preserves lengths and the published rear articulation branch.
 const Probe = preload("res://scripts/dragon_pose_probe.gd")
 const Biomechanics = preload("res://scripts/dragon_biomechanics.gd")
+const NOMINAL_SWING_DURATION: float = 0.36
 var claw_probe = Probe.new()
 var limbs: Array[Dictionary] = []
 var debug_contacts: Array[Vector3] = []
@@ -41,9 +42,9 @@ func prepare(dragon: Node3D, sk: Skeleton3D) -> void:
 func _configure(sk: Skeleton3D) -> void:
 	var specs := [
 		[[5, 6, 7], 8, Vector3(-1.45, 0.0, 1.65), 0.0],
-		[[80, 81], 82, Vector3(1.35, 0.0, -2.55), 0.25],
+		[[80, 81], 82, Vector3(1.35, 0.0, -2.55), 0.75],
 		[[20, 21, 22], 23, Vector3(1.45, 0.0, 1.65), 0.5],
-		[[39, 40], 41, Vector3(-1.35, 0.0, -2.55), 0.75],
+		[[39, 40], 41, Vector3(-1.35, 0.0, -2.55), 0.25],
 	]
 	for spec in specs:
 		limbs.append({"chain": spec[0], "end": spec[1], "home": spec[2], "phase": spec[3], "planted": Vector3.ZERO, "start": Vector3.ZERO, "finish": Vector3.ZERO, "swinging": false, "initialized": false, "foot_basis": Basis.IDENTITY, "repositioning": false, "step_t": 0.0, "actual": Vector3.ZERO, "clearance": 1.4, "probe": prepared_probes[spec[1]], "contact_sample": {}, "contact_anchor": Vector3.ZERO})
@@ -109,7 +110,7 @@ func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 					candidate.swing_elapsed=float(candidate.get("swing_elapsed",0))+(advance if advance>0 else float(candidate.get("swing_clock_rate",0))*elapsed_s)
 				candidate.swing_clock_frame=plan_frame
 				candidate.swing_clock_cycle=cycle
-			if candidate.swinging and not candidate.repositioning and float(candidate.get("swing_elapsed",0))>=.24 and not bool(candidate.get("support_limited",false)):
+			if candidate.swinging and not candidate.repositioning and float(candidate.get("swing_elapsed",0))>=NOMINAL_SWING_DURATION and not bool(candidate.get("support_limited",false)):
 				candidate.swinging=false
 				candidate.planted=candidate.finish
 				candidate.swing_elapsed=0.0
@@ -184,7 +185,7 @@ func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 		if recovery and limb.has("recovery_phase"): phase = limb.recovery_phase
 		var raw_cycle: float=dragon.walk_cycle_phase/TAU+float(limb.phase)
 		var frame:=Engine.get_physics_frames()
-		var swing_t:=clampf(float(limb.get("swing_elapsed",0))/.24,0,1)
+		var swing_t:=clampf(float(limb.get("swing_elapsed",0))/NOMINAL_SWING_DURATION,0,1)
 		var continuing_swing: bool=limb.swinging and not bool(limb.get("support_pending",false)) and not limb.repositioning and (swing_t<1 or previous_support_limited)
 		var swing_now: bool=continuing_swing or (not recovery and int(limb.end)==planned_start)
 		if not limb.initialized:
@@ -247,13 +248,13 @@ func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 			var t: float = limb.step_t
 			swing_t=t
 			target = (limb.start as Vector3).lerp(limb.finish, t * t * (3.0 - 2.0 * t))
-			target.y += sin(t * PI) * 0.42
+			target.y += sin(pow(t, 0.85) * PI) * 0.42
 			swing_now = true
 		elif swing_now:
 			var t := swing_t
 			var smooth_t := t * t * (3.0 - 2.0 * t)
 			target = (limb.start as Vector3).lerp(limb.finish, smooth_t)
-			target.y += sin(t * PI) * 0.65
+			target.y += sin(pow(t, 0.85) * PI) * (0.65 if rear else 0.55)
 			limb.planted = limb.finish
 		elif not moving and (limb.planted as Vector3).distance_to(home) > 1.8:
 			# Reposition when turning in place; avoid stretching limbs through the body.
@@ -309,7 +310,7 @@ func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 				measured_clearance=lowest
 				clearance_valid=true
 				if is_inf(lowest): break
-				var wanted_clearance := 0.025 + float(limb.get("terrain_hull_clearance",0.0)) + (sin(swing_t * PI) * (0.42 if limb.repositioning else 0.65) if swing_now else 0.0)
+				var wanted_clearance := 0.025 + float(limb.get("terrain_hull_clearance",0.0)) + (sin(pow(swing_t, 0.85) * PI) * (0.42 if limb.repositioning else (0.65 if rear else 0.55)) if swing_now else 0.0)
 				var correction := wanted_clearance - lowest
 				if dragon.locomotion_state == dragon.LocomotionState.LANDING: correction = maxf(0.0,correction)
 				if absf(correction) < 0.006: break

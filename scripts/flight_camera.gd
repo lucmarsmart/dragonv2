@@ -37,6 +37,16 @@ var head_follow_blend := 0.0
 var collision_probe := SphereShape3D.new()
 var collision_pivot_world := Vector3.ZERO
 
+# Sistema de trauma y sacudida de cámara (Screen Shake) para impactos viscerales
+var trauma: float = 0.0
+var trauma_reduction_rate: float = 1.5
+var max_shake_offset: float = 0.8
+var max_shake_roll: float = 0.07
+var shake_time: float = 0.0
+
+func add_trauma(amount: float) -> void:
+	trauma = clampf(trauma + amount, 0.0, 1.0)
+
 func _sweep_camera(from: Vector3, to: Vector3, excluded: Array[RID]) -> Vector3:
 	# Keep the whole near-camera volume clear during the smoothed transition.
 	if from.distance_squared_to(to) < 0.000001:
@@ -226,3 +236,15 @@ func _physics_process(delta: float) -> void:
 		var speed_ratio = clamp((target_node.current_speed - 20.0) / 40.0, 0.0, 1.0)
 		var target_fov = base_fov + (speed_ratio * max_fov_boost)
 		fov = lerp(fov, target_fov, 4.0 * delta)
+
+	# 7. Trauma de impacto y sacudida visceral (Screen Shake)
+	if trauma > 0.0:
+		trauma = maxf(0.0, trauma - trauma_reduction_rate * delta)
+		var shake := trauma * trauma
+		shake_time += delta * 28.0
+		var ox := sin(shake_time * 1.7) * max_shake_offset * shake
+		var oy := cos(shake_time * 2.1) * max_shake_offset * shake
+		var oz := sin(shake_time * 1.3) * max_shake_offset * 0.5 * shake
+		var rz := sin(shake_time * 2.5) * max_shake_roll * shake
+		global_position += Vector3(ox, oy, oz)
+		rotate_object_local(Vector3.FORWARD, rz)

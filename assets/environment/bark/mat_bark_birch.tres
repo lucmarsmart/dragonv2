@@ -1,0 +1,22 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/realistic_bark.gdshader" id="1_kdvat"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_birch_diff_2k.png" id="2_lm3c6"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_birch_ao_2k.png" id="3_spuij"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_birch_nor_gl_2k.png" id="4_cbqyl"]
+[ext_resource type="Texture2D" path="res://assets/environment/bark/bark_birch_rough_2k.png" id="5_uxhil"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_kdvat")
+shader_parameter/albedo_tex = ExtResource("2_lm3c6")
+shader_parameter/normal_tex = ExtResource("4_cbqyl")
+shader_parameter/roughness_tex = ExtResource("5_uxhil")
+shader_parameter/ao_tex = ExtResource("3_spuij")
+shader_parameter/species_type = 2
+shader_parameter/uv_scale = Vector2(1.2, 3.8)
+shader_parameter/normal_scale = 2.0
+shader_parameter/moss_color = Color(0.22, 0.3, 0.18, 1)
+shader_parameter/moss_amount = 0.18
+shader_parameter/wetness_at_base = 0.35
+shader_parameter/trunk_tint = Color(1.25, 1.25, 1.2, 1)

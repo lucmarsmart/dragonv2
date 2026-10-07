@@ -1,0 +1,57 @@
+{
+  "attack_camera_regression": {
+    "attack_input": "one KEY_T press/release",
+    "camera_distance_to_muzzle_m": 23.1631259918213,
+    "camera_forward_dot_fire_target": 0.990829885005951,
+    "camera_forward_dot_real_breath": 0.966844439506531,
+    "camera_height_above_muzzle_m": 4.07734680175781,
+    "head_follow_blend": 0.0,
+    "preset_input": "KEY_4 press/release; production mapping LEFT",
+    "selected_left_before_attack": false,
+    "view_preset_during_attack": 0
+  },
+  "attack_mode_pulses": 1,
+  "checks": 7,
+  "display_server": "headless",
+  "failures": [
+    "Actual main mission initializes",
+    "ENTER and one released T pulse enable production attack mode",
+    "Above-head production camera also activates in FLYING attack mode",
+    "One released T overrides a prior LEFT preset: actual camera is above muzzle and faces the real breath direction",
+    "Production landing reaches the ground without actor placement",
+    "Mission and actual knight remain available after landing"
+  ],
+  "final_mission_phase": 0,
+  "final_player_health": 240.0,
+  "final_stage": "air_attack_camera",
+  "fixture": {
+    "direct_damage_calls": 0,
+    "manual_overrides": false,
+    "production_enemy_ai": true,
+    "production_main_camera": true,
+    "runtime_state_writes": 0,
+    "teleports_after_start": 0
+  },
+  "input_events": 8,
+  "legacy_head_and_simultaneous_tests_modified": false,
+  "limits": "Projected viewport and physical camera LOS do not prove rendered skin visibility; native screenshot inspection is required. Cone, target LOS, HP and retreat are measured independently.",
+  "measured_input_method": "W/S + MouseMotion + LEFT_MOUSE; no A/D/F/held T in encounter observation",
+  "measured_retreat": {},
+  "pass": false,
+  "rows": [],
+  "snapshots": [],
+  "sources_sha256": {
+    "scenes/main.tscn": "8d48d96c6f1113b564f94ca31bdcb1173a4d7b0fd901e0e2021da8ab31cbdcb1",
+    "scripts/combat/siege_combat.gd": "2fcc7463e32877d35b81962ece30a214722ef160ce927548d4ca10b999a827a3",
+    "scripts/combat/siege_ui.gd": "44128a384a1bb4d6f45b056eb2ed53cabb59eb8902d233111be42c4b17dbcf93",
+    "scripts/combat/test_player_aim_feedback.gd": "276b369fcf0af7e51e581a4dbac9a1b68666df9c9c5ce201897a8a0dac0c3808",
+    "scripts/dragon_breath.gd": "903d25d630998178e8de5371ee2fd9928b5e3e170e063d7af941ad29d9700d5a",
+    "scripts/dragon_breath_modifier.gd": "214533816fe02ad1dad901c606c0c5bc075beb80bae47bf01e66314dbc5973a2",
+    "scripts/dragon_controller.gd": "d71c880c47271b6f8e91780d5a0ea861d64c01fcfdf84dcb76168dd7fd547efb",
+    "scripts/dragon_ground_pose.gd": "1b2f1bc8348d0f0adfd2ae2f1f1d59b86acf72c41911516c72664bc56d4d30b1",
+    "scripts/dragon_wing_contact.gd": "4f2c700205e69d6b7731c1f24c291679e0fadd66ead8db2026a061814120e2eb",
+    "scripts/flight_camera.gd": "9a19cb334a42533f86fb226e14cd66292b96f7848baa5f45575b6e47602ee2fd",
+    "scripts/hud.gd": "97646f4b1dcab1c8d5988b01c7512f535290e8be443462156198c4093190df14",
+    "shaders/flame.gdshader": "2300128f45a21b374751955011b9b95a4cce4b39e55b9c2f20669ceaaaaca337"
+  }
+}

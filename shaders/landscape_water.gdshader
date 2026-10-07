@@ -91,37 +91,42 @@ void vertex() {
 	float c_pos = dot(wp.xz, vec2(-rdir.y, rdir.x));
 	
 	// Multi-frequency directional waves traveling downstream
-	float wave1 = sin(s_pos * 0.26 - TIME * 1.7 + c_pos * 0.12) * 0.13;
-	float wave2 = sin(s_pos * 0.58 - TIME * 2.7 - c_pos * 0.18) * 0.065;
-	float wave3 = cos(s_pos * 1.22 - TIME * 3.8 + c_pos * 0.30) * 0.03;
+	float wave1 = sin(s_pos * 0.28 - TIME * 2.2 + c_pos * 0.14) * 0.14;
+	float wave2 = sin(s_pos * 0.64 - TIME * 3.4 - c_pos * 0.22) * 0.07;
+	float wave3 = cos(s_pos * 1.35 - TIME * 4.6 + c_pos * 0.35) * 0.03;
 	
 	VERTEX.y += (wave1 + wave2 + wave3) * shore * near_wave;
 }
 
 void fragment() {
 	vec2 rdir = get_river_direction(wp.z);
+	vec2 cdir = vec2(-rdir.y, rdir.x);
 	float dist = distance(wp, CAMERA_POSITION_WORLD);
 	float dist_fade = 1.0 - smoothstep(60.0, 360.0, dist);
 	
-	// Dual flow texture coordinates streaming downriver with interference
-	vec2 flow1 = wp.xz * 0.42 + rdir * (TIME * 0.75);
-	vec2 flow2 = wp.xz * 0.65 + vec2(rdir.y, -rdir.x) * 0.20 + rdir * (TIME * 1.10);
-	vec2 micro = wp.xz * 2.20 + rdir * (TIME * 1.90);
+	// Stream-aligned flow coordinates
+	float stream_coord = dot(wp.xz, rdir);
+	float cross_coord  = dot(wp.xz, cdir);
 	
-	// Finite-difference normals for smooth organic ripples
-	const float eps = 0.08;
-	float h_c = fbm_grad(flow1) * 0.50 + fbm_grad(flow2) * 0.34 + gnoise(micro) * 0.16;
-	float h_x = fbm_grad(flow1 + vec2(eps, 0.0)) * 0.50 + fbm_grad(flow2 + vec2(eps, 0.0)) * 0.34 + gnoise(micro + vec2(eps, 0.0)) * 0.16;
-	float h_y = fbm_grad(flow1 + vec2(0.0, eps)) * 0.50 + fbm_grad(flow2 + vec2(0.0, eps)) * 0.34 + gnoise(micro + vec2(0.0, eps)) * 0.16;
+	// Multi-scale streaming ripple layers moving downstream
+	vec2 flow1 = vec2(cross_coord * 0.35, stream_coord * 0.40 - TIME * 0.85);
+	vec2 flow2 = vec2(cross_coord * 0.55 + stream_coord * 0.15, stream_coord * 0.70 - TIME * 1.35);
+	vec2 micro = vec2(cross_coord * 1.80, stream_coord * 2.20 - TIME * 2.40);
+	
+	// Finite-difference normals for crisp wave facets
+	const float eps = 0.07;
+	float h_c = fbm_grad(flow1) * 0.48 + fbm_grad(flow2) * 0.36 + gnoise(micro) * 0.16;
+	float h_x = fbm_grad(flow1 + vec2(eps, 0.0)) * 0.48 + fbm_grad(flow2 + vec2(eps, 0.0)) * 0.36 + gnoise(micro + vec2(eps, 0.0)) * 0.16;
+	float h_y = fbm_grad(flow1 + vec2(0.0, eps)) * 0.48 + fbm_grad(flow2 + vec2(0.0, eps)) * 0.36 + gnoise(micro + vec2(0.0, eps)) * 0.16;
 	vec2 ripple = vec2(h_x - h_c, h_y - h_c) / eps;
 	
-	// Broad standing wave swell
-	vec2 broad_uv = wp.xz * 0.05 + rdir * (TIME * 0.20);
+	// Broad standing wave swell along the canyon
+	vec2 broad_uv = vec2(cross_coord * 0.06, stream_coord * 0.06 - TIME * 0.25);
 	float bx = fbm_grad(broad_uv + vec2(0.12, 0.0)) - fbm_grad(broad_uv - vec2(0.12, 0.0));
 	float by = fbm_grad(broad_uv + vec2(0.0, 0.12)) - fbm_grad(broad_uv - vec2(0.0, 0.12));
-	vec2 broad_ripple = vec2(bx, by) * 0.30;
+	vec2 broad_ripple = vec2(bx, by) * 0.32;
 	
-	vec2 total_pert = ripple * 0.065 * dist_fade + broad_ripple;
+	vec2 total_pert = (ripple * 0.075 * dist_fade + broad_ripple);
 	vec3 world_normal = normalize(vec3(-total_pert.x, 1.0, -total_pert.y));
 	NORMAL = normalize((VIEW_MATRIX * vec4(world_normal, 0.0)).xyz);
 	
@@ -130,58 +135,60 @@ void fragment() {
 	vec4 scene_pos = INV_PROJECTION_MATRIX * vec4(SCREEN_UV * 2.0 - 1.0, raw_depth, 1.0);
 	float depth = max(0.0, -scene_pos.z / scene_pos.w + VERTEX.z);
 	
-	// Screen refraction
-	vec2 refr_offset = total_pert * 0.035 * clamp(depth * 1.5, 0.0, 1.0);
+	// Screen refraction with depth attenuation (no hard border bleeding)
+	vec2 refr_offset = total_pert * 0.032 * clamp(depth * 1.6, 0.0, 1.0);
 	vec2 refr_uv = clamp(SCREEN_UV + refr_offset, vec2(0.001), vec2(0.999));
 	vec3 refracted = textureLod(screen_texture, refr_uv, 0.0).rgb;
 	
-	// Mountain Glacial River Palette (matching reference video)
-	// Shallow: crystal clear alpine turquoise
-	// Deep: rich mountain emerald / dark teal
-	vec3 color_shallow = vec3(0.13, 0.65, 0.68);
-	vec3 color_deep    = vec3(0.02, 0.21, 0.28);
-	vec3 water_body = mix(color_shallow, color_deep, clamp(depth / 3.6, 0.0, 1.0));
+	// Natural Alpine Mountain River Palette (matches video reference)
+	// Shallow: crystal clear, high visibility of pebbles & gravel
+	// Mid-depth: natural glacial turquoise / alpine teal
+	// Deep pools: rich dark mountain teal
+	vec3 color_shallow = vec3(0.09, 0.48, 0.52);
+	vec3 color_deep    = vec3(0.015, 0.16, 0.22);
+	vec3 water_body = mix(color_shallow, color_deep, clamp(depth / 3.2, 0.0, 1.0));
 	
-	// Physical Beer-Lambert light absorption
-	vec3 absorption = vec3(0.48, 0.15, 0.06);
-	vec3 transmission = exp(-depth * absorption);
+	// Physical Beer-Lambert absorption: red absorbed quickly, green/cyan persists
+	vec3 absorption_coeff = vec3(0.60, 0.20, 0.07);
+	vec3 transmission = exp(-depth * absorption_coeff);
 	
-	// Caustics on shallow riverbed stones and submerged rocks
-	vec2 c_uv1 = wp.xz * 1.5 + rdir * (TIME * 0.90);
-	vec2 c_uv2 = wp.xz * 1.5 - rdir * (TIME * 0.78) + vec2(2.7, 1.3);
-	float caust = pow(clamp(1.0 - abs(gnoise(c_uv1) - gnoise(c_uv2)) * 1.5, 0.0, 1.0), 2.8);
-	float caust_mask = (1.0 - smoothstep(0.05, 2.2, depth)) * transmission.r;
-	vec3 caustics = vec3(0.88, 0.97, 1.0) * (caust * caust_mask * 0.40);
+	// Sunlight caustics projected onto shallow riverbed
+	vec2 c_uv1 = vec2(cross_coord * 1.5, stream_coord * 1.5 - TIME * 1.1);
+	vec2 c_uv2 = vec2(cross_coord * 1.5 + 2.5, stream_coord * 1.5 + TIME * 0.95);
+	float caust = pow(clamp(1.0 - abs(gnoise(c_uv1) - gnoise(c_uv2)) * 1.5, 0.0, 1.0), 3.0);
+	float caust_mask = (1.0 - smoothstep(0.05, 1.8, depth)) * transmission.r;
+	vec3 caustics = vec3(0.92, 0.98, 1.0) * (caust * caust_mask * 0.42);
 	
-	// Frothy White-water Foam & Shoreline Breakers (matching video)
-	// 1. Shoreline and rock contact foam
-	float shore_contact = 1.0 - smoothstep(0.02, 0.52, depth);
+	// Whitewater Rapids & Trailing Foam Wakes (matching video)
+	// 1. Shoreline & obstacle contact foam
+	float shore_contact = 1.0 - smoothstep(0.02, 0.48, depth);
 	// 2. Rapids turbulence along current
-	float rapids = smoothstep(0.50, 0.84, fbm_grad(wp.xz * 0.95 + rdir * (TIME * 1.35)) + 0.5);
-	float foam_strength = max(shore_contact * 0.88, rapids * 0.62);
+	float rapids = smoothstep(0.50, 0.85, fbm_grad(vec2(cross_coord * 0.8, stream_coord * 1.2 - TIME * 1.5)) + 0.5);
+	float foam_base = max(shore_contact * 0.92, rapids * 0.65);
 	
-	// Cellular froth pattern
-	vec2 foam_uv = wp.xz * 3.0 + rdir * (TIME * 1.05);
-	float foam_cells = voronoi(foam_uv);
-	float foam_fbm = fbm_grad(wp.xz * 1.3 + rdir * (TIME * 0.60)) + 0.5;
-	float foam_pattern = (1.0 - foam_cells * 0.85) * 0.65 + foam_fbm * 0.35;
-	float foam_mask = smoothstep(0.32, 0.64, foam_strength * foam_pattern);
-	vec3 foam_color = vec3(0.95, 0.98, 1.0);
+	// Elongated foam streaks streaming downstream (wake effect)
+	vec2 foam_wake_uv = vec2(cross_coord * 2.8, stream_coord * 0.85 - TIME * 1.2);
+	float foam_cells = voronoi(vec2(cross_coord * 3.2, stream_coord * 1.2 - TIME * 1.4));
+	float foam_noise = fbm_grad(foam_wake_uv) + 0.5;
+	float foam_pattern = (1.0 - foam_cells * 0.82) * 0.68 + foam_noise * 0.32;
+	float foam_mask = smoothstep(0.32, 0.65, foam_base * foam_pattern);
+	vec3 foam_color = vec3(0.96, 0.98, 1.0);
 	
-	// Fresnel sky reflection at grazing angles
+	// PBR Water Surface & Volume (NO artificial emission glow!)
+	// Underwater scene transmission through crystal water:
+	vec3 underwater = (refracted + caustics) * transmission + water_body * (1.0 - transmission);
+	
+	// Fresnel sky reflection at grazing view angles
 	float fresnel = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 4.5);
-	vec3 sky_tint = vec3(0.62, 0.75, 0.90);
+	vec3 sky_reflection = vec3(0.68, 0.80, 0.94);
+	vec3 water_surface = mix(underwater, sky_reflection, fresnel * 0.35);
 	
-	// Lit water albedo + transmitted underwater scene
-	vec3 water_lit = mix(water_body * (1.0 - transmission), sky_tint, fresnel * 0.30);
-	vec3 underwater = (refracted + caustics) * transmission;
+	// Mix surface with aerated frothy whitewater foam
+	ALBEDO = mix(water_surface, foam_color, foam_mask);
 	
-	ALBEDO = mix(water_lit, foam_color, foam_mask);
-	EMISSION = underwater * (1.0 - foam_mask);
-	
-	// Glassy water surface with diffuse aerated foam
-	ROUGHNESS = mix(0.03, 0.68, foam_mask);
+	// Realistic PBR properties: glassy water with sharp sun glints, diffuse foam
+	ROUGHNESS = mix(0.025, 0.72, foam_mask);
 	METALLIC = 0.0;
-	SPECULAR = mix(0.55, 0.16, foam_mask);
+	SPECULAR = mix(0.58, 0.15, foam_mask);
 	ALPHA = 1.0;
 }

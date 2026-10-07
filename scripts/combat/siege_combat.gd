@@ -5,6 +5,7 @@ signal state_changed
 signal player_hurt(amount: float)
 
 const Enemy = preload("res://scripts/combat/siege_enemy.gd")
+const CollisionEffects = preload("res://scripts/collision_effects.gd")
 enum Phase { BRIEFING, DEFENSES, CAPTAIN, RESCUE, ESCAPE, VICTORY, DEFEAT }
 var phase := Phase.BRIEFING
 var dragon: CharacterBody3D
@@ -218,11 +219,15 @@ func _damage_with_breath(delta: float) -> void:
 		var center := enemy.global_position + Vector3.UP * (1.8 if enemy.kind == "turret" else (0.95 * k_scale))
 		var offset := center-origin
 		var along := offset.dot(direction)
-		if along < 0 or along > breath.max_reach:
+		var is_locked: bool = is_instance_valid(dragon.locked_target) and dragon.locked_target == enemy
+		var effective_reach: float = breath.max_reach * (1.25 if is_locked else 1.0)
+		if along < 0 or along > effective_reach:
 			continue
 		var lateral := (offset-direction*along).length()
 		var enemy_radius := 1.3 if enemy.kind == "turret" else (0.42 * k_scale)
-		if lateral > 0.55 + along * tan(deg_to_rad(7.0)) + enemy_radius:
+		var hit_cone_angle: float = deg_to_rad(15.0 if is_locked else 7.0)
+		var max_allowed_lateral: float = (1.1 if is_locked else 0.55) + along * tan(hit_cone_angle) + enemy_radius
+		if lateral > max_allowed_lateral:
 			continue
 		# Check the specific target. A nearby floor/other target must never authorize damage through a wall.
 		var ray := PhysicsRayQueryParameters3D.create(origin,center,7)
@@ -286,6 +291,8 @@ func _notify(message: String) -> void:
 	event_life = 4
 
 func spawn_impact(point: Vector3,normal: Vector3,hot: bool) -> void:
+	var landscape_node: Node = arena._landscape if is_instance_valid(arena) and "_landscape" in arena else null
+	CollisionEffects.spawn_impact(self, point, normal, 1.4 if hot else 1.1, hot, landscape_node)
 	var particles := CPUParticles3D.new()
 	particles.amount = 24 if hot else 12
 	particles.one_shot = true

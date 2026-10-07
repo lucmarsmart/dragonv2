@@ -173,7 +173,7 @@ func _refresh() -> void:
 			story.text = "El valle espera.\n\nPulsa T una vez para entrar o salir del ataque.\nW/S te mueven; ratón apunta y gira el cuerpo; clic izquierdo exhala.\nLa cámara se coloca sobre la cabeza.\nL aterriza/despega; P cierra esta pausa; H muestra los controles."
 			action.text = "CONTINUAR [P]"
 		elif combat.phase == combat.Phase.BRIEFING:
-			story.text = "La Orden del Hierro ha ocupado el paso de Cuervo Gris. Sus ballistas dominan el cielo; sus caballeros custodian el último nido del valle.\n\nEres su antiguo guardián. Destruye las tres ballistas, derrota al capitán y rompe las cadenas del nido. Después escapa por el paso del sur.\n\nT: activar/desactivar ataque con una pulsación\nW/S: moverse · Ratón: apuntar/girar · Clic izquierdo: fuego\nEspacio: subir · L: aterrizar/despegar · H: ayuda · P: pausa"
+			story.text = "La Orden del Hierro ha ocupado el paso de Cuervo Gris. Sus ballistas dominan el cielo; sus caballeros custodian el último nido del valle.\n\nEres su antiguo guardián. Destruye las tres ballistas, derrota al capitán y rompe las cadenas del nido. Después escapa por el paso del sur.\n\nAuto-fijación (estilo Arceus): la mira sigue al enemigo más cercano\nTAB: cambiar enemigo · Clic izquierdo / F: fuego directo\nT: ataque con ratón · W/S: moverse · L: aterrizar/despegar · P: pausa"
 			action.text = "INICIAR ASEDIO [ENTER]"
 		elif combat.phase == combat.Phase.VICTORY:
 			story.text = "La Orden pierde su dominio sobre el cielo. La última cría vuelve a sentir el calor de su guardián. El valle no olvida a quien regresó.\n\nAsedio completado en %d:%02d. Ballistas destruidas: %d.\nPuedes volver a jugar desde el inicio." % [int(combat.active_time)/60,int(combat.active_time)%60,combat.turrets_destroyed]

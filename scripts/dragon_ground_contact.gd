@@ -21,15 +21,12 @@ static func constrain_all(space: PhysicsDirectSpaceState3D, hulls: Array,
 	for hull_index in hulls.size():
 		var hull: Shape3D = hulls[hull_index]
 		if hull == null: continue
-		for mask in [1, 2]:
+		if hull is ConvexPolygonShape3D and hull.points.size() < 4: continue
+		for mask in [2]: # Only scenery obstacles (layer 2) restrict horizontal walking motion
 			var query := _query(hull, transform, [rid], mask)
 			queries.append(query)
 			var hits := space.intersect_shape(query, MAX_OVERLAPS + 1)
 			if hits.is_empty(): continue
-			# A concave terrain cast ignores an initially overlapping shape, including
-			# unseen walls in that shape. Bounded manifold contacts cannot prove retreat.
-			if mask == 1:
-				return _blocked(planes, "terrain_pose_requires_clearance", true)
 			if hits.size() > MAX_OVERLAPS:
 				return _blocked(planes, "overlap_budget_exceeded")
 			for hit in hits:

@@ -14,7 +14,7 @@ func _drive(dragon: Node3D, sk: Skeleton3D, wanted: Vector3) -> void:
 	# The source's basal Neck joint also parents both fore-leg clavicles.
 	# Aim through the two upper cervicals and skull so looking sideways does
 	# not pull the load-bearing shoulders and planted forefeet with the head.
-	for pair in [[dragon.bone_neck_indices[1], 0.42], [dragon.bone_neck_indices[2], 0.58], [head, 1.0]]:
+	for pair in [[dragon.bone_neck_indices[1], 0.22], [dragon.bone_neck_indices[2], 0.38], [head, 0.40]]:
 		var current := (sk.to_global(sk.get_bone_global_pose(muzzle).origin) - sk.to_global(sk.get_bone_global_pose(head).origin)).normalized()
 		var correction := Quaternion.IDENTITY.slerp(Quaternion(current, wanted), float(pair[1]))
 		var b: int = pair[0]

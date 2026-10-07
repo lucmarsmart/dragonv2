@@ -287,12 +287,11 @@ func constrain(dragon: Node3D, delta: float) -> void:
 		query.transform = dragon.global_transform
 		query.collision_mask = 3
 		query.exclude = [dragon.get_rid()]
-		query.margin = 0.25 if dragon.locomotion_state == dragon.LocomotionState.GROUNDED else 1.2
-		# Flight steering can add22m/s² while braking removes32; use the net10m/s² stopping distance.
+		query.margin = 0.25 if dragon.locomotion_state == dragon.LocomotionState.GROUNDED else 0.5
 		var speed: float = look_velocity.length()
 		# Grounded CharacterBody clips travel directly at this tick's swept contact.
-		# Flight needs its full stopping distance because steering adds acceleration.
-		query.motion = look_velocity * delta if dragon.locomotion_state == dragon.LocomotionState.GROUNDED else look_velocity.normalized() * (speed * speed / 20.0 + speed * delta + 4.0)
+		# In flight, query immediate frame displacement for wing fold detection without artificial mid-air braking.
+		query.motion = look_velocity * delta
 		var cast_started := Time.get_ticks_usec() if Probe.profiling else 0
 		var cast := space.cast_motion(query)
 		Probe.record("wing_cast_%d" % hull_index,cast_started)
@@ -315,16 +314,14 @@ func constrain(dragon: Node3D, delta: float) -> void:
 				var collider := instance_from_id(contact.collider_id)
 				if dragon.locomotion_state == dragon.LocomotionState.GROUNDED and contact_normal.y >= 0.985 and collider is CollisionObject3D and (collider.collision_layer & 1) != 0:
 					continue
-			# Even an approach started inside braking distance stops at the swept surface.
-			# This clips travel, never rewrites the actor's position.
+			# Grounded mode clips travel to prevent entering geometry.
+			# Flight mode leaves collision and impacts to CharacterBody3D and physics simulation.
 			if cast.size() == 2 and cast[0] < 1.0:
 				var safe_speed: float = cast[0] * query.motion.length() / maxf(delta,0.0001)
-				if speed > safe_speed:
+				if speed > safe_speed and dragon.locomotion_state == dragon.LocomotionState.GROUNDED:
 					var constrained: Vector3 = look_velocity.normalized() * safe_speed
-					if dragon.locomotion_state == dragon.LocomotionState.GROUNDED:
-						dragon.velocity.x = constrained.x
-						dragon.velocity.z = constrained.z
-					else: dragon.velocity = constrained
+					dragon.velocity.x = constrained.x
+					dragon.velocity.z = constrained.z
 			predictive_contact = true
 			contact_details.append({"hull":hull_index,"normal":contact_normal,"normal_available":not contact.is_empty(),"collider":str(instance_from_id(contact.collider_id)) if not contact.is_empty() else "predicted", "cast_fraction":cast[0] if cast.size() == 2 else -1})
 	if predictive_contact:
@@ -334,26 +331,6 @@ func constrain(dragon: Node3D, delta: float) -> void:
 			dragon.velocity.x = horizontal.x
 			dragon.velocity.z = horizontal.z
 			dragon.current_speed = move_toward(dragon.current_speed,0,32.0 * delta)
-		if dragon.locomotion_state == dragon.LocomotionState.FLYING:
-			dragon.velocity = dragon.velocity.move_toward(Vector3.ZERO, 32.0 * delta)
-			dragon.current_speed = minf(dragon.current_speed, dragon.velocity.length())
-			# Keep a legal climb or lateral escape when frontal braking reaches
-			# zero. Project only inward components, then sweep every actual hull
-			# against both layers at the final displacement (zero query margin).
-			var escape_velocity:=requested_velocity
-			var known_normal:=false
-			for detail in contact_details:
-				if not detail.get("normal_available",false):continue
-				var normal:Vector3=detail.normal
-				known_normal=true
-				if escape_velocity.dot(normal)<0:escape_velocity=escape_velocity.slide(normal)
-			if known_normal and escape_velocity.length()>.1:
-				var escape:=GroundContact.constrain_all(space,hulls,dragon.global_transform,dragon.get_rid(),escape_velocity*delta)
-				if escape.valid and escape.motion.length()>.0001:
-					dragon.velocity=escape.motion/maxf(delta,.00001)
-					dragon.current_speed=dragon.velocity.length()
-			if contact_normal.y > 0.4:
-				dragon.target_pitch = maxf(dragon.target_pitch, deg_to_rad(18.0))
 
 # A translation sweep covers the previous pose. Check the new rendered body
 # before committing its tail motion, including the model stabilizer's offset.
