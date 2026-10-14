@@ -237,10 +237,14 @@ func _physics_process(delta: float) -> void:
 		var target_fov = base_fov + (speed_ratio * max_fov_boost)
 		fov = lerp(fov, target_fov, 4.0 * delta)
 
-	# 7. Trauma de impacto y sacudida visceral (Screen Shake)
-	if trauma > 0.0:
+	# 7. Trauma de impacto, sacudida visceral y vibración aerodinámica de alta velocidad
+	var aero_buffeting := 0.0
+	if target_node and "current_speed" in target_node and target_node.current_speed > 28.0:
+		aero_buffeting = clampf((target_node.current_speed - 28.0) / 12.0, 0.0, 1.0) * 0.06
+
+	if trauma > 0.0 or aero_buffeting > 0.001:
 		trauma = maxf(0.0, trauma - trauma_reduction_rate * delta)
-		var shake := trauma * trauma
+		var shake := trauma * trauma + aero_buffeting
 		shake_time += delta * 28.0
 		var ox := sin(shake_time * 1.7) * max_shake_offset * shake
 		var oy := cos(shake_time * 2.1) * max_shake_offset * shake
@@ -248,3 +252,4 @@ func _physics_process(delta: float) -> void:
 		var rz := sin(shake_time * 2.5) * max_shake_roll * shake
 		global_position += Vector3(ox, oy, oz)
 		rotate_object_local(Vector3.FORWARD, rz)
+

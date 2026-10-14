@@ -140,39 +140,43 @@ void fragment() {
 	vec2 refr_uv = clamp(SCREEN_UV + refr_offset, vec2(0.001), vec2(0.999));
 	vec3 refracted = textureLod(screen_texture, refr_uv, 0.0).rgb;
 	
-	// Natural Alpine Mountain River Palette (matches video reference)
-	// Shallow: crystal clear, high visibility of pebbles & gravel
-	// Mid-depth: natural glacial turquoise / alpine teal
-	// Deep pools: rich dark mountain teal
-	vec3 color_shallow = vec3(0.09, 0.48, 0.52);
-	vec3 color_deep    = vec3(0.015, 0.16, 0.22);
-	vec3 water_body = mix(color_shallow, color_deep, clamp(depth / 3.2, 0.0, 1.0));
+	// Paleta fiel al Río de Cañón de Montaña (Foto 1 del usuario)
+	// Aguas someras: esmeralda / turquesa glacial translúcido hiperoxigenado
+	// Aguas medias: verde azulado alpino vibrante
+	// Pozas profundas: cerceta oscura de montaña
+	vec3 color_shallow = vec3(0.04, 0.65, 0.58);
+	vec3 color_mid     = vec3(0.02, 0.38, 0.45);
+	vec3 color_deep    = vec3(0.008, 0.12, 0.20);
+	float depth_factor = clamp(depth / 3.8, 0.0, 1.0);
+	vec3 water_body = mix(mix(color_shallow, color_mid, clamp(depth / 1.5, 0.0, 1.0)), color_deep, depth_factor);
 	
-	// Physical Beer-Lambert absorption: red absorbed quickly, green/cyan persists
-	vec3 absorption_coeff = vec3(0.60, 0.20, 0.07);
+	// Absorción física Beer-Lambert (el rojo se absorbe en <0.8m, el verde y azul persisten)
+	vec3 absorption_coeff = vec3(0.55, 0.14, 0.05);
 	vec3 transmission = exp(-depth * absorption_coeff);
 	
-	// Sunlight caustics projected onto shallow riverbed
+	// Refracción y caústicas solares en el fondo cristalino
 	vec2 c_uv1 = vec2(cross_coord * 1.5, stream_coord * 1.5 - TIME * 1.1);
 	vec2 c_uv2 = vec2(cross_coord * 1.5 + 2.5, stream_coord * 1.5 + TIME * 0.95);
 	float caust = pow(clamp(1.0 - abs(gnoise(c_uv1) - gnoise(c_uv2)) * 1.5, 0.0, 1.0), 3.0);
-	float caust_mask = (1.0 - smoothstep(0.05, 1.8, depth)) * transmission.r;
-	vec3 caustics = vec3(0.92, 0.98, 1.0) * (caust * caust_mask * 0.42);
+	float caust_mask = (1.0 - smoothstep(0.05, 2.2, depth)) * transmission.r;
+	vec3 caustics = vec3(0.95, 1.0, 0.98) * (caust * caust_mask * 0.45);
 	
-	// Whitewater Rapids & Trailing Foam Wakes (matching video)
-	// 1. Shoreline & obstacle contact foam
-	float shore_contact = 1.0 - smoothstep(0.02, 0.48, depth);
-	// 2. Rapids turbulence along current
-	float rapids = smoothstep(0.50, 0.85, fbm_grad(vec2(cross_coord * 0.8, stream_coord * 1.2 - TIME * 1.5)) + 0.5);
-	float foam_base = max(shore_contact * 0.92, rapids * 0.65);
+	// Rápidos de aguas bravas (Whitewater Rapids) y estelas de espuma (Foto 1)
+	// 1. Espuma en contacto con orillas y peñascos
+	float shore_contact = 1.0 - smoothstep(0.02, 0.65, depth);
+	// 2. Turbulencia de corriente rápida y crestas de ola
+	float rapids = smoothstep(0.42, 0.82, fbm_grad(vec2(cross_coord * 0.9, stream_coord * 1.4 - TIME * 1.8)) + 0.5);
+	float crest_foam = smoothstep(0.06, 0.15, total_pert.y); // Espuma en crestas de oleaje
+	float foam_base = max(max(shore_contact * 0.95, rapids * 0.75), crest_foam * 0.85);
 	
-	// Elongated foam streaks streaming downstream (wake effect)
-	vec2 foam_wake_uv = vec2(cross_coord * 2.8, stream_coord * 0.85 - TIME * 1.2);
-	float foam_cells = voronoi(vec2(cross_coord * 3.2, stream_coord * 1.2 - TIME * 1.4));
+	// Estelas alargadas de burbujas arrastradas corriente abajo (wake foam)
+	vec2 foam_wake_uv = vec2(cross_coord * 2.8, stream_coord * 0.85 - TIME * 1.3);
+	float foam_cells = voronoi(vec2(cross_coord * 3.5, stream_coord * 1.4 - TIME * 1.5));
 	float foam_noise = fbm_grad(foam_wake_uv) + 0.5;
-	float foam_pattern = (1.0 - foam_cells * 0.82) * 0.68 + foam_noise * 0.32;
-	float foam_mask = smoothstep(0.32, 0.65, foam_base * foam_pattern);
-	vec3 foam_color = vec3(0.96, 0.98, 1.0);
+	float foam_pattern = (1.0 - foam_cells * 0.85) * 0.70 + foam_noise * 0.30;
+	float foam_mask = smoothstep(0.28, 0.60, foam_base * foam_pattern);
+	vec3 foam_color = vec3(0.98, 1.0, 1.0);
+
 	
 	// PBR Water Surface & Volume (NO artificial emission glow!)
 	// Underwater scene transmission through crystal water:

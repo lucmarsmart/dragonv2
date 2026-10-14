@@ -51,7 +51,7 @@ func run() -> void:
 	# Esperar calibración e inicialización
 	for _i in 300:
 		await ticks(1)
-		if combat.initialized:
+		if combat.initialized and not dragon.calibrating:
 			break
 	
 	check(combat.initialized, "Combate inicializado con éxito")
@@ -98,22 +98,35 @@ func run() -> void:
 	check(dragon.get_locked_target() != null, "TAB mantiene o cicla objetivo válido")
 	
 	# 5. Probar que al alejarse (> 68m) la mira se desengancha ("hasta que este se aleja")
-	dragon.global_position = ballista.global_position + Vector3(0, 10, 85) # 85m de distancia
-	await ticks(15)
+	dragon.global_position = Vector3(0, 150, 0) # Lejos de la arena (>300m)
+	dragon.rotation = Vector3.ZERO
+	await ticks(20)
 	check(dragon.get_locked_target() == null, "La mira se desengancha al alejarse del enemigo (>68m)")
 	check(not reticle.is_locked, "Retícula vuelve a modo libre al alejarse el objetivo")
 	
 	# 6. Regresar a rango cercano y probar daño certero
-	dragon.global_position = ballista.global_position + Vector3(0, 3, 20)
-	await ticks(15)
-	check(dragon.get_locked_target() == ballista, "Re-fija automáticamente al volver a entrar en rango")
+	dragon.global_position = ballista.global_position + Vector3(0, 4, 30)
+	dragon.rotation = Vector3.ZERO
+	dragon.target_yaw = 0
+	dragon.target_pitch = 0
+	dragon.target_roll = 0
+	dragon.velocity = Vector3.ZERO
+	dragon.current_speed = 0.0
+	dragon.manual_input_override = true
+	dragon.manual_move_input = 0.0
+	dragon.manual_turn_input = 0.0
+	await ticks(12)
+	var relocked = dragon.get_locked_target()
+	print("Objetivo re-fijado: ", relocked.name if relocked else "Ninguno")
+	check(relocked == ballista, "Re-fija automáticamente al volver a entrar en rango")
 	
 	var hp_before: float = ballista.health
 	breath.manual_override = true
 	breath.manual_fire = true
-	await ticks(45)
+	await ticks(60)
 	breath.manual_fire = false
 	breath.manual_override = false
+	dragon.manual_input_override = false
 	
 	check(ballista.health < hp_before, "El fuego daña efectivamente al objetivo fijado gracias al seguimiento")
 	

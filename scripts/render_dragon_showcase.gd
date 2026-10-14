@@ -1,107 +1,84 @@
-@tool
 extends SceneTree
 
 func _init():
 	var root_node = Node3D.new()
 	root.add_child(root_node)
 	
-	# Iluminación cinematográfica natural (sol directo + luz ambiental de cielo)
-	var sun = DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-50, 40, 0)
-	sun.light_color = Color(1.0, 0.96, 0.90)
-	sun.light_energy = 1.3
-	sun.shadow_enabled = true
-	root_node.add_child(sun)
+	# Directional sun from front-top-right
+	var light = DirectionalLight3D.new()
+	light.rotation_degrees = Vector3(-40, 50, 0)
+	light.light_energy = 1.35
+	light.shadow_enabled = true
+	root_node.add_child(light)
 	
-	var rim_light = DirectionalLight3D.new()
-	rim_light.rotation_degrees = Vector3(130, -140, 0)
-	rim_light.light_color = Color(0.65, 0.80, 1.0)
-	rim_light.light_energy = 0.5
-	root_node.add_child(rim_light)
-	
+	# Sky & Environment
 	var env_node = WorldEnvironment.new()
 	var env = Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.35, 0.45, 0.55)
+	env.background_color = Color(0.22, 0.25, 0.28)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.40, 0.48, 0.56)
-	env.ambient_light_energy = 0.7
-	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.ambient_light_color = Color(0.40, 0.42, 0.46)
 	env_node.environment = env
 	root_node.add_child(env_node)
 	
-	var dragon_model = load("res://assets/models/dragon.glb").instantiate()
-	root_node.add_child(dragon_model)
-	dragon_model.rotation_degrees = Vector3(0, 180, 0)
+	# Instantiate dragon
+	var dragon_scene = load("res://assets/models/dragon.glb").instantiate()
+	root_node.add_child(dragon_scene)
 	
-	# Aplicar el gestor de materiales con los shaders de relieve y SSS
-	var skin_script = load("res://scripts/dragon_surface_materials.gd").new()
-	dragon_model.add_child(skin_script)
-	skin_script._ready()
+	# Attach and apply surface materials
+	var mat_script = load("res://scripts/dragon_surface_materials.gd").new()
+	dragon_scene.add_child(mat_script)
+	mat_script.apply_materials(dragon_scene)
 	
 	var ap: AnimationPlayer = null
 	var skel: Skeleton3D = null
-	var q = [dragon_model]
+	var q = [dragon_scene]
 	while q.size() > 0:
 		var c = q.pop_front()
 		if c is AnimationPlayer: ap = c
 		if c is Skeleton3D: skel = c
 		for ch in c.get_children(): q.append(ch)
-		
+	
+	# Look for animation
+	if ap and ap.has_animation("Qishilong_fly2"):
+		ap.play("Qishilong_fly2")
+		ap.seek(0.5, true)
+	
 	var cam = Camera3D.new()
 	root_node.add_child(cam)
 	cam.current = true
-	cam.far = 1000.0
+	cam.fov = 42.0
 	
-	var b_pelvis = skel.find_bone("Bip001_03")
-	var b_head = skel.find_bone("Bip001-Head_011")
+	for f in range(6): await process_frame
 	
-	# -------------------------------------------------------------------------
-	# TOMA 1: PRIMER PLANO DEL CUERPO Y RELIEVE DE ESCAMAS (LOMO Y CABEZA)
-	# -------------------------------------------------------------------------
-	ap.play("Qishilong_fly2")
-	ap.seek(34.8, true) # Pose de planeo con alas extendidas
+	# 1. Close-up of dorsal scales and osteoderms
+	cam.position = Vector3(1.2, 2.8, 3.8)
+	cam.look_at(Vector3(0.0, 1.8, 0.8), Vector3.UP)
 	for f in range(4): await process_frame
+	root.get_viewport().get_texture().get_image().save_png("c:/Proyectos/Dragon v2/showcase_scales_v2.png")
+	print("Saved showcase_scales_v2.png")
 	
-	var p_head = skel.global_transform * skel.get_bone_global_pose(b_head).origin
-	var p_pelvis = skel.global_transform * skel.get_bone_global_pose(b_pelvis).origin
-	var p_spine = (p_head + p_pelvis) * 0.5
-	
-	cam.position = p_spine + Vector3(2.5, 2.2, 5.0)
-	cam.look_at_from_position(cam.position, p_spine + Vector3(0.0, 0.5, -0.5), Vector3.UP)
+	# 2. Ventral throat, gular plates and head
+	cam.position = Vector3(1.8, 1.4, 2.8)
+	cam.look_at(Vector3(0.2, 2.0, 1.2), Vector3.UP)
 	for f in range(4): await process_frame
+	root.get_viewport().get_texture().get_image().save_png("c:/Proyectos/Dragon v2/showcase_throat_v2.png")
+	print("Saved showcase_throat_v2.png")
 	
-	root.get_viewport().get_texture().get_image().save_png("showcase_scales_relief.png")
-	print("Guardado showcase_scales_relief.png")
-	
-	# -------------------------------------------------------------------------
-	# TOMA 2: PRIMER PLANO DE LA CABEZA, FAUCES Y PLACAS VENTRALES
-	# -------------------------------------------------------------------------
-	cam.position = p_head + Vector3(1.8, 0.4, -2.8)
-	cam.look_at_from_position(cam.position, p_head + Vector3(0.0, 0.1, 0.2), Vector3.UP)
+	# 3. Wings with backlight SSS and vascular veins
+	light.rotation_degrees = Vector3(15, -130, 0) # Sol detrás de las alas
+	cam.position = Vector3(-4.0, 3.2, 4.2)
+	cam.look_at(Vector3(-2.2, 2.4, 0.2), Vector3.UP)
 	for f in range(4): await process_frame
+	root.get_viewport().get_texture().get_image().save_png("c:/Proyectos/Dragon v2/showcase_wings_v2.png")
+	print("Saved showcase_wings_v2.png")
 	
-	root.get_viewport().get_texture().get_image().save_png("showcase_head_detail.png")
-	print("Guardado showcase_head_detail.png")
-	
-	# -------------------------------------------------------------------------
-	# TOMA 3: ALAS TRANSLÚCIDAS CON RETROILUMINACIÓN (SSS)
-	# -------------------------------------------------------------------------
-	cam.position = p_pelvis + Vector3(-5.5, -0.8, 3.2)
-	cam.look_at_from_position(cam.position, p_pelvis + Vector3(-3.0, 1.2, -1.0), Vector3.UP)
+	# 4. Heroic full body profile
+	light.rotation_degrees = Vector3(-35, 40, 0)
+	cam.position = Vector3(7.2, 3.2, 8.0)
+	cam.look_at(Vector3(0.0, 1.4, 0.0), Vector3.UP)
 	for f in range(4): await process_frame
-	
-	root.get_viewport().get_texture().get_image().save_png("showcase_wings_sss.png")
-	print("Guardado showcase_wings_sss.png")
-	
-	# -------------------------------------------------------------------------
-	# TOMA 4: VISTA COMPLETA DEL DRAGÓN MAJESTUOSO EN VUELO
-	# -------------------------------------------------------------------------
-	cam.position = p_pelvis + Vector3(0.0, 4.0, 16.0)
-	cam.look_at_from_position(cam.position, p_spine, Vector3.UP)
-	for f in range(4): await process_frame
-	
-	root.get_viewport().get_texture().get_image().save_png("showcase_full_flight.png")
-	print("Guardado showcase_full_flight.png")
+	root.get_viewport().get_texture().get_image().save_png("c:/Proyectos/Dragon v2/showcase_heroic_v2.png")
+	print("Saved showcase_heroic_v2.png")
 	
 	quit(0)

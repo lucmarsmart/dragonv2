@@ -65,7 +65,9 @@ func _wall_run(start: Vector3, end: Vector3, key: String = "wall_thick_straight_
 
 func _build_fortress() -> void:
 	var c := arena_center
-	_wall_run(c + Vector3(-76, 0, -67), c + Vector3(76, 0, -67))
+	# Per user instruction: eliminate wall behind nest to reveal the natural rolling hill covered in grass
+	_wall_run(c + Vector3(-76, 0, -67), c + Vector3(-50, 0, -67))
+	_wall_run(c + Vector3(50, 0, -67), c + Vector3(76, 0, -67))
 	_wall_run(c + Vector3(-76, 0, -67), c + Vector3(-76, 0, 70))
 	_wall_run(c + Vector3(76, 0, -67), c + Vector3(76, 0, 70), "wall_thick_straight_02")
 	# Wide, roofless breach lets the folded dragon enter on foot and launch safely.
@@ -77,14 +79,7 @@ func _build_fortress() -> void:
 	for x in [-69.0, 69.0]:
 		_place_module("wall_stairs_straight_01", c + Vector3(x, 0, -37), 0.0 if x < 0 else PI)
 		_place_module("wall_walkway_straight_01", c + Vector3(x, 0, -55), 0.0 if x < 0 else PI)
-	# Small PBR gate embedded in the northern sanctum facade, away from walking lanes.
-	_place_module("wall_thin_gate_01", c + Vector3(0, 0, -63), PI * 0.5, Vector3(1.0, 1.0, 1.6))
-	var door := (load("res://assets/siege/environment/gate/large_castle_door.gltf") as PackedScene).instantiate() as Node3D
-	door.name = "WeatheredSanctumDoor"
-	add_child(door)
-	door.position = c + Vector3(0, 0, -61.5)
-	door.scale = Vector3.ONE * 2.0
-	for offset in [Vector3(-15, 0, 68), Vector3(15, 0, 68), Vector3(-8, 0, -53), Vector3(8, 0, -53)]:
+	for offset in [Vector3(-15, 0, 68), Vector3(15, 0, 68)]:
 		var lantern := (load("res://assets/siege/environment/lantern.glb") as PackedScene).instantiate() as Node3D
 		lantern.name = "GitHubCC0WoodenLantern"
 		add_child(lantern)

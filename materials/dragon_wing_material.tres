@@ -1,0 +1,25 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://shaders/dragon_wing.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/models/dragon_Image_0.png" id="2_albedo"]
+[ext_resource type="Texture2D" path="res://assets/models/dragon_Image_1.png" id="3_normal"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/wing_relief_strength = 2.4
+shader_parameter/wing_roughness = 0.52
+shader_parameter/wing_specular = 0.45
+shader_parameter/patagium_amber_base = Color(0.7, 0.46, 0.26, 1)
+shader_parameter/patagium_ochre_bright = Color(0.86, 0.62, 0.36, 1)
+shader_parameter/patagium_shadow_edge = Color(0.38, 0.24, 0.14, 1)
+shader_parameter/wing_bone_charcoal = Color(0.13, 0.14, 0.15, 1)
+shader_parameter/capillary_vein_color = Color(0.38, 0.08, 0.03, 1)
+shader_parameter/wing_backlight_color = Color(0.95, 0.52, 0.16, 1)
+shader_parameter/wing_translucency = 1.15
+shader_parameter/vascular_vein_density = 48.0
+shader_parameter/aero_wind_speed = 0.0
+shader_parameter/aero_billow_amount = 0.0
+shader_parameter/aero_flutter_intensity = 0.0
+shader_parameter/skin_albedo = ExtResource("2_albedo")
+shader_parameter/skin_normal = ExtResource("3_normal")

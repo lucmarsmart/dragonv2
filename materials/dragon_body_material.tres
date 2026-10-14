@@ -1,0 +1,25 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://shaders/dragon_body.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/models/dragon_Image_2.png" id="2_albedo"]
+[ext_resource type="Texture2D" path="res://assets/models/dragon_Image_3.png" id="3_normal"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/scale_relief_strength = 2.6
+shader_parameter/micro_scale_intensity = 0.85
+shader_parameter/micro_scale_tile = 54.0
+shader_parameter/cavity_occlusion_depth = 0.82
+shader_parameter/charcoal_base = Color(0.12, 0.13, 0.14, 1)
+shader_parameter/charcoal_highlight = Color(0.24, 0.25, 0.27, 1)
+shader_parameter/ventral_cream = Color(0.74, 0.68, 0.55, 1)
+shader_parameter/ventral_shadow = Color(0.36, 0.32, 0.25, 1)
+shader_parameter/keratin_dark = Color(0.1, 0.09, 0.09, 1)
+shader_parameter/keratin_crest = Color(0.22, 0.2, 0.18, 1)
+shader_parameter/subcutaneous_vascular = Color(0.44, 0.09, 0.04, 1)
+shader_parameter/base_roughness = 0.35
+shader_parameter/scale_specular = 0.55
+shader_parameter/rim_intensity = 0.45
+shader_parameter/skin_albedo = ExtResource("2_albedo")
+shader_parameter/skin_normal = ExtResource("3_normal")

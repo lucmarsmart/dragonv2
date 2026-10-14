@@ -124,7 +124,6 @@ func _build_tree_mesh(species: String, seed_offset: int, bark_mat: Material, fol
 		"fir":
 			_generate_fir(st_bark, st_leaves, rng, leaf_tint)
 			
-	st_bark.generate_normals()
 	st_bark.generate_tangents()
 	st_bark.set_material(bark_mat)
 	
@@ -198,6 +197,7 @@ func _extrude_branch(st: SurfaceTool, points: Array[Vector3], radii: Array[float
 			uv_v += points[i].distance_to(points[i - 1]) * uv_v_scale
 			
 		var ring_verts: Array[Vector3] = []
+		var ring_normals: Array[Vector3] = []
 		var ring_uvs: Array[Vector2] = []
 		
 		for s in radial_segments + 1:
@@ -218,11 +218,13 @@ func _extrude_branch(st: SurfaceTool, points: Array[Vector3], radii: Array[float
 				var fluting = sin(angle * 18.0) * 0.08
 				cur_r *= (1.0 + fluting)
 				
-			var offset = (n * cos(angle) + b * sin(angle)) * cur_r
+			var norm = (n * cos(angle) + b * sin(angle)).normalized()
+			var offset = norm * cur_r
 			ring_verts.append(p + offset)
+			ring_normals.append(norm)
 			ring_uvs.append(Vector2(float(s) / float(radial_segments), uv_v))
 			
-		rings.append({"verts": ring_verts, "uvs": ring_uvs})
+		rings.append({"verts": ring_verts, "normals": ring_normals, "uvs": ring_uvs})
 		
 	for i in count - 1:
 		var r0 = rings[i]
@@ -233,51 +235,61 @@ func _extrude_branch(st: SurfaceTool, points: Array[Vector3], radii: Array[float
 			var v10: Vector3 = r1["verts"][s]
 			var v11: Vector3 = r1["verts"][s + 1]
 			
+			var n00: Vector3 = r0["normals"][s]
+			var n01: Vector3 = r0["normals"][s + 1]
+			var n10: Vector3 = r1["normals"][s]
+			var n11: Vector3 = r1["normals"][s + 1]
+			
 			var uv00: Vector2 = r0["uvs"][s]
 			var uv01: Vector2 = r0["uvs"][s + 1]
 			var uv10: Vector2 = r1["uvs"][s]
 			var uv11: Vector2 = r1["uvs"][s + 1]
 			
-			st.set_uv(uv00); st.add_vertex(v00)
-			st.set_uv(uv10); st.add_vertex(v10)
-			st.set_uv(uv01); st.add_vertex(v01)
+			st.set_normal(n00); st.set_uv(uv00); st.add_vertex(v00)
+			st.set_normal(n10); st.set_uv(uv10); st.add_vertex(v10)
+			st.set_normal(n01); st.set_uv(uv01); st.add_vertex(v01)
 			
-			st.set_uv(uv01); st.add_vertex(v01)
-			st.set_uv(uv10); st.add_vertex(v10)
-			st.set_uv(uv11); st.add_vertex(v11)
+			st.set_normal(n01); st.set_uv(uv01); st.add_vertex(v01)
+			st.set_normal(n10); st.set_uv(uv10); st.add_vertex(v10)
+			st.set_normal(n11); st.set_uv(uv11); st.add_vertex(v11)
 			
 	if cap_ends:
 		var b_center = points[0]
 		var b_verts = rings[0]["verts"]
+		var b_norm = -tangents[0] if tangents.size() > 0 else Vector3.DOWN
 		for s in radial_segments:
-			st.set_uv(Vector2(0.5, 0.5)); st.add_vertex(b_center)
-			st.set_uv(Vector2(0.0, 0.0)); st.add_vertex(b_verts[s + 1])
-			st.set_uv(Vector2(1.0, 0.0)); st.add_vertex(b_verts[s])
+			st.set_normal(b_norm); st.set_uv(Vector2(0.5, 0.5)); st.add_vertex(b_center)
+			st.set_normal(b_norm); st.set_uv(Vector2(0.0, 0.0)); st.add_vertex(b_verts[s + 1])
+			st.set_normal(b_norm); st.set_uv(Vector2(1.0, 0.0)); st.add_vertex(b_verts[s])
 			
 		var t_center = points[count - 1]
 		var t_verts = rings[count - 1]["verts"]
+		var t_norm = tangents[count - 1] if tangents.size() > 0 else Vector3.UP
 		for s in radial_segments:
-			st.set_uv(Vector2(0.5, 0.5)); st.add_vertex(t_center)
-			st.set_uv(Vector2(1.0, 1.0)); st.add_vertex(t_verts[s])
-			st.set_uv(Vector2(0.0, 1.0)); st.add_vertex(t_verts[s + 1])
+			st.set_normal(t_norm); st.set_uv(Vector2(0.5, 0.5)); st.add_vertex(t_center)
+			st.set_normal(t_norm); st.set_uv(Vector2(1.0, 1.0)); st.add_vertex(t_verts[s])
+			st.set_normal(t_norm); st.set_uv(Vector2(0.0, 1.0)); st.add_vertex(t_verts[s + 1])
 
 # Generate realistic surface buttress roots spreading into the ground
 func _generate_roots(st_bark: SurfaceTool, base_pos: Vector3, base_r: float, num_roots: int, rng: RandomNumberGenerator, profile: int = 0) -> void:
 	for r_idx in num_roots:
 		var angle = (float(r_idx) / float(num_roots)) * TAU + rng.randf_range(-0.25, 0.25)
 		var root_dir = Vector3(cos(angle), 0, sin(angle)).normalized()
-		var root_len = rng.randf_range(1.8, 3.2) * base_r
+		var root_len = rng.randf_range(1.4, 2.2) * base_r
 		
-		var start_p = base_pos + Vector3(0, rng.randf_range(0.5, 1.1), 0) + root_dir * (base_r * 0.75)
-		var mid_p = base_pos + Vector3(0, 0.05, 0) + root_dir * (base_r + root_len * 0.5)
-		var end_p = base_pos + Vector3(0, -0.30, 0) + root_dir * (base_r + root_len)
+		var start_p = base_pos + Vector3(0, rng.randf_range(0.2, 0.4), 0) + root_dir * (base_r * 0.85)
+		var mid_p = base_pos + Vector3(0, -0.05, 0) + root_dir * (base_r + root_len * 0.4)
+		var end_p = base_pos + Vector3(0, -0.35, 0) + root_dir * (base_r + root_len)
 		
 		var pts: Array[Vector3] = [start_p, mid_p, end_p]
-		var rads: Array[float] = [base_r * 0.32, base_r * 0.18, 0.04]
+		var rads: Array[float] = [base_r * 0.26, base_r * 0.14, 0.04]
 		_extrude_branch(st_bark, pts, rads, 8, 0.45, profile, true)
 
 # Triple cross-quad foliage card for maximum 3D volume from all angles
 func _add_leaf_card(st: SurfaceTool, center: Vector3, size: float, normal_dir: Vector3, tint: Color, pitch_tilt: float = 0.0) -> void:
+	# Downscale cards from 5.5m down to 1.5m - 2.2m to eliminate geometric planar look
+	var effective_size = size * 0.40
+	var hs = effective_size * 0.5
 	var fwd = normal_dir.normalized()
 	var right = fwd.cross(Vector3.UP).normalized()
 	if right.length_squared() < 0.01:
@@ -287,8 +299,6 @@ func _add_leaf_card(st: SurfaceTool, center: Vector3, size: float, normal_dir: V
 	if absf(pitch_tilt) > 0.001:
 		up = (up * cos(pitch_tilt) + fwd * sin(pitch_tilt)).normalized()
 		fwd = right.cross(up).normalized()
-		
-	var hs = size * 0.5
 	
 	# Quad 1: Front
 	var v0 = center - right * hs - up * hs

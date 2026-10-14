@@ -115,45 +115,43 @@ func _landform_height(x: float, z: float) -> float:
 	var distance_to_river := absf(x - river_center(z))
 	var width := river_width(z)
 	var detail := _noise.get_noise_2d(x, z)
-	var h := maxf(_original_height(x, z), 9.0) + detail * 9.0
-	var court_distance := maxf(absf(x - ARENA_CENTER.x) / 96.0, absf(z - ARENA_CENTER.z) / 90.0)
-	# Functional surfaces retain their exact previous samples; deformation fades in
-	# beyond their margins. This is procedural ridge/gully relief, not hydraulic erosion.
-	var protection := (1.0 - smoothstep(48.0, 100.0, absf(x - 300.0))) * smoothstep(100.0, 150.0, z) * (1.0 - smoothstep(430.0, 480.0, z))
+	var court_distance := maxf(absf(x - ARENA_CENTER.x) / 88.0, absf(z - ARENA_CENTER.z) / 78.0)
+
+	# 1. Natural base elevation from original terrain contours, preserved with authentic relief
+	var raw_orig := _original_height(x, z)
+	var base_h := maxf(raw_orig * 0.52 + 5.5, 7.5)
+
+	# 2. Domain-warped organic geological folds (eliminates geometric bubbles)
+	var warp_x := _erosion_noise.get_noise_2d(x * 0.0022 + 230.0, z * 0.0022 - 310.0) * 95.0
+	var warp_z := _erosion_noise.get_noise_2d(x * 0.0022 - 410.0, z * 0.0022 + 190.0) * 95.0
+	var wx := x + warp_x
+	var wz := z + warp_z
+
+	# 3. Multi-scale rolling hill ridges, shoulders and saddles (Foto de referencia)
+	# Primary broad rolling hill chains (~450m scale)
+	var h1 := _hill_noise.get_noise_2d(wx * 0.0022, wz * 0.0022)
+	# Secondary undulating ridgelines and shoulders (~180m scale)
+	var h2 := 1.0 - absf(_ridge_noise.get_noise_2d(wx * 0.0048 + 140.0, wz * 0.0048 - 290.0))
+	# Subtle drainage erosion creases (~65m scale)
+	var h3 := _erosion_noise.get_noise_2d(x * 0.010, z * 0.010)
+
+	var hill_relief := smoothstep(-0.25, 0.65, h1) * (26.0 + h2 * 32.0) + pow(maxf(h2, 0.0), 1.35) * 16.0 - absf(h3) * 5.5
+
+	# Natural mountain foothill transition toward map margins (smoothly ramps up toward distant cordilleras)
+	var edge_dist := maxf(absf(x), absf(z)) / MAP_EDGE
+	var margin_rise := smoothstep(0.45, 0.98, edge_dist) * (25.0 + h2 * 45.0)
+
+	var h := base_h + hill_relief + margin_rise + detail * 2.8
+
+	# Mask out hill deformation near protected gameplay areas:
+	var court_protection := 1.0 - smoothstep(1.0, 1.45, court_distance)
+	var gate_road_protection := 0.0
+	if z > 160.0 and z < 410.0:
+		gate_road_protection = (1.0 - smoothstep(16.0, 38.0, absf(x - 300.0))) * (1.0 - smoothstep(330.0, 410.0, z))
 
 	# Distance to forest lake basin (Foto 4)
 	var lake_dist := (Vector2(x, z) - LAKE_CENTER).length()
 	var noisy_lake_dist := lake_dist + _noise.get_noise_2d(x * 0.08, z * 0.08) * 14.0
-	var lake_valley_mask := smoothstep(LAKE_RADIUS + 15.0, LAKE_CLEARING_RADIUS + 80.0, noisy_lake_dist)
-
-	# Distance to forest streams / riachuelos (Fotos 2 & 3 y Video)
-	var dist_w := absf(x - stream_west_center(z))
-	var in_west_stream_z := z >= -260.0 and z <= 350.0
-	var blend_z_w := smoothstep(-260.0, -220.0, z) * smoothstep(350.0, 310.0, z) if in_west_stream_z else 0.0
-	var west_stream_valley_mask := 1.0 - (1.0 - smoothstep(16.0, 85.0, dist_w)) * blend_z_w
-
-	var dist_e := absf(x - stream_east_center(z))
-	var in_east_stream_z := z >= -370.0 and z <= 210.0
-	var blend_z_e := smoothstep(-370.0, -330.0, z) * smoothstep(210.0, 170.0, z) if in_east_stream_z else 0.0
-	var east_stream_valley_mask := 1.0 - (1.0 - smoothstep(16.0, 80.0, dist_e)) * blend_z_e
-
-	var deformation := smoothstep(1.55, 2.1, court_distance) * smoothstep(width + 64.0, width + 125.0, distance_to_river) * (1.0 - protection) * lake_valley_mask * west_stream_valley_mask * east_stream_valley_mask * 0.22
-	if deformation > 0.0:
-		var warp := Vector2(_ridge_noise.get_noise_2d(x * 1.5 + 711.0, z * 1.5 - 319.0), _ridge_noise.get_noise_2d(x * 1.5 - 517.0, z * 1.5 + 823.0)) * 40.0
-		var warped_height := maxf(_original_height(x + warp.x, z + warp.y), 9.0)
-		var elevation_strength := smoothstep(12.0, 150.0, warped_height)
-		var shoulders := _ridge_noise.get_noise_2d(x * 1.5 - 930.0, z * 1.5 + 471.0) * 6.0
-		var gullies := _erosion_noise.get_noise_2d(x, z) * 4.0
-		var broken_height := warped_height + (shoulders + gullies) * lerpf(0.30, 1.0, elevation_strength) + detail * 4.0
-		h = lerpf(h, broken_height, deformation)
-
-	# Few and much smaller rolling hills ("pocas y mucho mas chicas a las colinas")
-	var hill_val := _hill_noise.get_noise_2d(x * 0.45, z * 0.45)
-	var knoll_t := smoothstep(0.24, 0.58, hill_val)
-	var hill_elevation := knoll_t * 9.5
-	var river_valley_mask := smoothstep(width + 45.0, width + 120.0, distance_to_river)
-	var hill_mask := smoothstep(1.5, 2.1, court_distance) * (1.0 - protection) * river_valley_mask * lake_valley_mask * west_stream_valley_mask * east_stream_valley_mask
-	h += hill_elevation * hill_mask
 
 	# Carve forest lake in a wide, gentle clearing (Foto 4)
 	var clearing_t := (1.0 - smoothstep(LAKE_RADIUS + 8.0, LAKE_CLEARING_RADIUS + 75.0, noisy_lake_dist))
@@ -164,6 +162,9 @@ func _landform_height(x: float, z: float) -> float:
 		h = lerpf(h, -2.8 + detail * 0.30, lake_t)
 
 	# Carve forest streams / riachuelos in deep woods (Fotos 2 & 3 y Video)
+	var dist_w := absf(x - stream_west_center(z))
+	var in_west_stream_z := z >= -260.0 and z <= 350.0
+	var blend_z_w := smoothstep(-260.0, -220.0, z) * smoothstep(350.0, 310.0, z) if in_west_stream_z else 0.0
 	if blend_z_w > 0.0:
 		var valley_t := (1.0 - smoothstep(14.0, 85.0, dist_w)) * blend_z_w
 		if valley_t > 0.0:
@@ -171,6 +172,10 @@ func _landform_height(x: float, z: float) -> float:
 		var st_t := (1.0 - smoothstep(5.0, 15.0, dist_w)) * blend_z_w
 		if st_t > 0.0:
 			h = lerpf(h, -1.25 + detail * 0.25, st_t)
+
+	var dist_e := absf(x - stream_east_center(z))
+	var in_east_stream_z := z >= -370.0 and z <= 210.0
+	var blend_z_e := smoothstep(-370.0, -330.0, z) * smoothstep(210.0, 170.0, z) if in_east_stream_z else 0.0
 	if blend_z_e > 0.0:
 		var valley_e := (1.0 - smoothstep(13.0, 80.0, dist_e)) * blend_z_e
 		if valley_e > 0.0:
@@ -178,14 +183,18 @@ func _landform_height(x: float, z: float) -> float:
 		var st_t_e := (1.0 - smoothstep(5.0, 14.5, dist_e)) * blend_z_e
 		if st_t_e > 0.0:
 			h = lerpf(h, -1.20 + detail * 0.25, st_t_e)
-	# A continuous incised river: underwater gravel -> exposed shore -> grassy terrace.
-	var bank := smoothstep(width - 8.0, width + 64.0, distance_to_river)
+
+	# River carving: incised gravel riverbed -> exposed banks -> terrace
+	var bank := smoothstep(width - 8.0, width + 55.0, distance_to_river)
 	h = lerpf(-3.0 + detail * 0.35, h, bank)
-	h = lerpf(ARENA_CENTER.y, h, smoothstep(1.0, 1.55, court_distance))
-	# A gently graded, 32m-wide approach reaches the open gate.
-	if z > 180.0 and z < 390.0:
-		var access := (1.0 - smoothstep(18.0, 42.0, absf(x - 300.0))) * (1.0 - smoothstep(325.0, 390.0, z))
-		h = lerpf(h, 24.0, access)
+
+	# Level courtyard inside castle fortress walls
+	h = lerpf(h, ARENA_CENTER.y, court_protection)
+
+	# Grade approach road to the gate
+	if gate_road_protection > 0.0:
+		h = lerpf(h, 24.0, gate_road_protection)
+
 	return h
 
 func _build_ground() -> void:
@@ -313,12 +322,34 @@ func _ridge_height(x: float, z: float) -> float:
 	var radius := maxf(absf(x), absf(z))
 	var p := Vector2(x, z) * MAP_EDGE / maxf(radius, MAP_EDGE)
 	var edge_h := _landform_height(p.x, p.y)
-	var t := clampf((radius - MAP_EDGE) / 1200.0, 0.0, 1.0)
-	var n := _ridge_noise.get_noise_2d(x, z)
-	var ridge := 1.0 - sqrt(n * n + 0.035)
-	var valley := absf(_ridge_noise.get_noise_2d(x * 1.6 + 143, z * 1.6))
-	var mass := pow(ridge, 2.1) * (520.0 + valley * 580.0) + _noise.get_noise_2d(x, z) * 18.0
-	return lerpf(edge_h, 100.0 + mass, smoothstep(0.0, 1.0, t))
+	var t := clampf((radius - MAP_EDGE) / 1400.0, 0.0, 1.0)
+	
+	# Domain warping for organic, natural geological curvature
+	var wx := x + _erosion_noise.get_noise_2d(x * 0.0018 + 520.0, z * 0.0018 - 380.0) * 180.0
+	var wz := z + _erosion_noise.get_noise_2d(x * 0.0018 - 290.0, z * 0.0018 + 610.0) * 180.0
+
+	# 1. Primary folded cordillera chain (continuous undulating mountain spine)
+	var n1 := _ridge_noise.get_noise_2d(wx * 0.75, wz * 0.75)
+	var ridge1 := 1.0 - absf(n1)
+	var spine := smoothstep(0.18, 0.82, ridge1) * 320.0
+
+	# 2. Secondary branching ridges / spurs and mountain shoulders
+	var n2 := _ridge_noise.get_noise_2d(wx * 1.55 + 173.0, wz * 1.55 - 289.0)
+	var ridge2 := 1.0 - absf(n2)
+	var spurs := pow(maxf(ridge2, 0.0), 1.5) * 160.0
+
+	# 3. Broad geological massif foundation (rolling high plateaus and foothills)
+	var massif := (1.0 + _hill_noise.get_noise_2d(wx * 0.65, wz * 0.65)) * 0.5 * 140.0
+
+	# 4. Drainage valleys and erosion incisions between mountain folds
+	var erosion := absf(_erosion_noise.get_noise_2d(wx * 2.2, wz * 2.2)) * 45.0
+
+	# 5. Fine surface rock relief
+	var detail := _noise.get_noise_2d(x * 0.8, z * 0.8) * 16.0
+
+	var mountain_mass := massif + spine + spurs - erosion + detail
+	var final_h := edge_h + mountain_mass * smoothstep(0.0, 1.0, t)
+	return maxf(final_h, edge_h)
 
 func _build_distant_ridges() -> void:
 	var st := SurfaceTool.new()
@@ -344,7 +375,71 @@ func _build_distant_ridges() -> void:
 	ridge.mesh = st.commit()
 	ridge.material_override = _terrain_material
 	add_child(ridge)
-	ridge.create_trimesh_collision()
+	_build_distant_ridge_forest()
+
+func _create_distant_canopy_mesh() -> Mesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.18, 0.38, 0.16)
+	mat.roughness = 0.95
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_VERTEX
+	var foliage_tex = load("res://assets/environment/foliage/foliage_pine.png") as Texture2D
+	if foliage_tex:
+		mat.albedo_texture = foliage_tex
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+		mat.alpha_scissor_threshold = 0.28
+	st.set_material(mat)
+	
+	var angles := [0.0, PI / 3.0, 2.0 * PI / 3.0]
+	var w := 10.0
+	var h := 16.0
+	for a in angles:
+		var dir := Vector3(cos(a), 0, sin(a)) * w * 0.5
+		var p0 := -dir
+		var p1 := dir
+		var p2 := dir + Vector3(0, h, 0)
+		var p3 := -dir + Vector3(0, h, 0)
+		st.set_uv(Vector2(0, 1)); st.add_vertex(p0)
+		st.set_uv(Vector2(1, 1)); st.add_vertex(p1)
+		st.set_uv(Vector2(1, 0)); st.add_vertex(p2)
+		st.set_uv(Vector2(0, 1)); st.add_vertex(p0)
+		st.set_uv(Vector2(1, 0)); st.add_vertex(p2)
+		st.set_uv(Vector2(0, 0)); st.add_vertex(p3)
+	st.index()
+	st.generate_normals()
+	return st.commit()
+
+func _build_distant_ridge_forest() -> void:
+	var ridge_tree_transforms: Array[Transform3D] = []
+	var canopy_mesh := _create_distant_canopy_mesh()
+	const RIDGE_SAMPLES := 48000
+	for i in RIDGE_SAMPLES:
+		var angle := _rng.randf() * TAU
+		var radial := _rng.randf()
+		var r_dist := lerpf(1015.0, 2600.0, pow(radial, 0.75))
+		var dir := Vector2(cos(angle), sin(angle))
+		var norm_box := maxf(absf(dir.x), absf(dir.y))
+		var p := dir * (r_dist / norm_box)
+		var h := _ridge_height(p.x, p.y)
+		if h > 720.0:
+			continue
+		var sl := Vector2(
+			_ridge_height(p.x + 12.0, p.y) - _ridge_height(p.x - 12.0, p.y),
+			_ridge_height(p.x, p.y + 12.0) - _ridge_height(p.x, p.y - 12.0)
+		).length() / 24.0
+		if sl > 0.98:
+			continue
+		var dist_factor := clampf((r_dist - 1000.0) / 1600.0, 0.0, 1.0)
+		var size := _rng.randf_range(1.8, 3.6) * lerpf(1.0, 1.7, dist_factor)
+		var yaw := _rng.randf() * TAU
+		var basis := Basis(Vector3.UP, yaw).scaled(Vector3.ONE * size)
+		ridge_tree_transforms.append(Transform3D(basis, Vector3(p.x, h - 0.4, p.y)))
+	
+	if ridge_tree_transforms.size() > 0:
+		var node := _batch(canopy_mesh, ridge_tree_transforms, "DistantRidgeForestCanopy")
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func _build_water() -> void:
 	var st := SurfaceTool.new()
@@ -526,19 +621,64 @@ func _build_forest() -> void:
 	var grass_mesh_1 := GrassGen.generate_tuft_mesh(1)
 	var grass_material := ShaderMaterial.new()
 	grass_material.shader = load("res://shaders/grass.gdshader")
+	grass_material.set_shader_parameter("texture_albedo", load("res://assets/environment/grass/textures/grass_medium_01_diff_2k.jpg"))
+	grass_material.set_shader_parameter("texture_normal", load("res://assets/environment/grass/textures/grass_medium_01_nor_gl_2k.jpg"))
+	grass_material.set_shader_parameter("texture_arm", load("res://assets/environment/grass/textures/grass_medium_01_arm_2k.jpg"))
+	grass_material.set_shader_parameter("use_photographic_texture", true)
+	grass_material.set_shader_parameter("alpha_scissor_threshold", 0.35)
+	grass_material.set_shader_parameter("wind_speed", 2.4)
+	grass_material.set_shader_parameter("wind_strength", 0.36)
+	grass_material.set_shader_parameter("backlight_tint", Color(0.42, 0.58, 0.15))
+
+	var grass_gltf := (load("res://assets/environment/grass/grass_medium_01.gltf") as PackedScene).instantiate()
+	var g_mesh_small: Mesh = null
+	var g_mesh_mid: Mesh = null
+	var g_mesh_tall: Mesh = null
+	var mi_s := grass_gltf.find_child("grass_medium_01_small_a_LOD0", true, false) as MeshInstance3D
+	if mi_s: g_mesh_small = mi_s.mesh
+	var mi_m := grass_gltf.find_child("grass_medium_01_mid_a_LOD0", true, false) as MeshInstance3D
+	if mi_m: g_mesh_mid = mi_m.mesh
+	var mi_t := grass_gltf.find_child("grass_medium_01_tall_a_LOD0", true, false) as MeshInstance3D
+	if mi_t: g_mesh_tall = mi_t.mesh
+	grass_gltf.free()
 
 	# AAA Botanical Species / Races of trees:
 	# 1. Robles / Oaks: broadleaf ancient hardwoods with massive spreading crowns
 	# 2. Abedules / Birches: slender pale-bark trees with dark eye scars
-	# 3. Pinos / Pines: Scots/stone pines with armor-plated bark and umbrella canopy
+	# 3. Pinos / Pines: Scots/stone pines with armor-plated bark and umbrella canopy (3D Scanned GLB)
 	# 4. Eucaliptos / Eucalyptus: tall upright trees with peeling bark ribbons
-	# 5. Abetos / Firs: layered evergreen conifers with corrugated trunks
+	# 5. Abetos / Firs: layered evergreen conifers with corrugated trunks (3D Scanned GLB)
 	var species_types := ["oak", "eucalyptus", "birch", "pine", "fir"]
 	var species_meshes: Dictionary = {}
 	var species_transforms: Dictionary = {}
 	for sp in species_types:
-		species_meshes[sp] = []
 		species_transforms[sp] = [[], [], []]
+
+	# Photogrammetric 3D Scans for Conifers:
+	# Fir: 3 LODs of mature mountain fir
+	species_meshes["fir"] = [_tree_lods[0], _tree_lods[1], _tree_lods[2]]
+
+	# Pine: 3 LODs of Scots pine
+	var pine_lods := [
+		_asset_mesh("res://assets/environment/pine/pine_lod0.glb"),
+		_asset_mesh("res://assets/environment/pine/pine_lod1.glb"),
+		_asset_mesh("res://assets/environment/pine/pine_lod2.glb")
+	]
+	for p_lod in pine_lods:
+		var p_mesh := p_lod as ArrayMesh
+		for surface in p_mesh.get_surface_count():
+			var mat := p_mesh.surface_get_material(surface) as StandardMaterial3D
+			if mat:
+				if mat.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA:
+					mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+					mat.alpha_scissor_threshold = 0.25
+				mat.roughness = 0.92
+				mat.metallic = 0.0
+	species_meshes["pine"] = [pine_lods[0], pine_lods[1], pine_lods[2]]
+
+	# Deciduous broadleaf species with smooth botanical meshes:
+	for sp in ["oak", "birch", "eucalyptus"]:
+		species_meshes[sp] = []
 		for v in range(1, 4):
 			var p := "res://assets/environment/trees/tree_%s_var%d.res" % [sp, v]
 			species_meshes[sp].append(load(p))
@@ -546,24 +686,145 @@ func _build_forest() -> void:
 	var rocks: Array[Transform3D] = []
 	var grasses_0: Array[Transform3D] = []
 	var grasses_1: Array[Transform3D] = []
+	var grasses_hill: Array[Transform3D] = []
+	var grasses_valley: Array[Transform3D] = []
 
-	# Fill the entire world with trees, leaving only designated clearings:
-	# - Castle Courtyard & Fortress
-	# - Castle Gate approach
-	# - Alpine Lake & immediate shoreline glade
-	# - Sinuous River & stream beds
-	# - Natural sunny forest clearings / meadow glades
-	for i in 110000:
+	# Spatial Hash Grid: Guarantees strict distance separation between all trees
+	# ("También deben estar mas separados, para notar que son distintos")
+	var tree_grid: Dictionary = {}
+	var grid_cell_size: float = 16.0
+
+	var can_place_tree := func(pos_x: float, pos_z: float, min_d: float) -> bool:
+		var gx := int(floor(pos_x / grid_cell_size))
+		var gz := int(floor(pos_z / grid_cell_size))
+		var min_d_sq := min_d * min_d
+		var pt := Vector2(pos_x, pos_z)
+		for dx in range(-1, 2):
+			for dz in range(-1, 2):
+				var key = Vector2i(gx + dx, gz + dz)
+				if tree_grid.has(key):
+					var cell_pts: Array = tree_grid[key]
+					for other_pt in cell_pts:
+						if pt.distance_squared_to(other_pt) < min_d_sq:
+							return false
+		return true
+
+	var register_tree := func(pos_x: float, pos_z: float):
+		var gx := int(floor(pos_x / grid_cell_size))
+		var gz := int(floor(pos_z / grid_cell_size))
+		var key = Vector2i(gx, gz)
+		if not tree_grid.has(key):
+			tree_grid[key] = []
+		tree_grid[key].append(Vector2(pos_x, pos_z))
+
+	# Helper to instantiate a botanically distinct tree with 100% unique scaling, yaw, and tilt
+	var add_tree := func(sp: String, x: float, z: float, h: float, var_idx: int = -1):
+		var base_size := 1.0
+		match sp:
+			"oak":
+				base_size = _rng.randf_range(0.55, 0.85)
+			"birch":
+				base_size = _rng.randf_range(0.72, 1.05)
+			"pine":
+				base_size = _rng.randf_range(7.5, 11.0)
+			"eucalyptus":
+				base_size = _rng.randf_range(0.65, 0.95)
+			"fir":
+				base_size = _rng.randf_range(0.85, 1.25)
+		var sx := base_size * _rng.randf_range(0.90, 1.12)
+		var sy := base_size * _rng.randf_range(0.88, 1.15)
+		var sz := base_size * _rng.randf_range(0.90, 1.12)
+		var yaw := _rng.randf() * TAU
+		var tilt_angle := _rng.randf_range(0.015, 0.050)
+		var tilt_dir := _rng.randf() * TAU
+		var tilt_rot := Basis(Vector3(cos(tilt_dir), 0.0, sin(tilt_dir)).normalized(), tilt_angle)
+		var basis := (Basis(Vector3.UP, yaw) * tilt_rot).scaled(Vector3(sx, sy, sz))
+		var tree_xform := Transform3D(basis, Vector3(x, h - 0.06, z))
+		_tree_transforms.append(tree_xform)
+		var v_idx := var_idx if (var_idx >= 0 and var_idx < 3) else _rng.randi_range(0, 2)
+		species_transforms[sp][v_idx].append(tree_xform)
+		register_tree.call(x, z)
+
+	# 1. Spawn Valley in front of the nest ("antes habían arboles ahí reponlos")
+	# Stately, well-separated trees framing the view across the valley
+	for i in 250:
+		var x := _rng.randf_range(110.0, 235.0)
+		var z := _rng.randf_range(45.0, 200.0)
+		# Clear zone for player spawn and direct camera vista to nest
+		if (x > 195.0 and x < 225.0 and z > 105.0 and z < 135.0):
+			continue
+		var h := ground_height(x, z)
+		if h < WATER_LEVEL + 0.6:
+			continue
+		if can_place_tree.call(x, z, 18.0):
+			var r_sp := _rng.randf()
+			var sp_v: String
+			if r_sp < 0.38:
+				sp_v = "birch"
+			elif r_sp < 0.65:
+				sp_v = "pine"
+			elif r_sp < 0.85:
+				sp_v = "oak"
+			else:
+				sp_v = "fir"
+			add_tree.call(sp_v, x, z, h)
+
+	# 2. Gate Approach: Framed avenue with wide central walking corridor clear
+	for i in 120:
+		var x := _rng.randf_range(230.0, 370.0)
+		var z := _rng.randf_range(200.0, 380.0)
+		if absf(x - 300.0) < 15.0:
+			continue
+		var h := ground_height(x, z)
+		if h < 2.0:
+			continue
+		if can_place_tree.call(x, z, 18.0):
+			var sp_g := "oak" if _rng.randf() < 0.55 else "pine"
+			add_tree.call(sp_g, x, z, h)
+
+	# 3. Riparian Conifers and River Birches along stream banks (Fotos 2 & 3)
+	for i in 200:
+		var z_s := _rng.randf_range(-230.0, 310.0)
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var x_s := stream_west_center(z_s) + side * _rng.randf_range(16.0, 38.0)
+		var h_s := ground_height(x_s, z_s)
+		if h_s > 1.2 and can_place_tree.call(x_s, z_s, 16.0):
+			var sp_s := "birch" if _rng.randf() < 0.55 else "fir"
+			add_tree.call(sp_s, x_s, z_s, h_s)
+
+	for i in 180:
+		var z_se := _rng.randf_range(-340.0, 170.0)
+		var side_e := -1.0 if i % 2 == 0 else 1.0
+		var x_se := stream_east_center(z_se) + side_e * _rng.randf_range(15.0, 36.0)
+		var h_se := ground_height(x_se, z_se)
+		if h_se > 1.2 and can_place_tree.call(x_se, z_se, 16.0):
+			var sp_se := "pine" if _rng.randf() < 0.5 else "birch"
+			add_tree.call(sp_se, x_se, z_se, h_se)
+
+	# 4. Global World Forest Sampling across the island:
+	# Respects:
+	# - Fortress and Nest clear zone (radius 36m around nest)
+	# - Castle Gate approach road (15m width)
+	# - Lake clearing & shore glade (Foto 4)
+	# - Sinuous Rivers & stream channels
+	# - Rolling hills ("pocas y mucho mas chicas", "no deben estar infestadas de arboles deben tener hierba y ser verdes"):
+	#   Trees on hills are widely spaced (min_d >= 22m, 28% density)
+	for i in 55000:
 		var x := _rng.randf_range(-965.0, 965.0)
 		var z := _rng.randf_range(-965.0, 965.0)
 
-		# 1. Protected fortress & gate approach (clear space)
-		if absf(x - 300.0) < 115.0 and absf(z - 120.0) < 110.0:
-			continue
-		if absf(x - 300.0) < 35.0 and z > 120.0 and z < 430.0:
+		var h := ground_height(x, z)
+		if h < WATER_LEVEL + 0.5:
 			continue
 
-		# 2. Lake clearing: open water, rocky shore and sunlit alpine glade (Foto 4)
+		# Fortress & Nest protected space
+		var dist_to_nest := Vector2(x - 300.0, z - 120.0).length()
+		if dist_to_nest < 36.0 or (absf(x - 300.0) < 62.0 and absf(z - 120.0) < 52.0):
+			continue
+		if absf(x - 300.0) < 14.0 and z > 180.0 and z < 360.0:
+			continue
+
+		# Lake clearing: open water and grassy glade (Foto 4)
 		var lake_dist := (Vector2(x, z) - LAKE_CENTER).length()
 		if lake_dist < LAKE_CLEARING_RADIUS:
 			var h_cl := ground_height(x, z)
@@ -576,33 +837,37 @@ func _build_forest() -> void:
 					grasses_1.append(t_cl)
 			continue
 
-		# 3. Main river and riachuelos water channels (clear space)
+		# Water channels
 		if is_water_at(Vector3(x, 0, z)) or _is_in_stream(x, z):
 			continue
 
-		# 4. Natural forest clearings / meadow glades ("dejando algunos espacios claramente")
+		# Natural valley clearings
 		var glade_val := _noise.get_noise_2d(x * 0.005 + 520.0, z * 0.005 - 280.0)
-		if glade_val > 0.42:
-			var h_gl := ground_height(x, z)
-			if h_gl > WATER_LEVEL + 0.3 and (grasses_0.size() + grasses_1.size()) < 18000:
-				var t_gl := Transform3D(Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * _rng.randf_range(0.70, 1.35)), Vector3(x, h_gl, z))
+		if glade_val > 0.42 and h < 7.5:
+			if (grasses_0.size() + grasses_1.size()) < 18000:
+				var t_gl := Transform3D(Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * _rng.randf_range(0.70, 1.35)), Vector3(x, h, z))
 				if grasses_0.size() <= grasses_1.size():
 					grasses_0.append(t_gl)
 				else:
 					grasses_1.append(t_gl)
 			continue
 
-		var h := ground_height(x, z)
-		if h < WATER_LEVEL + 0.5:
-			continue
 		var slope := Vector2(ground_height(x + 5, z) - ground_height(x - 5, z), ground_height(x, z + 5) - ground_height(x, z - 5)).length() / 10.0
-		if slope > 0.65:
+		if slope > 0.88:
 			continue
 
-		if _tree_transforms.size() >= 16500:
+		# Rolling hills rule ("las colinas no deben estar infestadas de árboles deben tener hierba y ser verdes"):
+		# On hills (h > 12.0), low density and wide spacing
+		var req_dist: float = 16.0
+		if h > 12.0:
+			if _rng.randf() > 0.28:
+				continue
+			req_dist = 22.0
+
+		if not can_place_tree.call(x, z, req_dist):
 			continue
 
-		# Ecological tree race / species determination:
+		# Ecological biome determination
 		var dist_to_west := absf(x - stream_west_center(z)) if (z >= -260.0 and z <= 350.0) else 999.0
 		var dist_to_east := absf(x - stream_east_center(z)) if (z >= -370.0 and z <= 210.0) else 999.0
 		var dist_to_stream := minf(dist_to_west, dist_to_east)
@@ -610,9 +875,7 @@ func _build_forest() -> void:
 		var biome_zone := _noise.get_noise_2d(x * 0.003 - 350.0, z * 0.003 + 450.0)
 
 		var chosen_sp := "fir"
-
 		if dist_to_stream < 42.0 or dist_to_river < 52.0:
-			# Riparian wetland & riverbank: Luminous Silver Birch and riparian trees
 			var r_pick := _rng.randf()
 			if r_pick < 0.55:
 				chosen_sp = "birch"
@@ -621,7 +884,6 @@ func _build_forest() -> void:
 			else:
 				chosen_sp = "oak"
 		elif h > 42.0 or slope > 0.38:
-			# Sunlit ridges & rocky crests: Mediterranean Stone Pine and mountain Firs
 			var r_pick := _rng.randf()
 			if r_pick < 0.65:
 				chosen_sp = "pine"
@@ -630,7 +892,6 @@ func _build_forest() -> void:
 			else:
 				chosen_sp = "birch"
 		elif biome_zone < -0.15:
-			# Ancient Oak Forest (Robledal): Giant mushroom/dome crowns and thick gnarled boughs
 			var r_pick := _rng.randf()
 			if r_pick < 0.68:
 				chosen_sp = "oak"
@@ -639,7 +900,6 @@ func _build_forest() -> void:
 			else:
 				chosen_sp = "pine"
 		elif biome_zone > 0.15:
-			# Eucalyptus Glades (Eucaliptal): Sinuous weeping tall trees with peeling ribbons
 			var r_pick := _rng.randf()
 			if r_pick < 0.65:
 				chosen_sp = "eucalyptus"
@@ -648,7 +908,6 @@ func _build_forest() -> void:
 			else:
 				chosen_sp = "oak"
 		else:
-			# Balanced mixed temperate woodland (Oaks, Pines, Eucalyptus, Birches, Firs)
 			var r_pick := _rng.randf()
 			if r_pick < 0.25:
 				chosen_sp = "oak"
@@ -661,106 +920,12 @@ func _build_forest() -> void:
 			else:
 				chosen_sp = "fir"
 
-		# Harmonious botanical proportions per species with 100% unique scaling, yaw, and tilt
-		var base_size := 1.0
-		match chosen_sp:
-			"oak":
-				base_size = _rng.randf_range(0.46, 0.78)
-			"birch":
-				base_size = _rng.randf_range(0.72, 1.25)
-			"pine":
-				base_size = _rng.randf_range(0.65, 1.15)
-			"eucalyptus":
-				base_size = _rng.randf_range(0.55, 0.95)
-			"fir":
-				base_size = _rng.randf_range(0.70, 1.20)
+		add_tree.call(chosen_sp, x, z, h)
 
-		var sx := base_size * _rng.randf_range(0.86, 1.15)
-		var sy := base_size * _rng.randf_range(0.82, 1.25)
-		var sz := base_size * _rng.randf_range(0.86, 1.15)
-		var yaw := _rng.randf() * TAU
-		var tilt_angle := _rng.randf_range(0.015, 0.055)
-		var tilt_dir := _rng.randf() * TAU
-		var tilt_rot := Basis(Vector3(cos(tilt_dir), 0.0, sin(tilt_dir)), tilt_angle)
-		var basis := (Basis(Vector3.UP, yaw) * tilt_rot).scaled(Vector3(sx, sy, sz))
-		var tree_xform := Transform3D(basis, Vector3(x, h - 0.06, z))
-		_tree_transforms.append(tree_xform)
-
-		var var_idx := _rng.randi_range(0, 2)
-		species_transforms[chosen_sp][var_idx].append(tree_xform)
-
-		if i % 65 == 0 and h > 0.5 and rocks.size() < 300:
+		if i % 85 == 0 and h > 0.5 and rocks.size() < 300:
 			var r_scale := Vector3(_rng.randf_range(0.9, 2.7), _rng.randf_range(0.6, 2.4), _rng.randf_range(0.9, 2.7))
 			var r_rot := Basis.from_euler(Vector3(_rng.randf() * TAU, _rng.randf() * TAU, _rng.randf() * TAU))
 			rocks.append(Transform3D(r_rot.scaled(r_scale), Vector3(x, h - 0.12, z)))
-
-	# Coherent mixed-age stands frame the approach, with broad walking lanes clear.
-	for z_index in 14:
-		for x_index in 22:
-			var x := 95.0 + x_index * 18.0 + _rng.randf_range(-6.0, 6.0)
-			var z := 255.0 + z_index * 19.0 + _rng.randf_range(-7.0, 7.0)
-			if absf(x - 300.0) < 39.0:
-				continue
-			var h := ground_height(x, z)
-			var slope := Vector2(ground_height(x + 5, z) - ground_height(x - 5, z), ground_height(x, z + 5) - ground_height(x, z - 5)).length() / 10.0
-			if h < 3.0 or h > 175.0 or slope > 0.60:
-				continue
-			var size := _rng.randf_range(1.0, 1.75)
-			var sx := size * _rng.randf_range(0.88, 1.14)
-			var sy := size * _rng.randf_range(0.85, 1.25)
-			var sz := size * _rng.randf_range(0.88, 1.14)
-			var yaw := _rng.randf() * TAU
-			var tilt_angle := _rng.randf_range(0.015, 0.055)
-			var tilt_dir := _rng.randf() * TAU
-			var tilt_rot := Basis(Vector3(cos(tilt_dir), 0.0, sin(tilt_dir)), tilt_angle)
-			var basis := (Basis(Vector3.UP, yaw) * tilt_rot).scaled(Vector3(sx, sy, sz))
-			var gate_tree := Transform3D(basis, Vector3(x, h - 0.06, z))
-			_tree_transforms.append(gate_tree)
-			var gate_sp = "oak" if _rng.randf() < 0.6 else "pine"
-			species_transforms[gate_sp][_rng.randi_range(0, 2)].append(gate_tree)
-
-	# Dense riparian conifers along the forest streams (Fotos 2 & 3 y Video)
-	for i in 180:
-		var z_s := _rng.randf_range(-230.0, 310.0)
-		var side := -1.0 if i % 2 == 0 else 1.0
-		var x_s := stream_west_center(z_s) + side * _rng.randf_range(16.0, 38.0)
-		var h_s := ground_height(x_s, z_s)
-		var sl := Vector2(ground_height(x_s + 4, z_s) - ground_height(x_s - 4, z_s), ground_height(x_s, z_s + 4) - ground_height(x_s, z_s - 4)).length() / 8.0
-		if h_s > 1.2 and sl < 0.60:
-			var size := _rng.randf_range(0.95, 1.85)
-			var sx := size * _rng.randf_range(0.86, 1.15)
-			var sy := size * _rng.randf_range(0.85, 1.25)
-			var sz := size * _rng.randf_range(0.86, 1.15)
-			var yaw := _rng.randf() * TAU
-			var tilt_angle := _rng.randf_range(0.02, 0.07)
-			var tilt_dir := atan2(z_s, x_s - stream_west_center(z_s)) + _rng.randf_range(-0.5, 0.5)
-			var tilt_rot := Basis(Vector3(cos(tilt_dir), 0.0, sin(tilt_dir)), tilt_angle)
-			var basis := (Basis(Vector3.UP, yaw) * tilt_rot).scaled(Vector3(sx, sy, sz))
-			var str_tree := Transform3D(basis, Vector3(x_s, h_s - 0.06, z_s))
-			_tree_transforms.append(str_tree)
-			var sw_sp = "birch" if _rng.randf() < 0.55 else "fir"
-			species_transforms[sw_sp][_rng.randi_range(0, 2)].append(str_tree)
-
-	for i in 140:
-		var z_se := _rng.randf_range(-340.0, 170.0)
-		var side_e := -1.0 if i % 2 == 0 else 1.0
-		var x_se := stream_east_center(z_se) + side_e * _rng.randf_range(15.0, 36.0)
-		var h_se := ground_height(x_se, z_se)
-		var sl_e := Vector2(ground_height(x_se + 4, z_se) - ground_height(x_se - 4, z_se), ground_height(x_se, z_se + 4) - ground_height(x_se, z_se - 4)).length() / 8.0
-		if h_se > 1.2 and sl_e < 0.60:
-			var size := _rng.randf_range(0.95, 1.80)
-			var sx := size * _rng.randf_range(0.86, 1.15)
-			var sy := size * _rng.randf_range(0.85, 1.25)
-			var sz := size * _rng.randf_range(0.86, 1.15)
-			var yaw := _rng.randf() * TAU
-			var tilt_angle := _rng.randf_range(0.02, 0.07)
-			var tilt_dir := _rng.randf() * TAU
-			var tilt_rot := Basis(Vector3(cos(tilt_dir), 0.0, sin(tilt_dir)), tilt_angle)
-			var basis := (Basis(Vector3.UP, yaw) * tilt_rot).scaled(Vector3(sx, sy, sz))
-			var str_tree_e := Transform3D(basis, Vector3(x_se, h_se - 0.06, z_se))
-			_tree_transforms.append(str_tree_e)
-			var se_sp = "pine" if _rng.randf() < 0.5 else "birch"
-			species_transforms[se_sp][_rng.randi_range(0, 2)].append(str_tree_e)
 
 	# Batch the 15 botanical tree species variants
 	for sp in species_types:
@@ -769,8 +934,8 @@ func _build_forest() -> void:
 				var node := _batch(species_meshes[sp][v], species_transforms[sp][v], "Tree_%s_v%d" % [sp, v])
 				# Optimize for Intel HD 620 GPU: shadows off on bulk instances to avoid TDR
 				node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-				node.visibility_range_end = 420.0
-				node.visibility_range_end_margin = 50.0
+				node.visibility_range_end = 1600.0
+				node.visibility_range_end_margin = 150.0
 
 	# Meadow tufts along river terraces and valley meadows
 	for i in 1200:
@@ -833,14 +998,52 @@ func _build_forest() -> void:
 				_forest_nodes.append(node)
 	_update_forest_lods()
 	_batch(rock_mesh, rocks, "ScatteredBoulders")
+	# Dense 3D grass blade covering on the hill behind the nest ("cubierta de brisnas de pasto que se muevan tengan forma y textura y parezcan reales")
+	for i in 6500:
+		var x := _rng.randf_range(370.0, 520.0)
+		var z := _rng.randf_range(50.0, 190.0)
+		var h := ground_height(x, z)
+		if h >= 22.0:
+			var s := _rng.randf_range(1.15, 2.25)
+			var yaw := _rng.randf() * TAU
+			var tilt_angle := _rng.randf_range(0.02, 0.08)
+			var tilt_dir := _rng.randf() * TAU
+			var tilt_rot := Basis(Vector3(cos(tilt_dir), 0.0, sin(tilt_dir)).normalized(), tilt_angle)
+			var b := (Basis(Vector3.UP, yaw) * tilt_rot).scaled(Vector3.ONE * s)
+			grasses_hill.append(Transform3D(b, Vector3(x, h - 0.03, z)))
+
+	# Dense 3D grass blade covering in the valley in front of the nest
+	for i in 5500:
+		var x := _rng.randf_range(105.0, 245.0)
+		var z := _rng.randf_range(40.0, 205.0)
+		var h := ground_height(x, z)
+		if h > WATER_LEVEL + 0.3:
+			var s := _rng.randf_range(1.0, 2.1)
+			var yaw := _rng.randf() * TAU
+			var b := Basis(Vector3.UP, yaw).scaled(Vector3.ONE * s)
+			grasses_valley.append(Transform3D(b, Vector3(x, h - 0.03, z)))
+
 	var grass_0 := _batch(grass_mesh_0, grasses_0, "PhotographicMeadowTufts", grass_material)
-	grass_0.visibility_range_end = 220.0
+	grass_0.visibility_range_end = 240.0
 	grass_0.visibility_range_end_margin = 40.0
 	grass_0.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var grass_1 := _batch(grass_mesh_1, grasses_1, "PhotographicMeadowTufts_Wild", grass_material)
-	grass_1.visibility_range_end = 220.0
+	grass_1.visibility_range_end = 240.0
 	grass_1.visibility_range_end_margin = 40.0
 	grass_1.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+	var hill_mesh: Mesh = g_mesh_tall if g_mesh_tall else grass_mesh_1
+	var grass_hill := _batch(hill_mesh, grasses_hill, "HillBehindNest_GrassBlades", grass_material)
+	grass_hill.visibility_range_end = 280.0
+	grass_hill.visibility_range_end_margin = 40.0
+	grass_hill.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+	var valley_mesh: Mesh = g_mesh_mid if g_mesh_mid else grass_mesh_0
+	var grass_valley := _batch(valley_mesh, grasses_valley, "ValleyNest_GrassBlades", grass_material)
+	grass_valley.visibility_range_end = 280.0
+	grass_valley.visibility_range_end_margin = 40.0
+	grass_valley.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
 	# Scanned eroded formations visibly anchor the river and mountain feet.
 	var scan := _asset_mesh("res://assets/environment/rock/rock_lod0.glb")
 	for data in [Vector4(138, -160, 17, 0.6), Vector4(-138, 220, 13, 1.5), Vector4(550, -100, 20, 2.3), Vector4(-590, -420, 27, 0.2), Vector4(790, 300, 34, 1.1)]:
@@ -860,19 +1063,22 @@ func _build_forest() -> void:
 			if body is StaticBody3D:
 				body.collision_layer = 2
 				body.add_to_group("scenery_obstacle")
+
+	# Eliminada la pared atrás del nido ("elimina o achica esa pared que ahí atras del nido, debe ser una colina")
+	# El terreno ahora es una suave colina ondulada y este nodo se conserva encogido al mínimo sin colisión para compatibilidad
 	var cliff := MeshInstance3D.new()
 	cliff.name = "GithubNamaqualandCliffScan"
 	cliff.mesh = _asset_mesh("res://assets/environment/github_cliff.glb")
 	cliff.position = Vector3(462, ground_height(462, 145) - 1.4, 145)
 	cliff.rotation.y = -PI * 0.5
-	cliff.scale = Vector3.ONE * 4.0
+	cliff.scale = Vector3.ONE * 0.001
+	cliff.visible = false
 	add_child(cliff)
 	cliff.create_trimesh_collision()
 	for body in cliff.get_children():
 		if body is StaticBody3D:
-			body.collision_layer = 2
+			body.collision_layer = 0
 			body.collision_mask = 0
-			body.add_to_group("scenery_obstacle")
 	print("LANDSCAPE mature fir, grass, limestone; ", _tree_transforms.size(), " trees. Courtyard ", ARENA_CENTER)
 
 func _process(delta: float) -> void:
@@ -882,7 +1088,7 @@ func _process(delta: float) -> void:
 		_update_forest_lods()
 
 func _update_forest_lods() -> void:
-	if _forest_nodes.is_empty():
+	if _forest_nodes.is_empty() or _mature_fir_transforms.is_empty():
 		return
 	var camera := get_viewport().get_camera_3d()
 	var viewer := to_local(camera.global_position) if camera else Vector3(300, 100, 350)
@@ -921,11 +1127,11 @@ func _setup_atmosphere() -> void:
 	var sun := get_parent().get_node_or_null("DirectionalLight3D") as DirectionalLight3D
 	if sun:
 		sun.rotation_degrees = Vector3(-39.0, -38.0, 0)
-		sun.light_color = Color(1.0, 0.95, 0.85)
-		sun.light_energy = 1.25
-		sun.light_angular_distance = 0.55
+		sun.light_color = Color(1.0, 0.96, 0.88)
+		sun.light_energy = 1.32
+		sun.light_angular_distance = 0.65
 		sun.shadow_enabled = true
-		sun.directional_shadow_max_distance = 360.0
+		sun.directional_shadow_max_distance = 420.0
 		sun.directional_shadow_fade_start = 0.85
 	if world and world.environment:
 		var env := world.environment
@@ -935,19 +1141,21 @@ func _setup_atmosphere() -> void:
 			sky_material.set_shader_parameter("sun_direction", sun.global_basis.z)
 		var sky := Sky.new()
 		sky.sky_material = sky_material
-		sky.radiance_size = Sky.RADIANCE_SIZE_256
+		sky.radiance_size = Sky.RADIANCE_SIZE_1024
 		env.sky = sky
 		env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-		env.ambient_light_energy = 0.5
+		env.ambient_light_energy = 0.55
 		env.fog_enabled = true
-		env.fog_density = 0.00028
-		env.fog_sky_affect = 0.16
-		env.fog_light_color = Color(0.69, 0.76, 0.77)
-		env.fog_sun_scatter = 0.3
+		env.fog_density = 0.00022
+		env.fog_sky_affect = 0.18
+		# Azul atmosferico de dispersion Rayleigh para cordilleras y colinas lejanas (Foto de referencia)
+		env.fog_light_color = Color(0.70, 0.82, 0.94)
+		env.fog_sun_scatter = 0.35
 		env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 		env.ssao_enabled = true
-		env.ssao_radius = 1.6
-		env.ssao_intensity = 1.2
+		env.ssao_radius = 1.8
+		env.ssao_intensity = 1.35
 		env.ssil_enabled = true
-		env.ssil_radius = 3.0
-		env.ssil_intensity = 0.35
+		env.ssil_radius = 3.2
+		env.ssil_intensity = 0.40
+

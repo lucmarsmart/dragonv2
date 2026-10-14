@@ -294,6 +294,7 @@ enum LocomotionState {
 @export var model_pos_offset: Vector3 = Vector3.ZERO
 @export var auto_calibrate_orientation: bool = true
 @export var reverse_speed: float = 6.0         # Velocidad máxima de marcha atrás (S mantenido, m/s)
+@export var model_scale: float = 1.6           # Escala colosal del dragón (Dragón Cuadrúpedo Colosal)
 
 # Base de orientación calculada a partir de los huesos (nariz -> -Z, lomo -> +Y)
 var calib_basis: Basis = Basis.from_euler(Vector3(0.0, deg_to_rad(-25.0), 0.0))
@@ -430,10 +431,15 @@ func _ready() -> void:
 	
 	if visual_root:
 		visual_root.position = model_pos_offset
-		visual_root.basis = _offset_basis() * calib_basis
+		visual_root.basis = (_offset_basis() * calib_basis).scaled(Vector3.ONE * model_scale)
 	
+	breath = get_node_or_null("DragonBreath")
 	_find_and_setup_skeleton(self)
 	_find_and_setup_anim_player(self)
+	
+	var skin_manager = find_child("DragonModel", true, false)
+	if skin_manager and skin_manager.has_method("apply_materials"):
+		skin_manager.apply_materials()
 	
 	floor_snap_length = 1.2
 	floor_max_angle = deg_to_rad(50.0)
@@ -905,6 +911,29 @@ func _calculate_flight_physics(delta: float) -> void:
 		# Thrust follows body pitch instead of adding a second full climb velocity.
 		wanted_velocity.y = maxf(wanted_velocity.y, climb_vertical_rate * climb_blend)
 
+	# Biomecánica de vuelo pulsado acoplado al aleteo real (Sophoria Academy / Jonathan Symmonds)
+	# Cada ciclo de aleteo dura 1.5s (2 batidos en el clip de 3.0s).
+	# En el downstroke (alas bajando) el dragón produce un empuje de masa con elevación y aceleración.
+	if is_flapping and locomotion_state == LocomotionState.FLYING and current_mode != FlightMode.GLIDE and current_mode != FlightMode.DIVE:
+		var flap_time: float = anim_player.current_animation_position if (anim_player and anim_player.is_playing()) else 0.0
+		var flap_phase: float = fposmod(flap_time, 1.5) / 1.5 * TAU
+		if flap_phase < PI:
+			# Downstroke activo: elevación vertical y aceleración horizontal
+			var downstroke_power := sin(flap_phase)
+			wanted_velocity.y += downstroke_power * (3.4 if current_mode == FlightMode.CLIMB else 2.2)
+			wanted_velocity += forward_dir * (downstroke_power * 2.8)
+		else:
+			# Upstroke de recobro: relajación aerodinámica y leve descenso por gravedad
+			var upstroke_sink := sin(flap_phase - PI) * 0.9
+			wanted_velocity.y -= upstroke_sink
+
+	# Actualización de deformación aerodinámica de membranas alares vivas (Dragontwin)
+	var dragon_model = visual_root.get_node_or_null("DragonModel") if visual_root else null
+	if dragon_model and dragon_model.has_method("update_aero_params"):
+		var aero_billow := clampf((current_speed / cruise_speed) * 0.8 + (0.35 if is_diving else 0.0), 0.0, 1.0)
+		var aero_flutter := clampf((current_speed - 22.0) / 16.0, 0.0, 1.0)
+		dragon_model.update_aero_params(current_speed, aero_billow, aero_flutter)
+
 	# Dinámica en agua: permite sumergirse y nadar; flotabilidad suave solo si no está en picada activa
 	if _is_in_water():
 		if not is_diving:
@@ -920,6 +949,7 @@ func _calculate_flight_physics(delta: float) -> void:
 	sway_vel_x += spring_force_x * delta
 	sway_offset_x += sway_vel_x * delta
 	sway_offset_x = clamp(sway_offset_x, -1.8, 1.8)
+
 
 # --- Respuesta Físico-Colisional con el Terreno ---
 func _handle_terrain_collisions(delta: float, pre_slide_vel: Vector3 = Vector3.ZERO) -> void:
@@ -1501,6 +1531,10 @@ func _cache_bone_relative_axes(b_idx: int) -> void:
 func _process(delta: float) -> void:
 	tail_wave_time += delta * (3.8 if is_flapping else 1.6)
 	
+	var skin_manager = find_child("DragonModel", true, false)
+	if skin_manager and skin_manager.has_method("update_aero_params"):
+		skin_manager.update_aero_params(current_speed, dive_fold_blend, 1.0 - glide_blend)
+	
 	var heave: float = 0.0
 	var pitch_surge: float = 0.0
 	var flight_factor: float = clamp(1.0 - ground_blend, 0.0, 1.0)
@@ -1521,7 +1555,7 @@ func _process(delta: float) -> void:
 		var lateral_sway = sway_offset_x * 0.30 * flight_factor + sin(walk_cycle_phase) * 0.14 * step_weight * ground_blend
 		var ground_pitch_bob = -sin(walk_cycle_phase * 2.0) * deg_to_rad(2.6) * step_weight * ground_blend
 		var surge_basis = Basis.from_euler(Vector3(pitch_surge + ground_pitch_bob, 0.0, climb_roll_wobble))
-		visual_root.basis = surge_basis * _offset_basis() * calib_basis
+		visual_root.basis = (surge_basis * _offset_basis() * calib_basis).scaled(Vector3.ONE * model_scale)
 		
 		if skeleton and bone_pelvis != -1:
 			# Centrar suavemente el núcleo del cuerpo sobre el CharacterBody3D sin interferir en los virajes
@@ -1560,7 +1594,7 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	var turn = smoothed_turn_rate
 	var flight_factor = clamp(1.0 - ground_blend, 0.0, 1.0)
 	
-	# 1. PELVIS / CADERA (Oscilación rítmica de transferencia de peso en marcha terrestre)
+	# 1. PELVIS / CADERA (Oscilación rítmica de transferencia de peso en marcha terrestre y elevación en aleteo)
 	if bone_pelvis != -1 and ground_blend > 0.01:
 		var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
 		var cycle := walk_cycle_phase
@@ -1570,6 +1604,19 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 		var roll_axis = bone_roll_axes[bone_pelvis] if bone_roll_axes.has(bone_pelvis) else Vector3.FORWARD
 		pel_rot = Quaternion(roll_axis, pel_roll) * pel_rot
 		sk.set_bone_pose_rotation(bone_pelvis, pel_rot * sk.get_bone_pose_rotation(bone_pelvis))
+		
+		# Traslación pélvica tridimensional de masa (heave y sway de cuadrúpedo)
+		var pel_heave = -absf(sin(cycle)) * 8.5 * step_weight * ground_blend
+		var pel_sway = sin(cycle) * 11.0 * step_weight * ground_blend
+		var cur_pos = sk.get_bone_pose_position(bone_pelvis)
+		sk.set_bone_pose_position(bone_pelvis, cur_pos + Vector3(pel_sway, pel_heave, 0.0))
+	elif bone_pelvis != -1 and flight_factor > 0.01:
+		var flap_time: float = anim_player.current_animation_position if (anim_player and anim_player.is_playing()) else 0.0
+		var flap_phase: float = fposmod(flap_time, 1.5) / 1.5 * TAU
+		var fly_heave = (sin(flap_phase) * 10.0) * flight_factor * (1.0 - glide_blend) * (1.0 - dive_fold_blend)
+		var cur_pos = sk.get_bone_pose_position(bone_pelvis)
+		sk.set_bone_pose_position(bone_pelvis, cur_pos + Vector3(0.0, fly_heave, 0.0))
+
 
 	# 2. COLUMNA DORSAL (Arco orgánico en virajes aéreos + Ondulación serpentina en S con onda viajera en tierra)
 	var spine_weights = [0.08, 0.14, 0.18]
