@@ -21,6 +21,9 @@ var _hill_noise := FastNoiseLite.new()
 var _terrain_material: ShaderMaterial
 const GrassGen = preload("res://scripts/grass_generator.gd")
 var _tree_transforms: Array[Transform3D] = []
+# Especie y variante de cada árbol (paralelos a _tree_transforms) para medir su malla real.
+var _tree_species: Array[String] = []
+var _tree_variants: Array[int] = []
 var _mature_fir_transforms: Array[Transform3D] = []
 var _tree_lods: Array = []
 var _forest_nodes: Array[MultiMeshInstance3D] = []
@@ -742,6 +745,8 @@ func _build_forest() -> void:
 		var tree_xform := Transform3D(basis, Vector3(x, h - 0.06, z))
 		_tree_transforms.append(tree_xform)
 		var v_idx := var_idx if (var_idx >= 0 and var_idx < 3) else _rng.randi_range(0, 2)
+		_tree_species.append(sp)
+		_tree_variants.append(v_idx)
 		species_transforms[sp][v_idx].append(tree_xform)
 		register_tree.call(x, z)
 

@@ -7,6 +7,7 @@ const ROCK_BUDGET := 64
 var landscape: Node3D
 var dragon: CharacterBody3D
 var trees: Array = []
+var tree_sizes: Array[Vector2] = [] # (radio de tronco, alto) en unidades de malla, por árbol
 var rock_transforms: Array[Transform3D] = []
 var rock_vertices: PackedVector3Array
 var active: Dictionary = {}
@@ -18,6 +19,7 @@ func _ready() -> void:
 	if not landscape:
 		return
 	trees = landscape.get("_tree_transforms")
+	_measure_tree_meshes()
 	var rocks := landscape.get_node_or_null("ScatteredBoulders") as MultiMeshInstance3D
 	if not rocks:
 		return
@@ -66,8 +68,9 @@ func _make_body(t: Transform3D, kind: String, label: String) -> StaticBody3D:
 	var size := t.basis.get_scale()
 	if kind == "tree":
 		var shape := CylinderShape3D.new()
-		shape.radius = 0.45 * maxf(size.x,size.z)
-		shape.height = 18.96 * size.y
+		var mesh_size: Vector2 = tree_sizes[int(label.get_slice("_", 1))]
+		shape.radius = maxf(0.25, mesh_size.x * maxf(size.x,size.z))
+		shape.height = maxf(1.0, mesh_size.y * size.y)
 		col.shape = shape
 		col.position.y = shape.height / 2.0
 	else:
@@ -82,3 +85,22 @@ func _make_body(t: Transform3D, kind: String, label: String) -> StaticBody3D:
 	add_child(body)
 	body.global_transform = landscape.global_transform * Transform3D(t.basis.orthonormalized(), t.origin)
 	return body
+
+# Cada especie tiene su malla: el alto de colisión sale de su AABB real, no de una constante.
+# Antes 18.96 x escala del pino (malla de 1.3 m) levantaba troncos invisibles de ~180 m.
+func _measure_tree_meshes() -> void:
+	tree_sizes.clear()
+	var species: Array = landscape.get("_tree_species") if "_tree_species" in landscape else []
+	var variants: Array = landscape.get("_tree_variants") if "_tree_variants" in landscape else []
+	var cache := {}
+	for i in trees.size():
+		var key := "Tree_%s_v%d" % [species[i], variants[i]] if i < species.size() and i < variants.size() else ""
+		if not cache.has(key):
+			var mm := landscape.get_node_or_null(key) as MultiMeshInstance3D if key != "" else null
+			if mm and mm.multimesh and mm.multimesh.mesh:
+				var aabb := mm.multimesh.mesh.get_aabb()
+				# Tronco ~7 % del ancho de copa (abeto: 0.46 m sobre 6.6 m de copa).
+				cache[key] = Vector2(0.07 * maxf(aabb.size.x, aabb.size.z), aabb.end.y)
+			else:
+				cache[key] = Vector2(0.45, 18.96)
+		tree_sizes.append(cache[key])

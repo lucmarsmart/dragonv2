@@ -2,7 +2,9 @@ extends RefCounted
 # World-space planted feet; FABRIK preserves lengths and the published rear articulation branch.
 const Probe = preload("res://scripts/dragon_pose_probe.gd")
 const Biomechanics = preload("res://scripts/dragon_biomechanics.gd")
-const NOMINAL_SWING_DURATION: float = 0.36
+# Fracción del ciclo en el aire por pata: 0.24 (duty factor ~0.76 de cuadrúpedo pesado)
+# permite que las cuatro patas pasen en secuencia dentro de un ciclo. Con 0.36 sumaban 1.44.
+const NOMINAL_SWING_DURATION: float = 0.24
 var claw_probe = Probe.new()
 var limbs: Array[Dictionary] = []
 var debug_contacts: Array[Vector3] = []

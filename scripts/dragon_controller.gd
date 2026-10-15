@@ -249,8 +249,8 @@ enum LocomotionState {
 
 # --- Parámetros de Vuelo y Físicas ---
 @export_group("Locomoción Terrestre y Aterrizaje")
-@export var walk_speed: float = 7.5             # Velocidad de marcha en tierra (m/s)
-@export var sprint_speed: float = 14.0          # Velocidad de trote/carrera en tierra (Shift, m/s)
+@export var walk_speed: float = 4.8             # Marcha pesada: patas de ~2.5 m (Froude ~0.9) en vez de galope a 7.5
+@export var sprint_speed: float = 8.0           # Trote/carrera en tierra (Shift, m/s)
 @export var ground_turn_speed: float = 0.7       # Tasa de giro horizontal en tierra (rad/s)
 @export var ground_accel: float = 18.0          # Aceleración en tierra
 @export var ground_friction: float = 14.0       # Fricción al detenerse
@@ -614,7 +614,9 @@ func _physics_process(delta: float) -> void:
 			current_speed = 0.0
 		var move_req := absf(manual_move_input) if manual_input_override else (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_S)) else 0.0)
 		var nominal_advance := move_req * walk_speed * delta
-		var effective_advance := maxf(distance_walked, nominal_advance * 0.8) if (move_req > 0.01 or absf(current_speed) > 0.1) else distance_walked
+		# Contra un obstáculo, agua o pared no hay marcha en el sitio: la fase sólo avanza con desplazamiento real.
+		var obstructed: bool = is_on_wall() or wing_contact.predictive_contact or shoreline_blocked
+		var effective_advance := maxf(distance_walked, nominal_advance * 0.8) if ((move_req > 0.01 or absf(current_speed) > 0.1) and not obstructed) else distance_walked
 		if effective_advance > 0.0005 or absf(ground_yaw_motion) > 0.0001:
 			walk_cycle_phase += (effective_advance + absf(ground_yaw_motion) * 4.0) * TAU / 3.5
 	_update_animations()

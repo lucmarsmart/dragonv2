@@ -12,7 +12,9 @@ enum ViewPreset { BACK, FRONT, RIGHT, LEFT }
 @export var distance: float = 16.0              # Distancia óptima detrás del dragón
 @export var height: float = 5.0                  # Altura sobre el lomo
 @export var follow_smoothness: float = 16.0     # Suavidad y firmeza de seguimiento de posición
-@export var flight_follow_smoothness: float = 7.0 # Seguimiento con inercia en vuelo libre
+@export var flight_follow_smoothness: float = 10.0 # Seguimiento con inercia en vuelo libre
+@export var rider_distance: float = 9.0          # Vista de jinete: distancia detrás de la montura
+@export var rider_height: float = 7.5            # Vista de jinete: altura sobre el lomo
 @export var rotation_smoothness: float = 14.0   # Respuesta ágil de la orientación
 @export var base_fov: float = 74.0              # FOV base inmersivo
 @export var max_fov_boost: float = 14.0         # Aumento de FOV en picada a alta velocidad
@@ -146,11 +148,15 @@ func _physics_process(delta: float) -> void:
 	var is_ground = target_node and "locomotion_state" in target_node and target_node.locomotion_state == 2 # GROUNDED
 	var is_landing = "locomotion_state" in target_node and target_node.locomotion_state == 1
 	var attack_view: bool = "attack_mode_active" in target_node and target_node.attack_mode_active
-	var head_view = attack_view or ((is_ground or is_landing) and view_preset == ViewPreset.BACK and not orbiting)
+	# La vista sobre el cráneo queda sólo para el modo ataque; caminando se ve al animal entero desde el lomo.
+	var head_view = attack_view
 	var back_amount = 1.0 - clampf((absf(orbit_yaw) + absf(orbit_pitch)) / 0.6, 0.0, 1.0)
 	head_follow_blend = lerpf(head_follow_blend, (1.0 if attack_view else back_amount) if head_view else 0.0, 1.0 - exp(-4.0 * delta))
-	var target_h = 3.2 if is_ground else 5.0
-	var target_d = clampf((14.0 if is_ground else 18.0) + zoom_offset, min_distance, max_distance)
+	# Vista de jinete en vuelo (ref. Dragontwin): sobre el lomo, detrás de los hombros.
+	# La cola (punta a ~17 m detrás y curvada hacia arriba) queda fuera del encuadre.
+	var rider = back_amount
+	var target_h = lerpf(3.2 if is_ground else 5.0, rider_height - (1.0 if is_ground else 0.0), rider)
+	var target_d = clampf(lerpf(14.0 if is_ground else 18.0, rider_distance + (2.0 if is_ground else 0.0), rider) + zoom_offset, min_distance, max_distance)
 	height = lerp(height, target_h, 3.0 * delta)
 	target_distance = lerp(target_distance, target_d, 3.0 * delta)
 

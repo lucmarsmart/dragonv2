@@ -26,6 +26,9 @@ func run() -> void:
 	var tag := _arg("tag", "captura")
 	DirAccess.make_dir_recursive_absolute(out)
 	var scene = load("res://scenes/main.tscn").instantiate()
+	# Sin briefing ni IA: la pantalla de misión pausa el árbol y taparía la cámara.
+	scene.get_node("SiegeUI").free()
+	scene.get_node("SiegeCombat").free()
 	root.add_child(scene)
 	for _i in 120:
 		await process_frame
