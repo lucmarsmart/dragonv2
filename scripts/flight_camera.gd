@@ -12,6 +12,7 @@ enum ViewPreset { BACK, FRONT, RIGHT, LEFT }
 @export var distance: float = 16.0              # Distancia óptima detrás del dragón
 @export var height: float = 5.0                  # Altura sobre el lomo
 @export var follow_smoothness: float = 16.0     # Suavidad y firmeza de seguimiento de posición
+@export var flight_follow_smoothness: float = 7.0 # Seguimiento con inercia en vuelo libre
 @export var rotation_smoothness: float = 14.0   # Respuesta ágil de la orientación
 @export var base_fov: float = 74.0              # FOV base inmersivo
 @export var max_fov_boost: float = 14.0         # Aumento de FOV en picada a alta velocidad
@@ -173,7 +174,12 @@ func _physics_process(delta: float) -> void:
 	var orbit_right = right.rotated(up, orbit_yaw)
 	orbit_dir = orbit_dir.rotated(orbit_right, -orbit_pitch)
 	var desired_pos = saddle + (orbit_dir * distance) + (up * height * cos(orbit_pitch))
-	var chase_target = saddle + (forward * 20.0) + (up * 0.2)
+	# En vuelo el jinete mira hacia donde va la trayectoria, no sólo hacia donde apunta el morro.
+	var path_dir = forward
+	var airborne = not is_ground and not is_landing
+	if airborne and "velocity" in target_node and target_node.velocity.length() > 6.0:
+		path_dir = forward.lerp(target_node.velocity.normalized(), 0.45).normalized()
+	var chase_target = saddle + (path_dir * 20.0) + (up * 0.2)
 	var breath = target_node.get_node_or_null("DragonBreath")
 	if breath and head_follow_blend > 0.001 and breath.mouth_pose_cached:
 		# Stay above the front of the skull: the old shoulder position let the
@@ -204,7 +210,9 @@ func _physics_process(delta: float) -> void:
 	excluded.assign(ray_query.exclude)
 	desired_pos = _sweep_camera(collision_pivot_world, desired_pos, excluded)
 	var previous := global_position
-	global_position = _sweep_camera(previous, previous.lerp(desired_pos, 1.0 - exp(-follow_smoothness * delta)), excluded)
+	# Seguimiento con inercia en vuelo: la cámara se queda algo atrás al acelerar y alcanza al frenar.
+	var follow_k: float = follow_smoothness if (not airborne or head_follow_blend > 0.5) else flight_follow_smoothness
+	global_position = _sweep_camera(previous, previous.lerp(desired_pos, 1.0 - exp(-follow_k * delta)), excluded)
 	# Recheck the smoothed path: the interpolation itself must not cut through hills.
 	var final_ray = PhysicsRayQueryParameters3D.create(collision_pivot_world, global_position, 3)
 	final_ray.exclude = ray_query.exclude
@@ -218,7 +226,7 @@ func _physics_process(delta: float) -> void:
 	
 	# El vector UP de la cámara acompaña el alabeo (bank roll) del dragón para un manejo intuitivo
 	var pitch_steepness = clamp(absf(forward.y), 0.0, 1.0)
-	var cam_up = up.lerp(Vector3.UP, lerp(0.35, 0.90, pitch_steepness)).normalized()
+	var cam_up = up.lerp(Vector3.UP, lerp(0.25, 0.90, pitch_steepness)).normalized()
 	if attack_view or absf(orbit_pitch) > 0.5 or cam_up.length_squared() < 0.5:
 		cam_up = Vector3.UP
 	

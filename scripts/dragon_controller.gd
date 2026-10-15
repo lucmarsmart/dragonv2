@@ -259,14 +259,26 @@ enum LocomotionState {
 @export_group("Aerodinámica y Modos de Vuelo")
 @export var cruise_speed: float = 26.0          # Velocidad de planeo nivelado (m/s, ~95 km/h)
 @export var climb_forward_speed: float = 22.0   # Velocidad horizontal al trepar
-@export var climb_vertical_rate: float = 16.0   # Fuerza de ascenso vertical al subir (m/s)
 @export var min_stall_speed: float = 7.0        # Velocidad mínima antes de pérdida
 @export var max_flap_speed: float = 34.0        # Velocidad máxima aleteando
-@export var dive_terminal_speed: float = 38.0   # Picada controlada (~140 km/h)
+@export var dive_terminal_speed: float = 46.0   # Tope de picada con alas plegadas (~165 km/h)
 @export var flap_acceleration: float = 12.0     # Impulso de aceleración por aleteo
 @export var air_brake_decel: float = 18.0       # Resistencia al frenar (S)
 @export var normal_drag: float = 1.6            # Fricción natural del aire en planeo
 @export var gravity_magnitude: float = 9.8      # Gravedad
+
+@export_group("Física de Energía y Sustentación")
+@export var drag_coefficient: float = 0.004       # Arrastre cuadrático con alas abiertas (1/m)
+@export var dive_drag_coefficient: float = 0.0035 # Arrastre con alas plegadas en picada
+@export var glide_drag_coefficient: float = 0.0022 # Arrastre en planeo limpio (alta eficiencia)
+@export var brake_drag_coefficient: float = 0.05  # Alas en paracaídas al frenar
+@export var lift_speed: float = 22.0              # Velocidad a la que la sustentación iguala el peso
+@export var max_sink_rate: float = 14.0           # Hundimiento máximo sin sustentación (m/s)
+@export var max_bank_angle: float = 65.0          # Alabeo máximo comandado (grados)
+@export var roll_response: float = 2.2            # Rapidez de entrada/salida del alabeo (1/s)
+@export var turn_gain: float = 1.35               # Agilidad sobre el viraje coordinado puro
+@export var max_turn_rate: float = 1.3            # Tasa de giro máxima (rad/s)
+@export var flap_cycle_scale: float = 0.74        # Tempo del aleteo de crucero (~2 s por batido)
 
 @export_group("Maniobrabilidad (Sensibilidad)")
 @export var mouse_sensitivity: float = 0.0018
@@ -732,7 +744,9 @@ func _handle_input_keys(delta: float) -> void:
 	if pitch_input != 0.0:
 		target_pitch = clamp(target_pitch + pitch_input * pitch_speed * delta, -deg_to_rad(80.0), deg_to_rad(80.0))
 	elif not mouse_captured and not (is_diving or is_braking or is_climbing):
-		target_pitch = lerp(target_pitch, 0.0, 0.8 * delta)
+		# Sin batir, el planeo se compensa con el morro levemente abajo para conservar velocidad.
+		var trim := -deg_to_rad(5.0) if glide_mode_active else 0.0
+		target_pitch = lerp(target_pitch, trim, 0.8 * delta)
 		
 	# 5. DETERMINAR MODO ACTIVO
 	if is_diving:
@@ -766,15 +780,18 @@ func _handle_input_keys(delta: float) -> void:
 		if Input.is_key_pressed(KEY_E):
 			turn_dir -= 0.8
 
-	if turn_dir != 0.0:
-		target_yaw += turn_dir * yaw_speed * 1.5 * delta
-		
+	# El teclado comanda alabeo; el giro sale de inclinar la sustentación (g·tan(alabeo)/v).
+	# El ratón y el apuntado de ataque siguen fijando rumbo directo y el alabeo lo acompaña.
+	var max_bank := deg_to_rad(max_bank_angle)
 	var yaw_diff = wrapf(target_yaw - rotation.y, -PI, PI)
-	var instant_turn_rate = clamp(yaw_diff * 3.5, -1.0, 1.0)
-	smoothed_turn_rate = lerp(smoothed_turn_rate, instant_turn_rate, 8.0 * delta)
-	
-	var desired_bank = smoothed_turn_rate * bank_amount
-	target_roll = lerp_angle(target_roll, desired_bank, return_to_level_rate * delta)
+	var desired_bank := clampf(turn_dir * max_bank + clampf(yaw_diff * 2.0, -1.0, 1.0) * max_bank * 0.8, -max_bank, max_bank)
+	target_roll = lerp_angle(target_roll, desired_bank, 1.0 - exp(-roll_response * delta))
+	var bank := clampf(rotation.z, -1.35, 1.35)
+	var coordinated_rate := clampf(gravity_magnitude * tan(bank) / maxf(current_speed, 8.0) * turn_gain, -max_turn_rate, max_turn_rate)
+	if turn_dir != 0.0 or absf(yaw_diff) < 0.05:
+		target_yaw += coordinated_rate * delta
+	var yaw_rate_now := coordinated_rate + clampf(yaw_diff * 3.5, -1.0, 1.0)
+	smoothed_turn_rate = lerp(smoothed_turn_rate, clampf(yaw_rate_now / 1.1, -1.0, 1.0), 8.0 * delta)
 
 func _update_mode_blends(delta: float) -> void:
 	var rate := 1.0 - exp(-5.0 * delta)
@@ -874,42 +891,47 @@ func _calculate_flight_physics(delta: float) -> void:
 			current_mode = FlightMode.NORMAL
 		return
 
-	# Acceleration-limited velocity preserves momentum through pitch and turns.
+	# Balance de energía: dv/dt = empuje - arrastre·v² - g·sen(trayectoria).
+	# Trepar consume velocidad, picar la acumula y planear la conserva con el morro bajo.
 	var forward_dir := -transform.basis.z.normalized()
-	var target_speed := cruise_speed
-	var acceleration := flap_acceleration
+	var thrust := 0.0
+	var drag_k := drag_coefficient
+	var flap_lift := 0.0
 	match current_mode:
 		FlightMode.DIVE:
-			target_speed = dive_terminal_speed
-			acceleration = flap_acceleration + maxf(0.0, -forward_dir.y) * gravity_magnitude
+			drag_k = dive_drag_coefficient
+			thrust = 1.5 # recogida de alas y empuje de cola hacia la picada
 		FlightMode.CLIMB:
-			target_speed = climb_forward_speed
+			# Batido potente: equilibrio cerca de 15 m/s con 42° de cabeceo.
+			thrust = drag_coefficient * 15.0 * 15.0 + gravity_magnitude * sin(deg_to_rad(42.0))
+			flap_lift = 0.35
 		FlightMode.GLIDE:
-			target_speed = clampf(cruise_speed - forward_dir.y * 9.0, min_stall_speed, dive_terminal_speed)
-			acceleration = 3.0
+			drag_k = glide_drag_coefficient
 		FlightMode.BRAKE:
-			target_speed = min_stall_speed
-			acceleration = air_brake_decel
+			drag_k = brake_drag_coefficient
+			flap_lift = 0.45
 		FlightMode.NORMAL:
-			var pitch_speed_mod := -forward_dir.y * 8.0
-			var base_speed := max_flap_speed if w_boost else cruise_speed
-			target_speed = clampf(base_speed + pitch_speed_mod, min_stall_speed, dive_terminal_speed)
-	current_speed = move_toward(current_speed, target_speed, acceleration * delta)
-	current_speed = clampf(current_speed, min_stall_speed, dive_terminal_speed)
+			var sustained := max_flap_speed if w_boost else cruise_speed
+			thrust = drag_coefficient * sustained * sustained
+			flap_lift = 0.25
+	var speed_rate := thrust - drag_k * current_speed * current_speed - gravity_magnitude * forward_dir.y
+	current_speed = clampf(current_speed + speed_rate * delta, min_stall_speed, dive_terminal_speed)
 
 	# Resistencia fluida al atravesar el agua (Water traversal / hydrodynamic drag)
 	if _is_in_water():
 		# El agua reduce la velocidad máxima por fricción hidrodinámica, pero permite atravesarla libremente
 		var max_water_speed := 14.0 if is_diving else 10.0
-		target_speed = minf(target_speed, max_water_speed)
-		current_speed = move_toward(current_speed, target_speed, 16.0 * delta)
+		current_speed = move_toward(current_speed, minf(current_speed, max_water_speed), 16.0 * delta)
 
 	var wanted_velocity := forward_dir * current_speed
-	if current_mode == FlightMode.GLIDE:
-		wanted_velocity.y -= 1.0
+	if current_mode != FlightMode.DIVE:
+		# Sustentación ∝ v², proyectada en vertical por cos(alabeo); el batido aporta sostén a baja velocidad.
+		var lift_ratio := (current_speed / lift_speed) * (current_speed / lift_speed)
+		var vertical_support := lift_ratio * cos(clampf(rotation.z, -1.4, 1.4)) + flap_lift
+		wanted_velocity.y -= clampf(1.0 - vertical_support, 0.0, 1.0) * max_sink_rate
 	if current_mode == FlightMode.CLIMB:
-		# Thrust follows body pitch instead of adding a second full climb velocity.
-		wanted_velocity.y = maxf(wanted_velocity.y, climb_vertical_rate * climb_blend)
+		# Piso de ascenso: el batido de esfuerzo siempre gana algo de altura.
+		wanted_velocity.y = maxf(wanted_velocity.y, 6.0 * climb_blend)
 
 	# Biomecánica de vuelo pulsado acoplado al aleteo real (Sophoria Academy / Jonathan Symmonds)
 	# Cada ciclo de aleteo dura 1.5s (2 batidos en el clip de 3.0s).
@@ -1313,7 +1335,8 @@ func _update_animations() -> void:
 
 	var target_anim = "Qishilong_fly2"
 	var custom_speed = 1.0
-	
+
+	# Tempo pesado (ref. Dragontwin): ~2 s por batido en crucero; el esfuerzo lo acelera un poco.
 	match current_mode:
 		FlightMode.DIVE:
 			if anim_player.has_animation("Qishilong_glide"):
@@ -1323,7 +1346,7 @@ func _update_animations() -> void:
 			custom_speed = 1.0
 		FlightMode.CLIMB:
 			target_anim = "Qishilong_fly2"
-			custom_speed = 0.72 # Aleteo más lento y pesado: el esfuerzo contra el aire (ref. video climb)
+			custom_speed = flap_cycle_scale * 1.12
 		FlightMode.GLIDE:
 			if anim_player.has_animation("Qishilong_glide"):
 				target_anim = "Qishilong_glide"
@@ -1332,10 +1355,10 @@ func _update_animations() -> void:
 			custom_speed = 1.0
 		FlightMode.BRAKE:
 			target_anim = "Qishilong_fly2"
-			custom_speed = 0.70
+			custom_speed = flap_cycle_scale * 1.05
 		FlightMode.NORMAL:
 			target_anim = "Qishilong_fly2"
-			custom_speed = 1.05
+			custom_speed = flap_cycle_scale * (1.2 if w_boost else 1.0)
 		
 	if anim_player.current_animation != target_anim or not anim_player.is_playing():
 		anim_player.play(target_anim, 0.40)
@@ -1638,7 +1661,9 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 
 	# 3. ALAS: ASIMETRÍA EN VIRAJES + PLANEO DIEDRO + PLEGADO EN PICADA + APERTURA EN TREPADA
 	var fold = clamp(dive_fold_blend, 0.0, 1.0) * (1.0 - ground_blend)
-	var glide_dihedral = glide_blend * deg_to_rad(4.5)
+	# Diedro: más marcado en planeo y creciente con la carga del viraje (n = 1/cos(alabeo)).
+	var bank_load: float = clampf(1.0 / maxf(cos(rotation.z), 0.35) - 1.0, 0.0, 1.5) * flight_factor
+	var glide_dihedral = glide_blend * deg_to_rad(8.0) + bank_load * deg_to_rad(4.0)
 	var glide_breathe = sin(tail_wave_time * 1.8) * deg_to_rad(1.5) * glide_blend
 	
 	# Carrera de potencia en trepada (power downstroke amplitude + forward reach)
