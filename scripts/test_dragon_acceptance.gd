@@ -385,7 +385,8 @@ func run() -> void:
 	var camera: FlightCamera = scene.get_node("FlightCamera")
 	camera.zoom_offset = 4
 	await ticks(120)
-	check(camera.target_distance > 20.5, "Camera zoom choice persists during follow")
+	# Contrato relativo a la vista de jinete (antes 18 m fijos + 4 de zoom > 20.5).
+	check(camera.target_distance > camera.rider_distance + 3.5, "Camera zoom choice persists during follow")
 	var bad_camera := false
 	for _i in range(100):
 		dragon.manual_climb = _i < 50

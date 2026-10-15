@@ -8,8 +8,8 @@
 render_priority = 0
 shader = ExtResource("1_shader")
 shader_parameter/wing_relief_strength = 2.4
-shader_parameter/wing_roughness = 0.52
-shader_parameter/wing_specular = 0.45
+shader_parameter/wing_roughness = 0.72
+shader_parameter/wing_specular = 0.3
 shader_parameter/patagium_amber_base = Color(0.7, 0.46, 0.26, 1)
 shader_parameter/patagium_ochre_bright = Color(0.86, 0.62, 0.36, 1)
 shader_parameter/patagium_shadow_edge = Color(0.38, 0.24, 0.14, 1)

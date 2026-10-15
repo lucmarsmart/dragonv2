@@ -12,6 +12,7 @@ config_version=5
 
 config/name="Dragon Simulator"
 run/main_scene="res://scenes/main.tscn"
+run/max_fps=60
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [display]

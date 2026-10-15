@@ -15,6 +15,11 @@ enum ViewPreset { BACK, FRONT, RIGHT, LEFT }
 @export var flight_follow_smoothness: float = 10.0 # Seguimiento con inercia en vuelo libre
 @export var rider_distance: float = 9.0          # Vista de jinete: distancia detrás de la montura
 @export var rider_height: float = 7.5            # Vista de jinete: altura sobre el lomo
+@export var cinematic_turn_swing: float = 0.6    # Apertura hacia el exterior del viraje (rad a giro máximo)
+@export var cinematic_response: float = 1.6      # Rapidez del muelle cinemático (1/s)
+var dynamic_yaw := 0.0
+var dynamic_pitch := 0.0
+var dynamic_stretch := 0.0
 @export var rotation_smoothness: float = 14.0   # Respuesta ágil de la orientación
 @export var base_fov: float = 74.0              # FOV base inmersivo
 @export var max_fov_boost: float = 14.0         # Aumento de FOV en picada a alta velocidad
@@ -174,18 +179,35 @@ func _physics_process(delta: float) -> void:
 	var saddle = target_node.global_position + (up * 0.5)
 	collision_pivot_world = saddle
 	
-	# 3. Dirección de cámara: parte desde "detrás" y se orbita (giro sobre el eje arriba y luego elevación)
+	# 3. Cámara cinemática (ref. Dragontwin): en la vista trasera no queda fija, acompaña la maniobra.
+	# Se abre hacia el exterior del viraje, baja al trepar mirando el vientre y las alas,
+	# sube en picada mirando hacia abajo y se aleja con la velocidad. Muelle lento: se percibe el peso.
+	var airborne = not is_ground and not is_landing
+	var cinematic: float = rider * (0.0 if (attack_view or orbiting) else 1.0) * (1.0 if airborne else 0.0)
+	var turn: float = target_node.smoothed_turn_rate if "smoothed_turn_rate" in target_node else 0.0
+	var climb: float = target_node.climb_blend if "climb_blend" in target_node else 0.0
+	var dive: float = target_node.dive_fold_blend if "dive_fold_blend" in target_node else 0.0
+	var speed: float = target_node.current_speed if "current_speed" in target_node else 26.0
+	var dk := 1.0 - exp(-cinematic_response * delta)
+	dynamic_yaw = lerpf(dynamic_yaw, turn * cinematic_turn_swing * cinematic, dk)
+	dynamic_pitch = lerpf(dynamic_pitch, (dive * 0.32 - climb * 0.38) * cinematic, dk)
+	dynamic_stretch = lerpf(dynamic_stretch, clampf((speed - 26.0) * 0.12, -1.5, 3.0) * cinematic, dk)
+	var view_yaw: float = orbit_yaw + dynamic_yaw
+	var view_pitch: float = orbit_pitch + dynamic_pitch
 	var back_dir = -forward
-	var orbit_dir = back_dir.rotated(up, orbit_yaw)
-	var orbit_right = right.rotated(up, orbit_yaw)
-	orbit_dir = orbit_dir.rotated(orbit_right, -orbit_pitch)
-	var desired_pos = saddle + (orbit_dir * distance) + (up * height * cos(orbit_pitch))
+	var orbit_dir = back_dir.rotated(up, view_yaw)
+	var orbit_right = right.rotated(up, view_yaw)
+	orbit_dir = orbit_dir.rotated(orbit_right, -view_pitch)
+	var view_height: float = height * (1.0 - 0.45 * climb * cinematic)
+	var desired_pos = saddle + (orbit_dir * (distance + dynamic_stretch)) + (up * view_height * cos(view_pitch))
 	# En vuelo el jinete mira hacia donde va la trayectoria, no sólo hacia donde apunta el morro.
 	var path_dir = forward
-	var airborne = not is_ground and not is_landing
 	if airborne and "velocity" in target_node and target_node.velocity.length() > 6.0:
 		path_dir = forward.lerp(target_node.velocity.normalized(), 0.45).normalized()
 	var chase_target = saddle + (path_dir * 20.0) + (up * 0.2)
+	# Con la cámara desplazada, el encuadre se recentra en el dragón para no perderlo.
+	var off_axis: float = clampf((absf(dynamic_yaw) + absf(dynamic_pitch)) / 0.6, 0.0, 1.0)
+	chase_target = chase_target.lerp(saddle + path_dir * 7.0, off_axis * 0.55)
 	var breath = target_node.get_node_or_null("DragonBreath")
 	if breath and head_follow_blend > 0.001 and breath.mouth_pose_cached:
 		# Stay above the front of the skull: the old shoulder position let the

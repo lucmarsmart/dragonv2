@@ -119,8 +119,8 @@ void fragment() {
 	
 	// 6. PROPIEDADES DE SUPERFICIE
 	METALLIC = 0.0;
-	ROUGHNESS = mix(0.38, wing_roughness, is_membrane); // Huesos más pulidos que el cuero
-	SPECULAR = mix(0.55, wing_specular, is_membrane);
+	ROUGHNESS = mix(0.6, wing_roughness, is_membrane); // Hueso con queratina mate, sin brillo de plástico
+	SPECULAR = mix(0.35, wing_specular, is_membrane);
 	AO = wing_ao;
 	AO_LIGHT_AFFECT = 0.8;
 }

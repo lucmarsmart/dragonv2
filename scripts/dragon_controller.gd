@@ -615,7 +615,8 @@ func _physics_process(delta: float) -> void:
 		var move_req := absf(manual_move_input) if manual_input_override else (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_S)) else 0.0)
 		var nominal_advance := move_req * walk_speed * delta
 		# Contra un obstáculo, agua o pared no hay marcha en el sitio: la fase sólo avanza con desplazamiento real.
-		var obstructed: bool = is_on_wall() or wing_contact.predictive_contact or shoreline_blocked
+		# Incluye el retroceso a la pose segura tras chocar con roca o árbol: el cuerpo casi no avanza.
+		var obstructed: bool = is_on_wall() or wing_contact.predictive_contact or shoreline_blocked or distance_walked < nominal_advance * 0.2
 		var effective_advance := maxf(distance_walked, nominal_advance * 0.8) if ((move_req > 0.01 or absf(current_speed) > 0.1) and not obstructed) else distance_walked
 		if effective_advance > 0.0005 or absf(ground_yaw_motion) > 0.0001:
 			walk_cycle_phase += (effective_advance + absf(ground_yaw_motion) * 4.0) * TAU / 3.5
@@ -943,12 +944,13 @@ func _calculate_flight_physics(delta: float) -> void:
 		var flap_phase: float = fposmod(flap_time, 1.5) / 1.5 * TAU
 		if flap_phase < PI:
 			# Downstroke activo: elevación vertical y aceleración horizontal
+			# Pulso moderado: con el batido lento de ~2 s, un empuje grande se percibe como avanzar y frenar.
 			var downstroke_power := sin(flap_phase)
-			wanted_velocity.y += downstroke_power * (3.4 if current_mode == FlightMode.CLIMB else 2.2)
-			wanted_velocity += forward_dir * (downstroke_power * 2.8)
+			wanted_velocity.y += downstroke_power * (2.6 if current_mode == FlightMode.CLIMB else 1.2)
+			wanted_velocity += forward_dir * (downstroke_power * 1.0)
 		else:
 			# Upstroke de recobro: relajación aerodinámica y leve descenso por gravedad
-			var upstroke_sink := sin(flap_phase - PI) * 0.9
+			var upstroke_sink := sin(flap_phase - PI) * 0.5
 			wanted_velocity.y -= upstroke_sink
 
 	# Actualización de deformación aerodinámica de membranas alares vivas (Dragontwin)

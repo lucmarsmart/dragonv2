@@ -136,7 +136,8 @@ void fragment() {
 	final_albedo += living_flush;
 	
 	// 5. PROPIEDADES DE SUPERFICIE: QUERATINA DURA Y ESCAMAS MINERALIZADAS
-	float scale_rough = mix(0.72, base_roughness, smoothstep(0.25, 0.85, crevice));
+	// Piel natural mate (ref. Dragontwin): grietas muy rugosas, placas apenas satinadas.
+	float scale_rough = mix(0.86, base_roughness, smoothstep(0.25, 0.85, crevice));
 	scale_rough = mix(scale_rough, 0.28, is_spine * 0.85); // Espinas más lustrosas
 	
 	// E) Ojo reptiliano noble (un solo ojo por lado en la cabeza)
@@ -156,7 +157,7 @@ void fragment() {
 	ALBEDO = final_albedo * cavity_shadow;
 	ROUGHNESS = scale_rough;
 	METALLIC = 0.0;
-	SPECULAR = mix(scale_specular, 0.65, is_spine);
+	SPECULAR = mix(scale_specular, 0.4, is_spine);
 	
 	// Oclusión ambiental
 	AO = cavity_shadow;
