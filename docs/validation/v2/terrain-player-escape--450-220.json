@@ -1,0 +1,679 @@
+{
+  "failures": [
+    "Every original rendered vertex stays within the existing5cm terrain limit"
+  ],
+  "fixture_xz": [
+    -450.0,
+    220.0
+  ],
+  "frames": [
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(-435.9026, 47.17165, 186.0939)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(-434.6776, 47.01772, 184.7492)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(3.220581, 0.0, -3.536103)",
+      "yaw": -0.753720283508301
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(-433.0227, 46.92426, 182.9923)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(3.326712, 0.0, -3.429969)",
+      "yaw": -0.75372052192688
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(-431.3588, 46.70184, 181.2771)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(3.326712, 0.0, -3.429969)",
+      "yaw": -0.753720343112946
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-429.7102, 46.43854, 179.5534)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(3.294524, 0.0, -3.445407)",
+      "yaw": -0.753720462322235
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-428.0632, 46.15781, 177.8309)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(3.294524, 0.0, -3.445407)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-428.011, 46.14891, 177.7762)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(3.134373, 0.0, -3.277922)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-427.9614, 46.14046, 177.7244)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.974223, 0.0, -3.110437)",
+      "yaw": -0.753720462322235
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-427.9145, 46.13247, 177.6754)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.814072, 0.0, -2.942952)",
+      "yaw": -0.753720343112946
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-427.8703, 46.12493, 177.6291)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.653922, 0.0, -2.775467)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-427.8287, 46.11785, 177.5856)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.493771, 0.0, -2.607982)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(-427.7898, 46.11122, 177.545)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(2.333621, 0.0, -2.440497)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(-428.0623, 46.15763, 177.8298)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.976714, 0.336899, 2.067245)",
+      "yaw": -0.753720164299011
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(-429.0511, 46.32609, 178.8634)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.976714, 0.336899, 2.067245)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(-430.0398, 46.49454, 179.897)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.976714, 0.336899, 2.067244)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-431.0286, 46.663, 180.9307)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.976714, 0.336899, 2.067244)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-432.0238, 46.80241, 181.9618)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.996027, 0.273838, 2.057982)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-432.0544, 46.80661, 181.9934)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.834312, 0.251652, 1.891247)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-432.0823, 46.81043, 182.0221)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.672597, 0.229466, 1.724512)",
+      "yaw": -0.753720462322235
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-432.1075, 46.81389, 182.0481)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.510882, 0.20728, 1.557778)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-432.1299, 46.81697, 182.0713)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.349167, 0.185094, 1.391043)",
+      "yaw": -0.753720462322235
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(-432.1497, 46.81969, 182.0917)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(-1.187451, 0.162908, 1.224308)",
+      "yaw": -0.75372040271759
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.461807727813721
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -0.112052522599697
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.237946435809135
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.587945878505707
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.597668170928955
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.60577005147934
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.60577005147934
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.60577005147934
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(-432.2124, 46.82845, 182.1571)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": 0.60577005147934
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(-433.2603, 46.52672, 180.6562)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.722267, 0.0, -3.890232)",
+      "yaw": 0.605769991874695
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(-434.6281, 46.02256, 178.702)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.722267, 0.0, -3.890232)",
+      "yaw": 0.605770170688629
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(-435.3921, 45.93483, 177.5683)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(-2.50061, 0.0, -3.661815)",
+      "yaw": 0.605769991874695
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-436.6784, 44.86568, 175.6882)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.50061, 0.0, -3.661814)",
+      "yaw": 0.605770111083984
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-437.8987, 44.07995, 173.7907)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(-1.983198, 0.0, -3.50386)",
+      "yaw": 0.60577005147934
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-437.9334, 44.05167, 173.7309)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(-1.886792, 0.0, -3.333533)",
+      "yaw": 0.60577005147934
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-437.9632, 44.01234, 173.6782)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(-1.790386, 0.0, -3.163207)",
+      "yaw": 0.60577005147934
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-437.9973, 43.99851, 173.6205)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(-1.693981, 0.0, -2.992881)",
+      "yaw": 0.605770111083984
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-438.0267, 43.97453, 173.57)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(-1.597575, 0.0, -2.822554)",
+      "yaw": 0.605770111083984
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(-438.0544, 43.95227, 173.5224)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": true,
+      "velocity": "(-1.50117, 0.0, -2.652227)",
+      "yaw": 0.605770111083984
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(-437.979, 44.12767, 173.663)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.189918, 1.568044, 2.102316)",
+      "yaw": 0.60576993227005
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(-437.3731, 44.90593, 174.7118)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.319923, 1.498717, 2.075103)",
+      "yaw": 0.605770111083984
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(-436.6322, 45.47433, 175.8057)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.500367, 1.102771, 2.197088)",
+      "yaw": 0.605770170688629
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(-435.8824, 46.02571, 176.9043)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.500366, 1.102771, 2.197088)",
+      "yaw": 0.605770230293274
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-435.1326, 46.57709, 178.003)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.500367, 1.102771, 2.197088)",
+      "yaw": 0.605770289897919
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-435.1096, 46.59398, 178.0366)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.378809, 1.013426, 2.019083)",
+      "yaw": 0.605770289897919
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-435.0887, 46.60938, 178.0673)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.257252, 0.924081, 1.841079)",
+      "yaw": 0.605770409107208
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-435.0697, 46.62329, 178.095)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.135694, 0.834736, 1.663074)",
+      "yaw": 0.605770349502563
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(-435.0528, 46.63572, 178.1198)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(1.014137, 0.745391, 1.485069)",
+      "yaw": 0.605770349502563
+    }
+  ],
+  "landing_position": "(-435.9026, 47.32223, 186.0939)",
+  "landing_ticks": 564,
+  "manual_override": false,
+  "maximum_overlap_count": 2,
+  "maximum_prop_overlap_count": 0,
+  "maximum_stance_slide_m": 0.00277424766682088,
+  "minimum_skin_terrain_clearance_m": -0.460325634302571,
+  "original_vertices_checked": 19099838,
+  "overlap_diagnostics": [
+    {
+      "frame": 30,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.00459743663668633,
+          "hull": 2
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col",
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0674301013350487,
+          "hull": 2
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col",
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.042180847376585,
+          "hull": 14
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col",
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0422147922217846,
+          "hull": 14
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 120,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col",
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.042326282709837,
+          "hull": 14
+        }
+      ],
+      "stage": "left"
+    },
+    {
+      "frame": 0,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col",
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0424226894974709,
+          "hull": 14
+        }
+      ],
+      "stage": "forward_after_turn"
+    }
+  ],
+  "source_after": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "4b12dca180198ee3c92986f5dd39ed648480d3a604421c5609fd760cd8b4da1f",
+    "res://scenes/main.tscn": "e6be17868c5dd0604706d3bb3116e678f471024b671d94cdc1ad6198ca81299c",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "12b5fa896814d13e8f9685f8e1f474103ed0e029a39e3fff81301ed351aee362",
+    "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+    "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+    "res://scripts/dragon_controller.gd": "5bd70388697b2fc3f9ecb84211f3c52ce1d7cbe798e81c8ede69e664f58b7ae0",
+    "res://scripts/dragon_ground_contact.gd": "4a6d03ea85edd850d548fdda58dba711dd4b101417e2d8c330c1abfece322c44",
+    "res://scripts/dragon_ground_pose.gd": "0fc0a2f53c8e4087db863cd23c98156e26bcf6abaf7f23333de327a4812a4562",
+    "res://scripts/dragon_head_pose.gd": "8826d363ae8f0665d0193b1dc588371e5c35ac08ede6ab0ea1b41e7a78f26ef7",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "d81e8d641e5fa6b0e9c7aebf45c3e1ada938eadc7ec8c80b640901131b54e349",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b1571bd906c96bcdef65143b37edcff169725b32101668d4eb74dcd3fca0b661",
+    "res://scripts/terrain.gd": "0b6b1d752c85a902a88c40d095ca88cf050cff57f03f13f3d4295dc5057a8353"
+  },
+  "source_before": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "4b12dca180198ee3c92986f5dd39ed648480d3a604421c5609fd760cd8b4da1f",
+    "res://scenes/main.tscn": "e6be17868c5dd0604706d3bb3116e678f471024b671d94cdc1ad6198ca81299c",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "12b5fa896814d13e8f9685f8e1f474103ed0e029a39e3fff81301ed351aee362",
+    "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+    "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+    "res://scripts/dragon_controller.gd": "5bd70388697b2fc3f9ecb84211f3c52ce1d7cbe798e81c8ede69e664f58b7ae0",
+    "res://scripts/dragon_ground_contact.gd": "4a6d03ea85edd850d548fdda58dba711dd4b101417e2d8c330c1abfece322c44",
+    "res://scripts/dragon_ground_pose.gd": "0fc0a2f53c8e4087db863cd23c98156e26bcf6abaf7f23333de327a4812a4562",
+    "res://scripts/dragon_head_pose.gd": "8826d363ae8f0665d0193b1dc588371e5c35ac08ede6ab0ea1b41e7a78f26ef7",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "d81e8d641e5fa6b0e9c7aebf45c3e1ada938eadc7ec8c80b640901131b54e349",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b1571bd906c96bcdef65143b37edcff169725b32101668d4eb74dcd3fca0b661",
+    "res://scripts/terrain.gd": "0b6b1d752c85a902a88c40d095ca88cf050cff57f03f13f3d4295dc5057a8353"
+  },
+  "stage_quality": {
+    "forward": {
+      "frames": 156,
+      "maximum_stance_slide_m": 0.00193184951785952,
+      "minimum_skin_terrain_clearance_m": -0.460325634302571
+    },
+    "forward_after_turn": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.00201144185848534,
+      "minimum_skin_terrain_clearance_m": 0.0201533811166996
+    },
+    "left": {
+      "frames": 125,
+      "maximum_stance_slide_m": 0.00195318460464478,
+      "minimum_skin_terrain_clearance_m": 0.0225430034100995
+    },
+    "reverse": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.00230200472287834,
+      "minimum_skin_terrain_clearance_m": 0.0194862892944485
+    },
+    "reverse_after_turn": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.00277424766682088,
+      "minimum_skin_terrain_clearance_m": 0.0191142234765209
+    }
+  },
+  "stages": {
+    "forward": {
+      "horizontal_distance_m": 11.7293758392334,
+      "yaw_delta_deg": 0.0
+    },
+    "forward_after_turn": {
+      "horizontal_distance_m": 10.4253034591675,
+      "yaw_delta_deg": 0.00000341509458500638
+    },
+    "left": {
+      "horizontal_distance_m": 0.0905570015311241,
+      "yaw_delta_deg": 77.8930653138074
+    },
+    "reverse": {
+      "horizontal_distance_m": 6.2430419921875,
+      "yaw_delta_deg": 0.0
+    },
+    "reverse_after_turn": {
+      "horizontal_distance_m": 5.5168399810791,
+      "yaw_delta_deg": 0.0000170754729250319
+    }
+  },
+  "teleports_after_initial_aerial_fixture": 0,
+  "worst_skin": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 0
+    },
+    "clearance": -0.460325634302571,
+    "physics_frame": 923,
+    "process_frame": 922,
+    "ray": "{ \"position\": (-435.6055, 43.00676, 189.2351), \"normal\": (0.185572, 0.98262, -0.004674), \"face_index\": -1, \"collider_id\": 43520099956, \"collider\": ErodedValleyGround_col:<StaticBody3D#43520099956>, \"shape\": 0, \"rid\": RID(644245094401) }",
+    "root": "(-435.2202, 47.08591, 185.3449)",
+    "rotation": "(-0.087067, -0.75372, -0.175256)",
+    "sample": "{ \"vertex\": (-5.128278, -2.756771, 5.008695), \"influence\": [{ \"bone\": 20, \"bind\": [X: (-17.78828, -10.24223, -150.0235), Y: (-149.2005, 20.04614, 16.32195), Z: (18.75707, 149.7408, -12.44697), O: (-155.0562, -661.4175, -685.4421)], \"weight\": 0.5137255191803, \"key\": 2020 }, { \"bone\": 21, \"bind\": [X: (16.13716, -12.67998, -150.024), Y: (37.0732, -145.9051, 16.31941), Z: (-145.9254, -38.47031, -12.44482), O: (806.9177, -233.7976, -685.4512)], \"weight\": 0.48627451062202, \"key\": 2021 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": -1, \"limb_claw\": -1, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 15851 }",
+    "stage": "forward",
+    "tick": 20,
+    "world": "(-435.6055, 42.54642, 189.2351)"
+  },
+  "worst_stance": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 0
+    },
+    "claw": 8,
+    "point": "(-436.8313, 41.01129, 176.7978)",
+    "previous": "(-436.8334, 41.01012, 176.7961)",
+    "root": "(-436.5573, 45.52947, 175.9156)",
+    "rotation": "(-0.412521, 0.60577, 0.026351)",
+    "sample": "{ \"vertex\": (-3.104467, -2.990276, 2.72519), \"influence\": [{ \"bone\": 19, \"bind\": [X: (-91.35087, -107.5535, -54.91491), Y: (-109.1403, 103.0048, -20.18568), Z: (51.69379, 27.40334, -139.6633), O: (-732.3054, -82.05611, 161.4779)], \"weight\": 0.92156863212585, \"key\": 2019 }, { \"bone\": 18, \"bind\": [X: (-114.8308, -82.01942, -54.90979), Y: (-80.71209, 126.5183, -20.1922), Z: (56.81663, 13.95575, -139.6644), O: (-698.4871, 99.09386, 161.4756)], \"weight\": 0.07843137532473, \"key\": 2018 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": 8, \"limb_claw\": 8, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 8629 }",
+    "slide": 0.00277424766682088,
+    "stage": "reverse_after_turn",
+    "tick": 93
+  }
+}

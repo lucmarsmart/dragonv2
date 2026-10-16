@@ -1,0 +1,637 @@
+{
+  "failures": [
+    "Every original rendered vertex stays within the existing5cm terrain limit",
+    "Original grounded claws stay within the existing1.5cm stance limit"
+  ],
+  "fixture_xz": [
+    850.0,
+    130.0
+  ],
+  "frames": [
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(861.4042, 94.67357, 119.1934)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(862.2027, 94.19004, 120.5527)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.283727, 0.0, 3.836162)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(863.2703, 93.20947, 122.3562)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(0.691338, 0.0, 1.147769)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(864.3172, 92.46535, 124.0937)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.355086, 0.0, 3.906622)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(865.5205, 91.78355, 126.0999)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.361634, 0.0, 3.880461)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(866.7114, 90.99149, 128.0909)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.359475, 0.0, 3.876547)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(866.7488, 90.9667, 128.1523)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.244778, 0.0, 3.688104)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(866.7844, 90.94318, 128.2106)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.130082, 0.0, 3.49966)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(866.8179, 90.92092, 128.2658)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(2.015385, 0.0, 3.311217)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(866.8496, 90.89993, 128.3179)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(1.900688, 0.0, 3.122774)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(866.8794, 90.88021, 128.3667)",
+      "stage": "forward",
+      "turn_blocked": false,
+      "velocity": "(1.785992, 0.0, 2.93433)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(866.9075, 90.86598, 128.414)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(1.671295, 0.0, 2.745887)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(866.4118, 91.19428, 127.6003)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.415685, 0.93824, -2.325928)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(865.7032, 91.66025, 126.4364)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.416981, 0.930426, -2.328277)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(864.9946, 92.12556, 125.2723)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.416981, 0.930427, -2.328277)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(864.2885, 92.58984, 124.1068)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.413052, 0.896367, -2.343973)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(863.5918, 93.10739, 122.9586)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.386486, 1.036089, -2.301864)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(863.5706, 93.12326, 122.9233)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.274155, 0.952147, -2.11537)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(863.5512, 93.13773, 122.8912)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.161824, 0.868205, -1.928877)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(863.5337, 93.1508, 122.8621)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-1.049493, 0.784262, -1.742383)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(863.5181, 93.16248, 122.8362)",
+      "stage": "reverse",
+      "turn_blocked": false,
+      "velocity": "(-0.937162, 0.70032, -1.555889)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(863.5043, 93.17274, 122.8134)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(-0.824831, 0.616377, -1.369396)",
+      "yaw": -2.63242816925049
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -2.34051585197449
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.99076044559479
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": false,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.64076137542725
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "left",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(863.4599, 93.20542, 122.7409)",
+      "stage": "forward_after_turn",
+      "turn_blocked": true,
+      "velocity": "(0.0, 0.0, 0.0)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(865.2485, 93.01022, 122.769)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.782026, -0.392435, 0.134975)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(867.6399, 92.81406, 122.8365)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.782026, -0.392435, 0.134975)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(870.0225, 92.54064, 122.8784)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.75115, -0.681947, 0.038957)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(872.3997, 92.21352, 122.9045)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.756987, -0.638324, 0.060177)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(874.7782, 91.89446, 122.9345)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.756987, -0.638324, 0.060177)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(874.8536, 91.88434, 122.9355)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.525744, -0.607295, 0.057252)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(874.9252, 91.87473, 122.9364)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.294502, -0.576265, 0.054327)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(874.993, 91.86565, 122.9372)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(4.063259, -0.545235, 0.051402)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(875.0568, 91.85708, 122.938)",
+      "stage": "forward_after_turn",
+      "turn_blocked": false,
+      "velocity": "(3.832017, -0.514206, 0.048476)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 0,
+      "position": "(875.117, 91.85027, 122.9392)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(3.609573, -0.40901, 0.069305)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 30,
+      "position": "(874.8044, 91.88968, 122.9344)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.854192, 0.382995, -0.036106)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 60,
+      "position": "(873.3781, 92.08125, 122.9163)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.854192, 0.382995, -0.036106)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 90,
+      "position": "(871.9517, 92.27283, 122.8983)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.854192, 0.382995, -0.036106)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 120,
+      "position": "(870.5257, 92.46745, 122.8817)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.85069, 0.409168, -0.023374)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(869.1011, 92.67207, 122.87)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.85069, 0.409168, -0.023374)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(869.0575, 92.67833, 122.8696)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.619731, 0.376018, -0.021481)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(869.0177, 92.68404, 122.8693)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.388773, 0.342868, -0.019587)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(868.9818, 92.68921, 122.869)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-2.157814, 0.309718, -0.017693)",
+      "yaw": -1.62642860412598
+    },
+    {
+      "details": [],
+      "frame": 150,
+      "position": "(868.9496, 92.69382, 122.8687)",
+      "stage": "reverse_after_turn",
+      "turn_blocked": false,
+      "velocity": "(-1.926855, 0.276568, -0.015799)",
+      "yaw": -1.62642860412598
+    }
+  ],
+  "landing_position": "(861.4042, 94.8347, 119.1934)",
+  "landing_ticks": 563,
+  "manual_override": false,
+  "maximum_overlap_count": 4,
+  "maximum_prop_overlap_count": 0,
+  "maximum_stance_slide_m": 1.31677460670471,
+  "minimum_skin_terrain_clearance_m": -0.597125088330387,
+  "original_vertices_checked": 19099838,
+  "overlap_diagnostics": [
+    {
+      "frame": 30,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.0812261924147606,
+          "hull": 2
+        }
+      ],
+      "stage": "forward"
+    },
+    {
+      "frame": 90,
+      "overlaps": [
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.100141502916813,
+          "hull": 2
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.406565070152283,
+          "hull": 4
+        },
+        {
+          "colliders": [
+            "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+          ],
+          "depth": 0.406579256057739,
+          "hull": 5
+        }
+      ],
+      "stage": "forward"
+    }
+  ],
+  "source_after": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "4b12dca180198ee3c92986f5dd39ed648480d3a604421c5609fd760cd8b4da1f",
+    "res://scenes/main.tscn": "e6be17868c5dd0604706d3bb3116e678f471024b671d94cdc1ad6198ca81299c",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "12b5fa896814d13e8f9685f8e1f474103ed0e029a39e3fff81301ed351aee362",
+    "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+    "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+    "res://scripts/dragon_controller.gd": "5bd70388697b2fc3f9ecb84211f3c52ce1d7cbe798e81c8ede69e664f58b7ae0",
+    "res://scripts/dragon_ground_contact.gd": "4a6d03ea85edd850d548fdda58dba711dd4b101417e2d8c330c1abfece322c44",
+    "res://scripts/dragon_ground_pose.gd": "0fc0a2f53c8e4087db863cd23c98156e26bcf6abaf7f23333de327a4812a4562",
+    "res://scripts/dragon_head_pose.gd": "8826d363ae8f0665d0193b1dc588371e5c35ac08ede6ab0ea1b41e7a78f26ef7",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "d81e8d641e5fa6b0e9c7aebf45c3e1ada938eadc7ec8c80b640901131b54e349",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b1571bd906c96bcdef65143b37edcff169725b32101668d4eb74dcd3fca0b661",
+    "res://scripts/terrain.gd": "0b6b1d752c85a902a88c40d095ca88cf050cff57f03f13f3d4295dc5057a8353"
+  },
+  "source_before": {
+    "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+    "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+    "res://project.godot": "4b12dca180198ee3c92986f5dd39ed648480d3a604421c5609fd760cd8b4da1f",
+    "res://scenes/main.tscn": "e6be17868c5dd0604706d3bb3116e678f471024b671d94cdc1ad6198ca81299c",
+    "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+    "res://scripts/combat/test_terrain_player_escape.gd": "12b5fa896814d13e8f9685f8e1f474103ed0e029a39e3fff81301ed351aee362",
+    "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+    "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+    "res://scripts/dragon_controller.gd": "5bd70388697b2fc3f9ecb84211f3c52ce1d7cbe798e81c8ede69e664f58b7ae0",
+    "res://scripts/dragon_ground_contact.gd": "4a6d03ea85edd850d548fdda58dba711dd4b101417e2d8c330c1abfece322c44",
+    "res://scripts/dragon_ground_pose.gd": "0fc0a2f53c8e4087db863cd23c98156e26bcf6abaf7f23333de327a4812a4562",
+    "res://scripts/dragon_head_pose.gd": "8826d363ae8f0665d0193b1dc588371e5c35ac08ede6ab0ea1b41e7a78f26ef7",
+    "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+    "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+    "res://scripts/dragon_wing_contact.gd": "d81e8d641e5fa6b0e9c7aebf45c3e1ada938eadc7ec8c80b640901131b54e349",
+    "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+    "res://scripts/siege_environment.gd": "b1571bd906c96bcdef65143b37edcff169725b32101668d4eb74dcd3fca0b661",
+    "res://scripts/terrain.gd": "0b6b1d752c85a902a88c40d095ca88cf050cff57f03f13f3d4295dc5057a8353"
+  },
+  "stage_quality": {
+    "forward": {
+      "frames": 156,
+      "maximum_stance_slide_m": 0.00122984801419079,
+      "minimum_skin_terrain_clearance_m": -0.597125088330387
+    },
+    "forward_after_turn": {
+      "frames": 155,
+      "maximum_stance_slide_m": 1.31677460670471,
+      "minimum_skin_terrain_clearance_m": -0.277648191060862
+    },
+    "left": {
+      "frames": 125,
+      "maximum_stance_slide_m": 0.00268138223327696,
+      "minimum_skin_terrain_clearance_m": 0.0190617375355373
+    },
+    "reverse": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.00290931132622063,
+      "minimum_skin_terrain_clearance_m": 0.0190319329313979
+    },
+    "reverse_after_turn": {
+      "frames": 155,
+      "maximum_stance_slide_m": 0.00235697673633695,
+      "minimum_skin_terrain_clearance_m": 0.020614303322489
+    }
+  },
+  "stages": {
+    "forward": {
+      "horizontal_distance_m": 10.6830158233643,
+      "yaw_delta_deg": 0.0
+    },
+    "forward_after_turn": {
+      "horizontal_distance_m": 11.6587905883789,
+      "yaw_delta_deg": 0.0
+    },
+    "left": {
+      "horizontal_distance_m": 0.0849761813879013,
+      "yaw_delta_deg": 57.6395292736307
+    },
+    "reverse": {
+      "horizontal_distance_m": 6.49854564666748,
+      "yaw_delta_deg": 0.0
+    },
+    "reverse_after_turn": {
+      "horizontal_distance_m": 6.19602108001709,
+      "yaw_delta_deg": 0.0
+    }
+  },
+  "teleports_after_initial_aerial_fixture": 0,
+  "worst_skin": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 4
+    },
+    "clearance": -0.597125088330387,
+    "physics_frame": 938,
+    "process_frame": 937,
+    "ray": "{ \"position\": (863.8904, 88.5708, 123.0588), \"normal\": (0.106644, 0.929151, 0.353984), \"face_index\": -1, \"collider_id\": 43520099956, \"collider\": ErodedValleyGround_col:<StaticBody3D#43520099956>, \"shape\": 0, \"rid\": RID(644245094401) }",
+    "root": "(862.4312, 93.85546, 120.9363)",
+    "rotation": "(-0.377173, -2.632428, -0.070527)",
+    "sample": "{ \"vertex\": (-3.524457, -1.845963, 8.881945), \"influence\": [{ \"bone\": 36, \"bind\": [X: (0.000012, -0.000296, 151.4212), Y: (19.27872, -150.1911, -0.000107), Z: (150.1911, 19.27872, 0.000042), O: (-1124.05, -163.0527, 570.8563)], \"weight\": 0.64313727617264, \"key\": 1036 }, { \"bone\": 145, \"bind\": [X: (151.4211, 0.000242, -0.000014), Y: (-0.000041, 134.3539, 69.84329), Z: (0.00015, -69.84329, 134.3539), O: (570.8544, 732.3113, -1101.375)], \"weight\": 0.33725491166115, \"key\": 1145 }, { \"bone\": 35, \"bind\": [X: (0.000288, -0.000368, 151.4212), Y: (4.678312, -151.3511, -0.000189), Z: (151.3511, 4.678309, -0.00026), O: (-961.5646, -53.89564, 570.8587)], \"weight\": 0.01960784383118, \"key\": 1035 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": -1, \"limb_claw\": -1, \"mesh\": &\"Object_7\", \"surface\": 0, \"index\": 3948 }",
+    "stage": "forward",
+    "tick": 36,
+    "world": "(863.8904, 87.9738, 123.0588)"
+  },
+  "worst_stance": {
+    "articulation": {
+      "body_compensated": 0,
+      "folded": 0,
+      "restored": 0,
+      "uncleared": 4
+    },
+    "claw": 23,
+    "point": "(863.4185, 88.45676, 123.711)",
+    "previous": "(862.6009, 89.46139, 122.6788)",
+    "root": "(863.9811, 93.14339, 122.7467)",
+    "rotation": "(-0.151433, -1.626429, -0.349721)",
+    "sample": "{ \"vertex\": (-4.591046, -2.894905, 2.595331), \"influence\": [{ \"bone\": 33, \"bind\": [X: (114.8323, 82.01749, -54.9097), Y: (-80.71016, 126.5198, 20.19088), Z: (56.81624, 13.95589, 139.6647), O: (167.3499, 717.515, -575.5001)], \"weight\": 0.93725490570068, \"key\": 2033 }, { \"bone\": 34, \"bind\": [X: (91.35137, 107.5537, -54.9138), Y: (-109.1403, 103.005, 20.18463), Z: (51.69249, 27.40324, 139.664), O: (-43.51487, 728.8987, -575.5366)], \"weight\": 0.0627451017499, \"key\": 2034 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": 23, \"limb_claw\": 23, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 17209 }",
+    "slide": 1.31677460670471,
+    "stage": "forward_after_turn",
+    "tick": 14
+  }
+}

@@ -1,0 +1,2570 @@
+{
+  "cases": [
+    {
+      "distance": 17.9981303204577,
+      "final_position": [
+        0.000000459834524235703,
+        303.001617431641,
+        1.80000019073486
+      ],
+      "frames": 150,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "frontal approaches a wall during smoothing",
+      "max_pivot_distance_m": 16.7185363769531,
+      "min_box_clearance_m": 0.800000071525574,
+      "min_pivot_distance_m": 8.57310199737549,
+      "nonfinite": 0,
+      "orbit_yaw": -3.14159264792278,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 17.9998233746564,
+      "final_position": [
+        0.000000786431598953641,
+        302.999908447266,
+        1.79999995231628
+      ],
+      "frames": 45,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "settled frontal camera after negative-control recovery",
+      "max_pivot_distance_m": 8.57260417938232,
+      "min_box_clearance_m": 0.799999713897705,
+      "min_pivot_distance_m": 8.443039894104,
+      "nonfinite": 0,
+      "orbit_yaw": -3.1415926535775,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 17.9999996438694,
+      "final_position": [
+        17.9999713897705,
+        305.499908447266,
+        9.99998664855957
+      ],
+      "frames": 120,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "front-to-right lateral transition",
+      "max_pivot_distance_m": 18.681489944458,
+      "min_box_clearance_m": 0.799745678901672,
+      "min_pivot_distance_m": 8.61653614044189,
+      "nonfinite": 0,
+      "orbit_yaw": -4.71238882568044,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 17.9999999998459,
+      "final_position": [
+        -17.9999942779541,
+        305.499908447266,
+        9.99999618530273
+      ],
+      "frames": 150,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "right-to-left orbit passes the wall",
+      "max_pivot_distance_m": 18.681510925293,
+      "min_box_clearance_m": 1.58521318435669,
+      "min_pivot_distance_m": 7.63193655014038,
+      "nonfinite": 0,
+      "orbit_yaw": -1.57079633246191,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 18.0,
+      "final_position": [
+        22.5214157104492,
+        303.000091552734,
+        1.80000030994415
+      ],
+      "frames": 180,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "frontal parallel traversal",
+      "max_pivot_distance_m": 9.3283052444458,
+      "min_box_clearance_m": 0.800000309944153,
+      "min_pivot_distance_m": 5.63124418258667,
+      "nonfinite": 0,
+      "orbit_yaw": -3.1415926535379,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 23.9971915776337,
+      "final_position": [
+        0.00000078687475024708,
+        302.375305175781,
+        1.79999959468842
+      ],
+      "frames": 150,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "zoom out against wall",
+      "max_pivot_distance_m": 9.55830383300781,
+      "min_box_clearance_m": 0.799999594688416,
+      "min_pivot_distance_m": 8.41170501708984,
+      "nonfinite": 0,
+      "orbit_yaw": -3.14159265358979,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00528859719019,
+      "final_position": [
+        0.000000612610847383621,
+        305.499908447266,
+        2.9925491809845
+      ],
+      "frames": 150,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "zoom in releases wall clipping",
+      "max_pivot_distance_m": 9.77192974090576,
+      "min_box_clearance_m": 0.522502183914185,
+      "min_pivot_distance_m": 8.51748180389404,
+      "nonfinite": 0,
+      "orbit_yaw": -3.14159265358979,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00477295896434,
+      "final_position": [
+        0.00644380925223231,
+        305.500396728516,
+        2.99329519271851
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 000",
+      "max_pivot_distance_m": 8.6080150604248,
+      "min_box_clearance_m": 1.99329519271851,
+      "min_pivot_distance_m": 8.6080150604248,
+      "nonfinite": 0,
+      "orbit_yaw": -3.14758433427573,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00453431101619,
+      "final_position": [
+        0.0239782650023699,
+        305.501739501953,
+        2.99378895759583
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 001",
+      "max_pivot_distance_m": 8.60842418670654,
+      "min_box_clearance_m": 1.99378895759583,
+      "min_pivot_distance_m": 8.60842418670654,
+      "nonfinite": 0,
+      "orbit_yaw": -3.15881977403423,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00430759546545,
+      "final_position": [
+        0.0558308437466621,
+        305.504119873047,
+        2.99467182159424
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 002",
+      "max_pivot_distance_m": 8.60923671722412,
+      "min_box_clearance_m": 1.99467182159424,
+      "min_pivot_distance_m": 8.60923671722412,
+      "nonfinite": 0,
+      "orbit_yaw": -3.17464441182452,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00409221569222,
+      "final_position": [
+        0.104106113314629,
+        305.507751464844,
+        2.99637389183044
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 003",
+      "max_pivot_distance_m": 8.61041164398193,
+      "min_box_clearance_m": 1.99637389183044,
+      "min_pivot_distance_m": 8.61041164398193,
+      "nonfinite": 0,
+      "orbit_yaw": -3.19448539328804,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00388760490766,
+      "final_position": [
+        0.170027688145638,
+        305.5126953125,
+        2.9994752407074
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 004",
+      "max_pivot_distance_m": 8.61181545257568,
+      "min_box_clearance_m": 1.9994752407074,
+      "min_pivot_distance_m": 8.61181545257568,
+      "nonfinite": 0,
+      "orbit_yaw": -3.21784137157447,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00369322466231,
+      "final_position": [
+        0.254130274057388,
+        305.519012451172,
+        3.00468349456787
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 005",
+      "max_pivot_distance_m": 8.6133337020874,
+      "min_box_clearance_m": 2.00468349456787,
+      "min_pivot_distance_m": 8.6133337020874,
+      "nonfinite": 0,
+      "orbit_yaw": -3.24427358129684,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00350856342922,
+      "final_position": [
+        0.356412380933762,
+        305.526672363281,
+        3.01280355453491
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 006",
+      "max_pivot_distance_m": 8.61483478546143,
+      "min_box_clearance_m": 2.01280355453491,
+      "min_pivot_distance_m": 8.61483478546143,
+      "nonfinite": 0,
+      "orbit_yaw": -3.27339802669515,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00333313525779,
+      "final_position": [
+        0.476459711790085,
+        305.535675048828,
+        3.02470684051514
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 007",
+      "max_pivot_distance_m": 8.61624908447266,
+      "min_box_clearance_m": 2.02470684051514,
+      "min_pivot_distance_m": 8.61624908447266,
+      "nonfinite": 0,
+      "orbit_yaw": -3.30487864492561,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00316647849492,
+      "final_position": [
+        0.613541126251221,
+        305.545989990234,
+        3.04130125045776
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 008",
+      "max_pivot_distance_m": 8.6175365447998,
+      "min_box_clearance_m": 2.04130125045776,
+      "min_pivot_distance_m": 8.6175365447998,
+      "nonfinite": 0,
+      "orbit_yaw": -3.33842132275383,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00300815457019,
+      "final_position": [
+        0.766687273979187,
+        305.557525634766,
+        3.06350421905518
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 009",
+      "max_pivot_distance_m": 8.61866283416748,
+      "min_box_clearance_m": 2.06350421905518,
+      "min_pivot_distance_m": 8.61866283416748,
+      "nonfinite": 0,
+      "orbit_yaw": -3.37376866012427,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00285774684169,
+      "final_position": [
+        0.934752702713013,
+        305.570220947266,
+        3.09221935272217
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 010",
+      "max_pivot_distance_m": 8.61964893341064,
+      "min_box_clearance_m": 2.09221935272217,
+      "min_pivot_distance_m": 8.61964893341064,
+      "nonfinite": 0,
+      "orbit_yaw": -3.41069538737603,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00271485949962,
+      "final_position": [
+        1.1164653301239,
+        305.584014892578,
+        3.12831568717957
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 011",
+      "max_pivot_distance_m": 8.6205415725708,
+      "min_box_clearance_m": 2.12831568717957,
+      "min_pivot_distance_m": 8.6205415725708,
+      "nonfinite": 0,
+      "orbit_yaw": -3.44900435451229,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00257911652465,
+      "final_position": [
+        1.31046545505524,
+        305.598815917969,
+        3.17261219024658
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 012",
+      "max_pivot_distance_m": 8.6213960647583,
+      "min_box_clearance_m": 2.17261219024658,
+      "min_pivot_distance_m": 8.6213960647583,
+      "nonfinite": 0,
+      "orbit_yaw": -3.48852302111597,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00245016069843,
+      "final_position": [
+        1.51533830165863,
+        305.614562988281,
+        3.22586488723755
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 013",
+      "max_pivot_distance_m": 8.62229156494141,
+      "min_box_clearance_m": 2.22586488723755,
+      "min_pivot_distance_m": 8.62229156494141,
+      "nonfinite": 0,
+      "orbit_yaw": -3.52910038441761,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00232765266351,
+      "final_position": [
+        1.72963869571686,
+        305.631164550781,
+        3.28875708580017
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 014",
+      "max_pivot_distance_m": 8.62329864501953,
+      "min_box_clearance_m": 2.28875708580017,
+      "min_pivot_distance_m": 8.62329864501953,
+      "nonfinite": 0,
+      "orbit_yaw": -3.57060429082225,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00221127003034,
+      "final_position": [
+        1.95191144943237,
+        305.648529052734,
+        3.36189365386963
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 015",
+      "max_pivot_distance_m": 8.62448692321777,
+      "min_box_clearance_m": 2.36189365386963,
+      "min_pivot_distance_m": 8.62448692321777,
+      "nonfinite": 0,
+      "orbit_yaw": -3.61291908302959,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00210070652883,
+      "final_position": [
+        2.18070721626282,
+        305.666625976562,
+        3.44579553604126
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 016",
+      "max_pivot_distance_m": 8.62595558166504,
+      "min_box_clearance_m": 2.44579553604126,
+      "min_pivot_distance_m": 8.62595558166504,
+      "nonfinite": 0,
+      "orbit_yaw": -3.65594354085624,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00199567120239,
+      "final_position": [
+        2.41459488868713,
+        305.685333251953,
+        3.54089832305908
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 017",
+      "max_pivot_distance_m": 8.62774276733398,
+      "min_box_clearance_m": 2.54089832305908,
+      "min_pivot_distance_m": 8.62774276733398,
+      "nonfinite": 0,
+      "orbit_yaw": -3.69958907909834,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00189588764228,
+      "final_position": [
+        2.65217185020447,
+        305.704620361328,
+        3.64755153656006
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 018",
+      "max_pivot_distance_m": 8.62993049621582,
+      "min_box_clearance_m": 2.64755153656006,
+      "min_pivot_distance_m": 8.62993049621582,
+      "nonfinite": 0,
+      "orbit_yaw": -3.74377817034904,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00180109326017,
+      "final_position": [
+        2.89207196235657,
+        305.724426269531,
+        3.76601886749268
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 019",
+      "max_pivot_distance_m": 8.632568359375,
+      "min_box_clearance_m": 2.76601886749268,
+      "min_pivot_distance_m": 8.632568359375,
+      "nonfinite": 0,
+      "orbit_yaw": -3.78844296469035,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00171103859716,
+      "final_position": [
+        3.13297057151794,
+        305.744689941406,
+        3.89648103713989
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 020",
+      "max_pivot_distance_m": 8.63569450378418,
+      "min_box_clearance_m": 2.89648103713989,
+      "min_pivot_distance_m": 8.63569450378418,
+      "nonfinite": 0,
+      "orbit_yaw": -3.83352408168434,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.0016254866673,
+      "final_position": [
+        3.37358975410461,
+        305.765380859375,
+        4.03903770446777
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 021",
+      "max_pivot_distance_m": 8.63935279846191,
+      "min_box_clearance_m": 3.03903770446777,
+      "min_pivot_distance_m": 8.63935279846191,
+      "nonfinite": 0,
+      "orbit_yaw": -3.87896955315607,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00154421233394,
+      "final_position": [
+        3.61270141601562,
+        305.786407470703,
+        4.19371032714844
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 022",
+      "max_pivot_distance_m": 8.64353656768799,
+      "min_box_clearance_m": 3.19371032714844,
+      "min_pivot_distance_m": 8.64353656768799,
+      "nonfinite": 0,
+      "orbit_yaw": -3.9247338979454,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00146700171724,
+      "final_position": [
+        3.84912967681885,
+        305.807739257812,
+        4.36044645309448
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 023",
+      "max_pivot_distance_m": 8.6482629776001,
+      "min_box_clearance_m": 3.36044645309448,
+      "min_pivot_distance_m": 8.6482629776001,
+      "nonfinite": 0,
+      "orbit_yaw": -3.97077731215444,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00139365163138,
+      "final_position": [
+        4.08175277709961,
+        305.829376220703,
+        4.53912448883057
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 024",
+      "max_pivot_distance_m": 8.65356063842773,
+      "min_box_clearance_m": 3.53912448883057,
+      "min_pivot_distance_m": 8.65356063842773,
+      "nonfinite": 0,
+      "orbit_yaw": -4.01706496047377,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00132396904981,
+      "final_position": [
+        4.30950355529785,
+        305.851226806641,
+        4.72955513000488
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 025",
+      "max_pivot_distance_m": 8.65939044952393,
+      "min_box_clearance_m": 3.72955513000488,
+      "min_pivot_distance_m": 8.65939044952393,
+      "nonfinite": 0,
+      "orbit_yaw": -4.06356635597003,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00125777059733,
+      "final_position": [
+        4.53137016296387,
+        305.873291015625,
+        4.93148899078369
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 026",
+      "max_pivot_distance_m": 8.66575908660889,
+      "min_box_clearance_m": 3.93148899078369,
+      "min_pivot_distance_m": 8.66575908660889,
+      "nonfinite": 0,
+      "orbit_yaw": -4.11025481729256,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00119488206746,
+      "final_position": [
+        4.74639701843262,
+        305.895538330078,
+        5.14461851119995
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 027",
+      "max_pivot_distance_m": 8.67264938354492,
+      "min_box_clearance_m": 4.14461851119995,
+      "min_pivot_distance_m": 8.67264938354492,
+      "nonfinite": 0,
+      "orbit_yaw": -4.15710699363514,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00113513796409,
+      "final_position": [
+        4.95368432998657,
+        305.917938232422,
+        5.36858224868774
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 028",
+      "max_pivot_distance_m": 8.68003940582275,
+      "min_box_clearance_m": 4.36858224868774,
+      "min_pivot_distance_m": 8.68003940582275,
+      "nonfinite": 0,
+      "orbit_yaw": -4.20410244899521,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00107838106588,
+      "final_position": [
+        5.15238618850708,
+        305.940460205078,
+        5.60296964645386
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 029",
+      "max_pivot_distance_m": 8.68789768218994,
+      "min_box_clearance_m": 4.60296964645386,
+      "min_pivot_distance_m": 8.68789768218994,
+      "nonfinite": 0,
+      "orbit_yaw": -4.25122329832855,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00102446201259,
+      "final_position": [
+        5.34171342849731,
+        305.963104248047,
+        5.84732532501221
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 030",
+      "max_pivot_distance_m": 8.69621276855469,
+      "min_box_clearance_m": 4.84732532501221,
+      "min_pivot_distance_m": 8.69621276855469,
+      "nonfinite": 0,
+      "orbit_yaw": -4.29845388912167,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00097323891196,
+      "final_position": [
+        5.52093029022217,
+        305.985809326172,
+        6.10115146636963
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 031",
+      "max_pivot_distance_m": 8.70492935180664,
+      "min_box_clearance_m": 5.10115146636963,
+      "min_pivot_distance_m": 8.70492935180664,
+      "nonfinite": 0,
+      "orbit_yaw": -4.34578052271238,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00092457696636,
+      "final_position": [
+        5.68935441970825,
+        306.008605957031,
+        6.36391258239746
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 032",
+      "max_pivot_distance_m": 8.7140474319458,
+      "min_box_clearance_m": 5.36391258239746,
+      "min_pivot_distance_m": 8.7140474319458,
+      "nonfinite": 0,
+      "orbit_yaw": -4.39319121039704,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00087834811804,
+      "final_position": [
+        5.84635639190674,
+        306.031433105469,
+        6.63503885269165
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 033",
+      "max_pivot_distance_m": 8.72350788116455,
+      "min_box_clearance_m": 5.63503885269165,
+      "min_pivot_distance_m": 8.72350788116455,
+      "nonfinite": 0,
+      "orbit_yaw": -4.44067545998206,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00083443071214,
+      "final_position": [
+        5.99135971069336,
+        306.054290771484,
+        6.91392946243286
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 034",
+      "max_pivot_distance_m": 8.73329067230225,
+      "min_box_clearance_m": 5.91392946243286,
+      "min_pivot_distance_m": 8.73329067230225,
+      "nonfinite": 0,
+      "orbit_yaw": -4.48822408897959,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00079270917653,
+      "final_position": [
+        6.12383842468262,
+        306.077178955078,
+        7.19995546340942
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 035",
+      "max_pivot_distance_m": 8.74337291717529,
+      "min_box_clearance_m": 6.19995546340942,
+      "min_pivot_distance_m": 8.74337291717529,
+      "nonfinite": 0,
+      "orbit_yaw": -4.53582906112124,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00075307371771,
+      "final_position": [
+        6.24331760406494,
+        306.10009765625,
+        7.49246311187744
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 036",
+      "max_pivot_distance_m": 8.75373363494873,
+      "min_box_clearance_m": 6.49246311187744,
+      "min_pivot_distance_m": 8.75373363494873,
+      "nonfinite": 0,
+      "orbit_yaw": -4.58348334327933,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00071542003182,
+      "final_position": [
+        6.34937191009521,
+        306.123016357422,
+        7.79077768325806
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 037",
+      "max_pivot_distance_m": 8.76433086395264,
+      "min_box_clearance_m": 6.79077768325806,
+      "min_pivot_distance_m": 8.76433086395264,
+      "nonfinite": 0,
+      "orbit_yaw": -4.63118078024817,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00067964903023,
+      "final_position": [
+        6.44162559509277,
+        306.145904541016,
+        8.09420490264893
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 038",
+      "max_pivot_distance_m": 8.77512645721436,
+      "min_box_clearance_m": 7.09420490264893,
+      "min_pivot_distance_m": 8.77512645721436,
+      "nonfinite": 0,
+      "orbit_yaw": -4.67891598515598,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00064566657872,
+      "final_position": [
+        6.51975059509277,
+        306.168792724609,
+        8.40203380584717
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 039",
+      "max_pivot_distance_m": 8.78611755371094,
+      "min_box_clearance_m": 7.40203380584717,
+      "min_pivot_distance_m": 8.78611755371094,
+      "nonfinite": 0,
+      "orbit_yaw": -4.72668424355627,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00061338324978,
+      "final_position": [
+        6.58346700668335,
+        306.191650390625,
+        8.71354007720947
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 040",
+      "max_pivot_distance_m": 8.79726696014404,
+      "min_box_clearance_m": 7.71354007720947,
+      "min_pivot_distance_m": 8.79726696014404,
+      "nonfinite": 0,
+      "orbit_yaw": -4.7744814294913,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.0005827140873,
+      "final_position": [
+        6.63254070281982,
+        306.214508056641,
+        9.02798938751221
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 041",
+      "max_pivot_distance_m": 8.80857467651367,
+      "min_box_clearance_m": 8.02798938751221,
+      "min_pivot_distance_m": 8.80857467651367,
+      "nonfinite": 0,
+      "orbit_yaw": -4.82230393203291,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00055357838293,
+      "final_position": [
+        6.66678476333618,
+        306.2373046875,
+        9.34463787078857
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 042",
+      "max_pivot_distance_m": 8.81998729705811,
+      "min_box_clearance_m": 8.34463787078857,
+      "min_pivot_distance_m": 8.81998729705811,
+      "nonfinite": 0,
+      "orbit_yaw": -4.87014859099313,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00052589946378,
+      "final_position": [
+        6.68605661392212,
+        306.260070800781,
+        9.66273498535156
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 043",
+      "max_pivot_distance_m": 8.83150768280029,
+      "min_box_clearance_m": 8.66273498535156,
+      "min_pivot_distance_m": 8.83150768280029,
+      "nonfinite": 0,
+      "orbit_yaw": -4.91801264065976,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00049960449059,
+      "final_position": [
+        6.69025850296021,
+        306.282806396484,
+        9.98152637481689
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 044",
+      "max_pivot_distance_m": 8.84311866760254,
+      "min_box_clearance_m": 8.98152637481689,
+      "min_pivot_distance_m": 8.84311866760254,
+      "nonfinite": 0,
+      "orbit_yaw": -4.96589366055528,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00047462426607,
+      "final_position": [
+        6.6793360710144,
+        306.305480957031,
+        10.3002557754517
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 045",
+      "max_pivot_distance_m": 8.85478973388672,
+      "min_box_clearance_m": 9.30025577545166,
+      "min_pivot_distance_m": 8.85478973388672,
+      "nonfinite": 0,
+      "orbit_yaw": -5.01378953234234,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00045089305276,
+      "final_position": [
+        6.65327882766724,
+        306.328094482422,
+        10.6181678771973
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 046",
+      "max_pivot_distance_m": 8.86650657653809,
+      "min_box_clearance_m": 9.61816787719727,
+      "min_pivot_distance_m": 8.86650657653809,
+      "nonfinite": 0,
+      "orbit_yaw": -5.06169840210862,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00042834840012,
+      "final_position": [
+        6.61211729049683,
+        306.350677490234,
+        10.9345083236694
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 047",
+      "max_pivot_distance_m": 8.8782787322998,
+      "min_box_clearance_m": 9.93450832366943,
+      "min_pivot_distance_m": 8.8782787322998,
+      "nonfinite": 0,
+      "orbit_yaw": -5.1096186473595,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00040693098012,
+      "final_position": [
+        6.55592393875122,
+        306.373199462891,
+        11.2485284805298
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 048",
+      "max_pivot_distance_m": 8.89007472991943,
+      "min_box_clearance_m": 10.2485284805298,
+      "min_pivot_distance_m": 8.89007472991943,
+      "nonfinite": 0,
+      "orbit_yaw": -5.15754884813101,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00038658443111,
+      "final_position": [
+        6.48481130599976,
+        306.395660400391,
+        11.5594854354858
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 049",
+      "max_pivot_distance_m": 8.90188598632812,
+      "min_box_clearance_m": 10.5594854354858,
+      "min_pivot_distance_m": 8.90188598632812,
+      "nonfinite": 0,
+      "orbit_yaw": -5.20548776170855,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00036725520956,
+      "final_position": [
+        6.3989315032959,
+        306.418060302734,
+        11.866644859314
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 050",
+      "max_pivot_distance_m": 8.91370391845703,
+      "min_box_clearance_m": 10.866644859314,
+      "min_pivot_distance_m": 8.91370391845703,
+      "nonfinite": 0,
+      "orbit_yaw": -5.25343430050145,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00034889244908,
+      "final_position": [
+        6.29847574234009,
+        306.440399169922,
+        12.1692810058594
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 051",
+      "max_pivot_distance_m": 8.92552089691162,
+      "min_box_clearance_m": 11.1692810058594,
+      "min_pivot_distance_m": 8.92552089691162,
+      "nonfinite": 0,
+      "orbit_yaw": -5.3013875126794,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00033144782662,
+      "final_position": [
+        6.18367195129395,
+        306.462677001953,
+        12.466682434082
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 052",
+      "max_pivot_distance_m": 8.93732833862305,
+      "min_box_clearance_m": 11.466682434082,
+      "min_pivot_distance_m": 8.93732833862305,
+      "nonfinite": 0,
+      "orbit_yaw": -5.34934656522588,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00031487543529,
+      "final_position": [
+        6.05478572845459,
+        306.48486328125,
+        12.7581491470337
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 053",
+      "max_pivot_distance_m": 8.94910049438477,
+      "min_box_clearance_m": 11.7581491470337,
+      "min_pivot_distance_m": 8.94910049438477,
+      "nonfinite": 0,
+      "orbit_yaw": -5.39731072910708,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00029913166353,
+      "final_position": [
+        5.91211748123169,
+        306.506988525391,
+        13.0429973602295
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 054",
+      "max_pivot_distance_m": 8.96085262298584,
+      "min_box_clearance_m": 12.0429973602295,
+      "min_pivot_distance_m": 8.96085262298584,
+      "nonfinite": 0,
+      "orbit_yaw": -5.44527936629204,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00028417508035,
+      "final_position": [
+        5.75600337982178,
+        306.529052734375,
+        13.3205595016479
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 055",
+      "max_pivot_distance_m": 8.97257804870605,
+      "min_box_clearance_m": 12.3205595016479,
+      "min_pivot_distance_m": 8.97257804870605,
+      "nonfinite": 0,
+      "orbit_yaw": -5.49325191839312,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00026996632633,
+      "final_position": [
+        5.58681106567383,
+        306.551055908203,
+        13.5901870727539
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 056",
+      "max_pivot_distance_m": 8.98427391052246,
+      "min_box_clearance_m": 12.5901870727539,
+      "min_pivot_distance_m": 8.98427391052246,
+      "nonfinite": 0,
+      "orbit_yaw": -5.54122789672431,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00025646801002,
+      "final_position": [
+        5.40494251251221,
+        306.572967529297,
+        13.8512525558472
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 057",
+      "max_pivot_distance_m": 8.99591445922852,
+      "min_box_clearance_m": 12.8512525558472,
+      "min_pivot_distance_m": 8.99591445922852,
+      "nonfinite": 0,
+      "orbit_yaw": -5.58920687360069,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00024364460952,
+      "final_position": [
+        5.21082878112793,
+        306.594818115234,
+        14.1031484603882
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 058",
+      "max_pivot_distance_m": 9.00751781463623,
+      "min_box_clearance_m": 13.1031484603882,
+      "min_pivot_distance_m": 9.00751781463623,
+      "nonfinite": 0,
+      "orbit_yaw": -5.63718847472382,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00023146237904,
+      "final_position": [
+        5.00493192672729,
+        306.616577148438,
+        14.345290184021
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 059",
+      "max_pivot_distance_m": 9.01905822753906,
+      "min_box_clearance_m": 13.345290184021,
+      "min_pivot_distance_m": 9.01905822753906,
+      "nonfinite": 0,
+      "orbit_yaw": -5.68517237251768,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00021988926009,
+      "final_position": [
+        4.78774261474609,
+        306.638275146484,
+        14.5771179199219
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 060",
+      "max_pivot_distance_m": 9.03055381774902,
+      "min_box_clearance_m": 13.5771179199219,
+      "min_pivot_distance_m": 9.03055381774902,
+      "nonfinite": 0,
+      "orbit_yaw": -5.73315828029649,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00020889479708,
+      "final_position": [
+        4.55977773666382,
+        306.659881591797,
+        14.7980976104736
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 061",
+      "max_pivot_distance_m": 9.04198265075684,
+      "min_box_clearance_m": 13.7980976104736,
+      "min_pivot_distance_m": 9.04198265075684,
+      "nonfinite": 0,
+      "orbit_yaw": -5.7811459471605,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00019845005723,
+      "final_position": [
+        4.32158041000366,
+        306.681427001953,
+        15.0077209472656
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 062",
+      "max_pivot_distance_m": 9.05336284637451,
+      "min_box_clearance_m": 14.0077209472656,
+      "min_pivot_distance_m": 9.05336284637451,
+      "nonfinite": 0,
+      "orbit_yaw": -5.82913515352894,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00018852755437,
+      "final_position": [
+        4.07371759414673,
+        306.702911376953,
+        15.205509185791
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 063",
+      "max_pivot_distance_m": 9.06469058990479,
+      "min_box_clearance_m": 14.205509185791,
+      "min_pivot_distance_m": 9.06469058990479,
+      "nonfinite": 0,
+      "orbit_yaw": -5.87712570723058,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00017910117665,
+      "final_position": [
+        3.81677937507629,
+        306.724304199219,
+        15.3910112380981
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 064",
+      "max_pivot_distance_m": 9.0759449005127,
+      "min_box_clearance_m": 14.3910112380981,
+      "min_pivot_distance_m": 9.0759449005127,
+      "nonfinite": 0,
+      "orbit_yaw": -5.92511744008229,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00017014611782,
+      "final_position": [
+        3.55137705802917,
+        306.74560546875,
+        15.5638065338135
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 065",
+      "max_pivot_distance_m": 9.08712291717529,
+      "min_box_clearance_m": 14.5638065338135,
+      "min_pivot_distance_m": 9.08712291717529,
+      "nonfinite": 0,
+      "orbit_yaw": -5.97311020489469,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00016163881193,
+      "final_position": [
+        3.27814126014709,
+        306.766845703125,
+        15.7235059738159
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 066",
+      "max_pivot_distance_m": 9.09824657440186,
+      "min_box_clearance_m": 14.7235059738159,
+      "min_pivot_distance_m": 9.09824657440186,
+      "nonfinite": 0,
+      "orbit_yaw": -6.02110387285154,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00015355687133,
+      "final_position": [
+        2.99772071838379,
+        306.787994384766,
+        15.8697509765625
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 067",
+      "max_pivot_distance_m": 9.10929012298584,
+      "min_box_clearance_m": 14.8697509765625,
+      "min_pivot_distance_m": 9.10929012298584,
+      "nonfinite": 0,
+      "orbit_yaw": -6.06909833121632,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00014587902776,
+      "final_position": [
+        2.71078109741211,
+        306.809051513672,
+        16.0022163391113
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 068",
+      "max_pivot_distance_m": 9.12025547027588,
+      "min_box_clearance_m": 15.0022163391113,
+      "min_pivot_distance_m": 9.12025547027588,
+      "nonfinite": 0,
+      "orbit_yaw": -6.11709348132503,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00013858507638,
+      "final_position": [
+        2.41800236701965,
+        306.830047607422,
+        16.1206111907959
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 069",
+      "max_pivot_distance_m": 9.1311616897583,
+      "min_box_clearance_m": 15.1206111907959,
+      "min_pivot_distance_m": 9.1311616897583,
+      "nonfinite": 0,
+      "orbit_yaw": -6.16508923682958,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00013165582256,
+      "final_position": [
+        2.12007713317871,
+        306.850952148438,
+        16.2246761322021
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 070",
+      "max_pivot_distance_m": 9.14198589324951,
+      "min_box_clearance_m": 15.2246761322021,
+      "min_pivot_distance_m": 9.14198589324951,
+      "nonfinite": 0,
+      "orbit_yaw": -6.2130855221604,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00012507303143,
+      "final_position": [
+        1.81771063804626,
+        306.871795654297,
+        16.31418800354
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 071",
+      "max_pivot_distance_m": 9.15275001525879,
+      "min_box_clearance_m": 15.31418800354,
+      "min_pivot_distance_m": 9.15275001525879,
+      "nonfinite": 0,
+      "orbit_yaw": -6.26108227118105,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00011881937986,
+      "final_position": [
+        1.5116161108017,
+        306.892547607422,
+        16.3889598846436
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 072",
+      "max_pivot_distance_m": 9.16343021392822,
+      "min_box_clearance_m": 15.3889598846436,
+      "min_pivot_distance_m": 9.16343021392822,
+      "nonfinite": 0,
+      "orbit_yaw": -6.30907942601066,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00011287841087,
+      "final_position": [
+        1.20251607894897,
+        306.913208007812,
+        16.4488372802734
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 073",
+      "max_pivot_distance_m": 9.17402744293213,
+      "min_box_clearance_m": 15.4488372802734,
+      "min_pivot_distance_m": 9.17402744293213,
+      "nonfinite": 0,
+      "orbit_yaw": -6.35707693599345,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00010723449032,
+      "final_position": [
+        0.891138732433319,
+        306.933776855469,
+        16.4937019348145
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 074",
+      "max_pivot_distance_m": 9.18453979492188,
+      "min_box_clearance_m": 15.4937019348145,
+      "min_pivot_distance_m": 9.18453979492188,
+      "nonfinite": 0,
+      "orbit_yaw": -6.40507475679682,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00010187276581,
+      "final_position": [
+        0.578215777873993,
+        306.954284667969,
+        16.523473739624
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 075",
+      "max_pivot_distance_m": 9.19499015808105,
+      "min_box_clearance_m": 15.523473739624,
+      "min_pivot_distance_m": 9.19499015808105,
+      "nonfinite": 0,
+      "orbit_yaw": -6.45307284962207,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00009677912752,
+      "final_position": [
+        0.264482885599136,
+        306.974700927734,
+        16.538106918335
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 076",
+      "max_pivot_distance_m": 9.20535373687744,
+      "min_box_clearance_m": 15.538106918335,
+      "min_pivot_distance_m": 9.20535373687744,
+      "nonfinite": 0,
+      "orbit_yaw": -6.50107118051362,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00009194017114,
+      "final_position": [
+        -0.0493249893188477,
+        306.995025634766,
+        16.5375919342041
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 077",
+      "max_pivot_distance_m": 9.21563339233398,
+      "min_box_clearance_m": 15.5375919342041,
+      "min_pivot_distance_m": 9.21563339233398,
+      "nonfinite": 0,
+      "orbit_yaw": -6.54906971975444,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00008734316258,
+      "final_position": [
+        -0.36247244477272,
+        307.015289306641,
+        16.5219554901123
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 078",
+      "max_pivot_distance_m": 9.22584915161133,
+      "min_box_clearance_m": 15.5219554901123,
+      "min_pivot_distance_m": 9.22584915161133,
+      "nonfinite": 0,
+      "orbit_yaw": -6.59706844133697,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00008297600445,
+      "final_position": [
+        -0.674227833747864,
+        307.035461425781,
+        16.4912586212158
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 079",
+      "max_pivot_distance_m": 9.23597812652588,
+      "min_box_clearance_m": 15.4912586212158,
+      "min_pivot_distance_m": 9.23597812652588,
+      "nonfinite": 0,
+      "orbit_yaw": -6.64506732250012,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00007882720423,
+      "final_position": [
+        -0.983863711357117,
+        307.055541992188,
+        16.4456005096436
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 080",
+      "max_pivot_distance_m": 9.24602031707764,
+      "min_box_clearance_m": 15.4456005096436,
+      "min_pivot_distance_m": 9.24602031707764,
+      "nonfinite": 0,
+      "orbit_yaw": -6.69306634332395,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00007488584402,
+      "final_position": [
+        -1.29065918922424,
+        307.075531005859,
+        16.3851127624512
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 081",
+      "max_pivot_distance_m": 9.2559757232666,
+      "min_box_clearance_m": 15.3851127624512,
+      "min_pivot_distance_m": 9.2559757232666,
+      "nonfinite": 0,
+      "orbit_yaw": -6.7410654863751,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00007114155182,
+      "final_position": [
+        -1.59390091896057,
+        307.095428466797,
+        16.309965133667
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 082",
+      "max_pivot_distance_m": 9.26584339141846,
+      "min_box_clearance_m": 15.309965133667,
+      "min_pivot_distance_m": 9.26584339141846,
+      "nonfinite": 0,
+      "orbit_yaw": -6.78906473639633,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00006758447423,
+      "final_position": [
+        -1.89288520812988,
+        307.115264892578,
+        16.2203598022461
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 083",
+      "max_pivot_distance_m": 9.2756462097168,
+      "min_box_clearance_m": 15.2203598022461,
+      "min_pivot_distance_m": 9.2756462097168,
+      "nonfinite": 0,
+      "orbit_yaw": -6.83706408003492,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00006420525052,
+      "final_position": [
+        -2.18691992759705,
+        307.135009765625,
+        16.1165332794189
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 084",
+      "max_pivot_distance_m": 9.28536224365234,
+      "min_box_clearance_m": 15.1165332794189,
+      "min_pivot_distance_m": 9.28536224365234,
+      "nonfinite": 0,
+      "orbit_yaw": -6.88506350560492,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00006099498799,
+      "final_position": [
+        -2.4753258228302,
+        307.154663085938,
+        15.9987554550171
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 085",
+      "max_pivot_distance_m": 9.29499053955078,
+      "min_box_clearance_m": 14.9987554550171,
+      "min_pivot_distance_m": 9.29499053955078,
+      "nonfinite": 0,
+      "orbit_yaw": -6.93306300287912,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00005794523859,
+      "final_position": [
+        -2.75743842124939,
+        307.174224853516,
+        15.8673295974731
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 086",
+      "max_pivot_distance_m": 9.30453109741211,
+      "min_box_clearance_m": 14.8673295974731,
+      "min_pivot_distance_m": 9.30453109741211,
+      "nonfinite": 0,
+      "orbit_yaw": -6.98106256290691,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00005504797666,
+      "final_position": [
+        -3.03260946273804,
+        307.193695068359,
+        15.7225885391235
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 087",
+      "max_pivot_distance_m": 9.31398391723633,
+      "min_box_clearance_m": 14.7225885391235,
+      "min_pivot_distance_m": 9.31398391723633,
+      "nonfinite": 0,
+      "orbit_yaw": -7.02906217785497,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00005229557783,
+      "final_position": [
+        -3.30020785331726,
+        307.213104248047,
+        15.5648984909058
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 088",
+      "max_pivot_distance_m": 9.32337093353271,
+      "min_box_clearance_m": 14.5648984909058,
+      "min_pivot_distance_m": 9.32337093353271,
+      "nonfinite": 0,
+      "orbit_yaw": -7.07706184086778,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00004968079894,
+      "final_position": [
+        -3.55962228775024,
+        307.232421875,
+        15.3946542739868
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 089",
+      "max_pivot_distance_m": 9.33266925811768,
+      "min_box_clearance_m": 14.3946542739868,
+      "min_pivot_distance_m": 9.33266925811768,
+      "nonfinite": 0,
+      "orbit_yaw": -7.12506154594559,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00004719675899,
+      "final_position": [
+        -3.81026196479797,
+        307.251647949219,
+        15.2122802734375
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 090",
+      "max_pivot_distance_m": 9.34187984466553,
+      "min_box_clearance_m": 14.2122802734375,
+      "min_pivot_distance_m": 9.34187984466553,
+      "nonfinite": 0,
+      "orbit_yaw": -7.17306128783755,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00004483692104,
+      "final_position": [
+        -4.05155801773071,
+        307.270782470703,
+        15.0182275772095
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 091",
+      "max_pivot_distance_m": 9.35100078582764,
+      "min_box_clearance_m": 14.0182275772095,
+      "min_pivot_distance_m": 9.35100078582764,
+      "nonfinite": 0,
+      "orbit_yaw": -7.22106106194829,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00004259507499,
+      "final_position": [
+        -4.2829647064209,
+        307.289825439453,
+        14.8129758834839
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 092",
+      "max_pivot_distance_m": 9.36003494262695,
+      "min_box_clearance_m": 13.8129758834839,
+      "min_pivot_distance_m": 9.36003494262695,
+      "nonfinite": 0,
+      "orbit_yaw": -7.26906086425603,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00004046532124,
+      "final_position": [
+        -4.50396060943604,
+        307.308776855469,
+        14.5970306396484
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 093",
+      "max_pivot_distance_m": 9.36898040771484,
+      "min_box_clearance_m": 13.5970306396484,
+      "min_pivot_distance_m": 9.36898040771484,
+      "nonfinite": 0,
+      "orbit_yaw": -7.31706069124104,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00003844205518,
+      "final_position": [
+        -4.71405029296875,
+        307.32763671875,
+        14.3709192276001
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 094",
+      "max_pivot_distance_m": 9.37783718109131,
+      "min_box_clearance_m": 13.3709192276001,
+      "min_pivot_distance_m": 9.37783718109131,
+      "nonfinite": 0,
+      "orbit_yaw": -7.36506053982294,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00003651995242,
+      "final_position": [
+        -4.91276597976685,
+        307.346405029297,
+        14.1351938247681
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 095",
+      "max_pivot_distance_m": 9.38660526275635,
+      "min_box_clearance_m": 13.1351938247681,
+      "min_pivot_distance_m": 9.38660526275635,
+      "nonfinite": 0,
+      "orbit_yaw": -7.41306040730585,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.0000346939548,
+      "final_position": [
+        -5.09966707229614,
+        307.365112304688,
+        13.8904275894165
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 096",
+      "max_pivot_distance_m": 9.39530754089355,
+      "min_box_clearance_m": 12.8904275894165,
+      "min_pivot_distance_m": 9.39530754089355,
+      "nonfinite": 0,
+      "orbit_yaw": -7.46106029133044,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00003295925706,
+      "final_position": [
+        -5.27434158325195,
+        307.383728027344,
+        13.6372137069702
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 097",
+      "max_pivot_distance_m": 9.40392017364502,
+      "min_box_clearance_m": 12.6372137069702,
+      "min_pivot_distance_m": 9.40392017364502,
+      "nonfinite": 0,
+      "orbit_yaw": -7.50906018983185,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.0000313112942,
+      "final_position": [
+        -5.43640804290771,
+        307.402252197266,
+        13.3761653900146
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 098",
+      "max_pivot_distance_m": 9.41244411468506,
+      "min_box_clearance_m": 12.3761653900146,
+      "min_pivot_distance_m": 9.41244411468506,
+      "nonfinite": 0,
+      "orbit_yaw": -7.55706010100299,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002974572949,
+      "final_position": [
+        -5.58551597595215,
+        307.420684814453,
+        13.1079111099243
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 099",
+      "max_pivot_distance_m": 9.42087936401367,
+      "min_box_clearance_m": 12.1079111099243,
+      "min_pivot_distance_m": 9.42087936401367,
+      "nonfinite": 0,
+      "orbit_yaw": -7.60506002326235,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002825844302,
+      "final_position": [
+        -5.7213454246521,
+        307.439025878906,
+        12.8330965042114
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 100",
+      "max_pivot_distance_m": 9.42922687530518,
+      "min_box_clearance_m": 11.8330965042114,
+      "min_pivot_distance_m": 9.42922687530518,
+      "nonfinite": 0,
+      "orbit_yaw": -7.65305995522581,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002684552087,
+      "final_position": [
+        -5.84360980987549,
+        307.457275390625,
+        12.5523815155029
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 101",
+      "max_pivot_distance_m": 9.43748378753662,
+      "min_box_clearance_m": 11.5523815155029,
+      "min_pivot_distance_m": 9.43748378753662,
+      "nonfinite": 0,
+      "orbit_yaw": -7.70105989568204,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002550324483,
+      "final_position": [
+        -5.95205450057983,
+        307.475433349609,
+        12.2664365768433
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 102",
+      "max_pivot_distance_m": 9.44565296173096,
+      "min_box_clearance_m": 11.2664365768433,
+      "min_pivot_distance_m": 9.44565296173096,
+      "nonfinite": 0,
+      "orbit_yaw": -7.74905984357093,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002422808258,
+      "final_position": [
+        -6.04645872116089,
+        307.493499755859,
+        11.975944519043
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 103",
+      "max_pivot_distance_m": 9.45373249053955,
+      "min_box_clearance_m": 10.975944519043,
+      "min_pivot_distance_m": 9.45373249053955,
+      "nonfinite": 0,
+      "orbit_yaw": -7.79705979796467,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002301667845,
+      "final_position": [
+        -6.12663507461548,
+        307.511474609375,
+        11.6815977096558
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 104",
+      "max_pivot_distance_m": 9.46172332763672,
+      "min_box_clearance_m": 10.6815977096558,
+      "min_pivot_distance_m": 9.46172332763672,
+      "nonfinite": 0,
+      "orbit_yaw": -7.8450597580513,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002186584453,
+      "final_position": [
+        -6.19243097305298,
+        307.529357910156,
+        11.3840951919556
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 105",
+      "max_pivot_distance_m": 9.46962451934814,
+      "min_box_clearance_m": 10.3840951919556,
+      "min_pivot_distance_m": 9.46962451934814,
+      "nonfinite": 0,
+      "orbit_yaw": -7.89305972312017,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00002077255231,
+      "final_position": [
+        -6.243727684021,
+        307.547149658203,
+        11.0841426849365
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 106",
+      "max_pivot_distance_m": 9.47743701934814,
+      "min_box_clearance_m": 10.0841426849365,
+      "min_pivot_distance_m": 9.47743701934814,
+      "nonfinite": 0,
+      "orbit_yaw": -7.94105969254938,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001973392469,
+      "final_position": [
+        -6.28044176101685,
+        307.564849853516,
+        10.7824487686157
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 107",
+      "max_pivot_distance_m": 9.48516082763672,
+      "min_box_clearance_m": 9.78244876861572,
+      "min_pivot_distance_m": 9.48516082763672,
+      "nonfinite": 0,
+      "orbit_yaw": -7.98905966579465,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001874722846,
+      "final_position": [
+        -6.30252408981323,
+        307.582458496094,
+        10.4797239303589
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 108",
+      "max_pivot_distance_m": 9.49279499053955,
+      "min_box_clearance_m": 9.47972393035889,
+      "min_pivot_distance_m": 9.49279499053955,
+      "nonfinite": 0,
+      "orbit_yaw": -8.03705964237961,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001780986703,
+      "final_position": [
+        -6.30996084213257,
+        307.599975585938,
+        10.1766815185547
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 109",
+      "max_pivot_distance_m": 9.50034046173096,
+      "min_box_clearance_m": 9.17668151855469,
+      "min_pivot_distance_m": 9.50034046173096,
+      "nonfinite": 0,
+      "orbit_yaw": -8.0850596218874,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001691937368,
+      "final_position": [
+        -6.3027720451355,
+        307.617401123047,
+        9.87403202056885
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 110",
+      "max_pivot_distance_m": 9.50779724121094,
+      "min_box_clearance_m": 8.87403202056885,
+      "min_pivot_distance_m": 9.50779724121094,
+      "nonfinite": 0,
+      "orbit_yaw": -8.13305960395316,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.000016073405,
+      "final_position": [
+        -6.28101348876953,
+        307.634735107422,
+        9.57248401641846
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 111",
+      "max_pivot_distance_m": 9.51516437530518,
+      "min_box_clearance_m": 8.57248401641846,
+      "min_pivot_distance_m": 9.51516437530518,
+      "nonfinite": 0,
+      "orbit_yaw": -8.1810595882576,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001526973475,
+      "final_position": [
+        -6.24477481842041,
+        307.651977539062,
+        9.27274227142334
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 112",
+      "max_pivot_distance_m": 9.52244186401367,
+      "min_box_clearance_m": 8.27274227142334,
+      "min_pivot_distance_m": 9.52244186401367,
+      "nonfinite": 0,
+      "orbit_yaw": -8.22905957452126,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001450624801,
+      "final_position": [
+        -6.19417953491211,
+        307.669128417969,
+        8.97550392150879
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 113",
+      "max_pivot_distance_m": 9.52962970733643,
+      "min_box_clearance_m": 7.97550392150879,
+      "min_pivot_distance_m": 9.52962970733643,
+      "nonfinite": 0,
+      "orbit_yaw": -8.27705956249958,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001378093561,
+      "final_position": [
+        -6.12938547134399,
+        307.686187744141,
+        8.68145847320557
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 114",
+      "max_pivot_distance_m": 9.53672981262207,
+      "min_box_clearance_m": 7.68145847320557,
+      "min_pivot_distance_m": 9.53672981262207,
+      "nonfinite": 0,
+      "orbit_yaw": -8.32505955197853,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001309188883,
+      "final_position": [
+        -6.05058431625366,
+        307.703155517578,
+        8.3912878036499
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 115",
+      "max_pivot_distance_m": 9.54374027252197,
+      "min_box_clearance_m": 7.3912878036499,
+      "min_pivot_distance_m": 9.54374027252197,
+      "nonfinite": 0,
+      "orbit_yaw": -8.37305954277078,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001243729439,
+      "final_position": [
+        -5.95799875259399,
+        307.720031738281,
+        8.1056604385376
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 116",
+      "max_pivot_distance_m": 9.55066108703613,
+      "min_box_clearance_m": 7.1056604385376,
+      "min_pivot_distance_m": 9.55066108703613,
+      "nonfinite": 0,
+      "orbit_yaw": -8.42105953471241,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001181542967,
+      "final_position": [
+        -5.85188436508179,
+        307.736785888672,
+        7.82523345947266
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 117",
+      "max_pivot_distance_m": 9.55746936798096,
+      "min_box_clearance_m": 6.82523345947266,
+      "min_pivot_distance_m": 9.55746936798096,
+      "nonfinite": 0,
+      "orbit_yaw": -8.46905952765994,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001122465818,
+      "final_position": [
+        -5.73252964019775,
+        307.753479003906,
+        7.55065059661865
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 118",
+      "max_pivot_distance_m": 9.56421279907227,
+      "min_box_clearance_m": 6.55065059661865,
+      "min_pivot_distance_m": 9.56421279907227,
+      "nonfinite": 0,
+      "orbit_yaw": -8.5170595214878,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00001066342528,
+      "final_position": [
+        -5.60025119781494,
+        307.770050048828,
+        7.28253793716431
+      ],
+      "frames": 1,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "free orbit step 119",
+      "max_pivot_distance_m": 9.57084274291992,
+      "min_box_clearance_m": 6.28253793716431,
+      "min_pivot_distance_m": 9.57084274291992,
+      "nonfinite": 0,
+      "orbit_yaw": -8.56505951608612,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 7.00000000104267,
+      "final_position": [
+        -0.00510535901412368,
+        305.504211425781,
+        3.00017237663269
+      ],
+      "frames": 180,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "release orbit and automatic return near wall",
+      "max_pivot_distance_m": 9.80978679656982,
+      "min_box_clearance_m": 2.00017237663269,
+      "min_pivot_distance_m": 8.60463523864746,
+      "nonfinite": 0,
+      "orbit_yaw": -9.42460245163865,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 23.998975465623,
+      "final_position": [
+        0.000000572359795114608,
+        305.500091552734,
+        -13.998556137085
+      ],
+      "frames": 180,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "obstacle removed, free frontal camera recovers",
+      "max_pivot_distance_m": 24.5139064788818,
+      "min_box_clearance_m": -1.0,
+      "min_pivot_distance_m": 13.1096467971802,
+      "nonfinite": 0,
+      "orbit_yaw": -9.42477796076937,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 22.000002492233,
+      "final_position": [
+        259.999938964844,
+        31.2000045776367,
+        45.9999923706055
+      ],
+      "frames": 180,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "real fortress front wall and smoothing",
+      "max_pivot_distance_m": 22.2331790924072,
+      "min_box_clearance_m": -1.0,
+      "min_pivot_distance_m": 17.769458770752,
+      "nonfinite": 0,
+      "orbit_yaw": -9.42477796066559,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 22.0000000050251,
+      "final_position": [
+        281.999938964844,
+        31.2000045776367,
+        67.9999771118164
+      ],
+      "frames": 120,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "real fortress frontal-to-lateral orbit",
+      "max_pivot_distance_m": 22.231466293335,
+      "min_box_clearance_m": -1.0,
+      "min_pivot_distance_m": 21.0097675323486,
+      "nonfinite": 0,
+      "orbit_yaw": -10.99557413286,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    },
+    {
+      "distance": 22.0000000000101,
+      "final_position": [
+        260.000061035156,
+        31.2000045776367,
+        46.0000076293945
+      ],
+      "frames": 120,
+      "inside_box": 0,
+      "interframe_sweep_intersections": 0,
+      "label": "real fortress lateral-to-frontal return",
+      "max_pivot_distance_m": 22.2315044403076,
+      "min_box_clearance_m": -1.0,
+      "min_pivot_distance_m": 21.0097694396973,
+      "nonfinite": 0,
+      "orbit_yaw": -9.42477811547361,
+      "pivot_segment_intersections": 0,
+      "sphere_intersections": 0
+    }
+  ],
+  "checks": 144,
+  "driver_sha256": "fe9b7072f2271ac02cf00f6d1c9f411e640e874d1f95db94a9a9f668b85ed229",
+  "environment_sha256": "b1571bd906c96bcdef65143b37edcff169725b32101668d4eb74dcd3fca0b661",
+  "failures": [
+    "Real imported fortress wall is the mask-3 physical obstruction",
+    "Imported fortress surface visibly constrains the actual camera distance, rather than passing overhead"
+  ],
+  "fortress_surface": {
+    "collider": "",
+    "layer": 0,
+    "observed": false
+  },
+  "limits": "Target is positioned by the test and gameplay frozen; real camera physics and real input run unchanged. This is a deterministic surface regression, not a native performance or screenshot measurement. 0.2m probe represents near camera clearance, not a full frustum swept convex hull. Fortress concave interiors are checked with the pivot segment and sphere-to-surface, not analytic box containment.",
+  "negative_controls": [
+    {
+      "label": "actual Camera3D deliberately inside physical box",
+      "result": {
+        "finite": true,
+        "inside_box": true,
+        "segment_hits": 1,
+        "sphere_hits": 1,
+        "sweep_hits": 0
+      }
+    },
+    {
+      "actual_position": [
+        0.000000111799437263471,
+        302.42236328125,
+        1.79999995231628
+      ],
+      "after": {
+        "finite": true,
+        "inside_box": false,
+        "segment_hits": 0,
+        "sphere_hits": 0,
+        "sweep_hits": 0
+      },
+      "before": {
+        "finite": true,
+        "inside_box": true,
+        "segment_hits": 1,
+        "sphere_hits": 1,
+        "sweep_hits": 0
+      },
+      "label": "post-smoothing ray repairs deliberately invalid previous camera pose in one physics frame",
+      "unrechecked_lerp_z": 0.421328990943632
+    }
+  ],
+  "oracle": {
+    "camera_runtime_surface_margin_m": 0.8,
+    "excluded": "target dragon RID only",
+    "frame_checks": "physical pivot-to-camera, interframe camera segment, sphere overlap; synthetic box analytic inside/clearance",
+    "mask": 3,
+    "shape_margin_m": 0.0,
+    "sphere_radius_m": 0.200000002980232
+  },
+  "pass": false,
+  "production_camera_sha256": "8b3bfe7d83f85526a30fea081daea69cf786f0bd5282c08b8660081c6a02dd5e"
+}

@@ -1,0 +1,868 @@
+{
+ "articulation": {
+  "body_compensated": 39,
+  "folded": 11,
+  "restored": 681,
+  "uncleared": 16
+ },
+ "failures": [
+  "Actual D and A both turn the dragon after retreat",
+  "Every original skinned vertex is checked each observed frame against actual terrain, within existing 5cm limit",
+  "Original claw stance remains locked within existing 1.5cm limit",
+  "Free neck tracks two mouse targets +15/-15 degrees during retreat"
+ ],
+ "frames": [
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(214.9816, 31.0757, 204.5678)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.00000000483421569441589
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(214.9971, 29.88178, 202.6894)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.004911, 0.0, -4.361281)",
+   "yaw": 0.00000000508664532716807
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(214.9975, 28.80645, 200.4305)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.004911, 0.0, -4.361281)",
+   "yaw": 0.00000000520004306281407
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(214.9981, 28.17619, 197.9393)",
+   "stage": "forward",
+   "turn_blocked": true,
+   "velocity": "(0.000286, 0.0, -3.318189)",
+   "yaw": 0.00000000531112931412281
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(214.9984, 28.23916, 196.6608)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.797426)",
+   "yaw": 0.00000000526770005393473
+  },
+  {
+   "details": [],
+   "frame": 150,
+   "position": "(214.9984, 28.22321, 196.1738)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": 0.00000000530888577543465
+  },
+  {
+   "details": [],
+   "frame": 180,
+   "position": "(214.9984, 28.17213, 194.6146)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.797426)",
+   "yaw": 0.00000000530865440495631
+  },
+  {
+   "details": [],
+   "frame": 210,
+   "position": "(214.9984, 27.99274, 192.2079)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.8)",
+   "yaw": 0.00000000530868904391468
+  },
+  {
+   "details": [],
+   "frame": 240,
+   "position": "(214.9984, 27.99274, 189.807)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.8)",
+   "yaw": 0.00000000530869037618231
+  },
+  {
+   "details": [],
+   "frame": 270,
+   "position": "(214.9984, 27.99274, 187.4077)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.8)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 300,
+   "position": "(214.9984, 27.99274, 185.0071)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.8)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 300,
+   "position": "(214.9984, 27.99274, 184.9315)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.566667)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 300,
+   "position": "(214.9984, 27.99274, 184.8593)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.333333)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 300,
+   "position": "(214.9984, 27.99274, 184.7901)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -4.1)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 300,
+   "position": "(214.9984, 27.99274, 184.7257)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -3.866667)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 300,
+   "position": "(214.9984, 27.99274, 184.6651)",
+   "stage": "forward",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -3.633333)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(214.9984, 27.99274, 184.6085)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.0, 0.0, -3.4)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(214.9984, 27.99274, 185.1898)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 4.5)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(214.9984, 27.99274, 187.4382)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 4.5)",
+   "yaw": 0.00000000530868948800389
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(214.9562, 27.99274, 189.6866)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.505183, 0.0, 4.471554)",
+   "yaw": -0.125
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(214.4975, 28.14221, 191.8881)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.975102, 0.0, 4.393083)",
+   "yaw": -0.218422055244446
+  },
+  {
+   "details": [],
+   "frame": 150,
+   "position": "(214.0099, 28.1595, 194.0841)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.975601, 0.143855, 4.390616)",
+   "yaw": -0.218422114849091
+  },
+  {
+   "details": [],
+   "frame": 180,
+   "position": "(213.53, 28.23143, 196.2431)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.975601, 0.143855, 4.390616)",
+   "yaw": -0.218422025442123
+  },
+  {
+   "details": [],
+   "frame": 180,
+   "position": "(213.5146, 28.2337, 196.3125)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.925014, 0.136396, 4.162954)",
+   "yaw": -0.218422040343285
+  },
+  {
+   "details": [],
+   "frame": 180,
+   "position": "(213.5001, 28.23585, 196.3781)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.874428, 0.128937, 3.935293)",
+   "yaw": -0.218422040343285
+  },
+  {
+   "details": [
+    {
+     "pose_clearance": false,
+     "reason": "swept"
+    }
+   ],
+   "frame": 180,
+   "position": "(213.4926, 28.23788, 196.4118)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.450402, 0.121478, 2.027001)",
+   "yaw": -0.218422040343285
+  },
+  {
+   "details": [],
+   "frame": 180,
+   "position": "(213.4797, 28.23978, 196.4698)",
+   "stage": "reverse",
+   "turn_blocked": false,
+   "velocity": "(-0.773254, 0.114018, 3.47997)",
+   "yaw": -0.218422055244446
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(213.4676, 28.24155, 196.524)",
+   "stage": "left",
+   "turn_blocked": false,
+   "velocity": "(-0.722667, 0.106559, 3.252308)",
+   "yaw": -0.218422070145607
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.047402523458004
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.026046384125948
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.0260464213788509
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.0260464679449797
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.0260464679449797
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.0260464698076248
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.0260464698076248
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.0260464679449797
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.0260464698076248
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": false,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.338809728622437
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 150,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 180,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 210,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 240,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 240,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 240,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 240,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 240,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "right",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "left_return",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(213.4052, 28.25355, 196.8876)",
+   "stage": "forward_after_turn",
+   "turn_blocked": true,
+   "velocity": "(0.0, 0.0, 0.0)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(214.1186, 28.19918, 195.2283)",
+   "stage": "forward_after_turn",
+   "turn_blocked": false,
+   "velocity": "(1.895001, -0.144416, -4.407734)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.0661, 28.14863, 193.0242)",
+   "stage": "forward_after_turn",
+   "turn_blocked": false,
+   "velocity": "(1.894143, 0.0, -4.410468)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.0961, 28.14863, 192.9543)",
+   "stage": "forward_after_turn",
+   "turn_blocked": false,
+   "velocity": "(1.802066, 0.0, -4.19607)",
+   "yaw": -0.405646681785583
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.1246, 28.14863, 192.8879)",
+   "stage": "forward_after_turn",
+   "turn_blocked": false,
+   "velocity": "(1.70999, 0.0, -3.981672)",
+   "yaw": -0.405646711587906
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.1516, 28.14863, 192.8251)",
+   "stage": "forward_after_turn",
+   "turn_blocked": false,
+   "velocity": "(1.617914, 0.0, -3.767275)",
+   "yaw": -0.405646651983261
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(215.177, 28.14863, 192.7659)",
+   "stage": "forward_after_turn",
+   "turn_blocked": false,
+   "velocity": "(1.525837, 0.0, -3.552876)",
+   "yaw": -0.405646711587906
+  },
+  {
+   "details": [],
+   "frame": 0,
+   "position": "(215.2009, 28.14863, 192.7103)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(1.433761, 0.0, -3.338479)",
+   "yaw": -0.405646711587906
+  },
+  {
+   "details": [],
+   "frame": 30,
+   "position": "(215.0115, 28.14863, 193.1513)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.775759, 0.0, 4.134813)",
+   "yaw": -0.405646711587906
+  },
+  {
+   "details": [],
+   "frame": 60,
+   "position": "(214.1423, 28.19602, 195.174)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.776563, 0.13539, 4.13225)",
+   "yaw": -0.405646592378616
+  },
+  {
+   "details": [],
+   "frame": 90,
+   "position": "(213.3296, 28.26475, 197.2581)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.163833, 0.13539, 4.297894)",
+   "yaw": -0.405646592378616
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(212.4983, 28.46357, 199.2925)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.776563, 0.13539, 4.13225)",
+   "yaw": -0.405646681785583
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(212.4707, 28.4899, 199.3487)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.634225, 0.373688, 3.923533)",
+   "yaw": -0.405646711587906
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(212.4446, 28.51422, 199.402)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.544854, 0.353252, 3.708965)",
+   "yaw": -0.405646741390228
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(212.4198, 28.53689, 199.4524)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.455482, 0.332816, 3.494396)",
+   "yaw": -0.405646711587906
+  },
+  {
+   "details": [],
+   "frame": 120,
+   "position": "(212.3965, 28.55801, 199.4997)",
+   "stage": "reverse_after_turn",
+   "turn_blocked": false,
+   "velocity": "(-1.36611, 0.31238, 3.279828)",
+   "yaw": -0.405646771192551
+  }
+ ],
+ "maximum_fire_head_error_deg": 0.0,
+ "maximum_fire_mouth_error_m": 0.0,
+ "maximum_head_step_deg": 2.09877241731188,
+ "maximum_overlap_count": 4,
+ "maximum_prop_overlap_count": 0,
+ "maximum_stance_slide_m": 0.250599890947342,
+ "maximum_wing_step_deg": 4.00115256343697,
+ "minimum_skin_terrain_clearance_m": -1.3007061006315,
+ "observed_final_frames": 1176,
+ "observed_non_grounded_frames": 0,
+ "original_vertices_checked": 30109128,
+ "overlap_diagnostics": [
+  {
+   "frame": 30,
+   "overlaps": [
+    {
+     "colliders": [
+      "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col",
+      "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+     ],
+     "depth": 0.632194757461548,
+     "hull": 2
+    },
+    {
+     "colliders": [
+      "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col",
+      "/root/Main/NaturalLandscape/ErodedValleyGround/ErodedValleyGround_col"
+     ],
+     "depth": 0.627082824707031,
+     "hull": 3
+    }
+   ],
+   "stage": "forward"
+  }
+ ],
+ "retreat_fire_frames": 180,
+ "retreat_head_angles": [
+  -32.9945790569787,
+  -16.1336300302925
+ ],
+ "source_sha256_after": {
+  "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+  "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+  "res://project.godot": "4b12dca180198ee3c92986f5dd39ed648480d3a604421c5609fd760cd8b4da1f",
+  "res://scenes/main.tscn": "e6be17868c5dd0604706d3bb3116e678f471024b671d94cdc1ad6198ca81299c",
+  "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+  "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+  "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+  "res://scripts/dragon_controller.gd": "865aa84623af7b5642e79e55d17dffc69ec92ade6de60f4d4066b5cb52ac7bc3",
+  "res://scripts/dragon_ground_contact.gd": "4a6d03ea85edd850d548fdda58dba711dd4b101417e2d8c330c1abfece322c44",
+  "res://scripts/dragon_ground_pose.gd": "226db6f9eff34c6edfe1c64344fc7818ac6a4caa2933f075700f80cda36e8ac0",
+  "res://scripts/dragon_head_pose.gd": "449e45fa1a1ee6cd094c7979ae0575209417bcfb424df578d7983e81dd5d3cfb",
+  "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+  "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+  "res://scripts/dragon_wing_contact.gd": "d81e8d641e5fa6b0e9c7aebf45c3e1ada938eadc7ec8c80b640901131b54e349",
+  "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+  "res://scripts/siege_environment.gd": "b1571bd906c96bcdef65143b37edcff169725b32101668d4eb74dcd3fca0b661",
+  "res://scripts/terrain.gd": "0b6b1d752c85a902a88c40d095ca88cf050cff57f03f13f3d4295dc5057a8353"
+ },
+ "source_sha256_before": {
+  "res://assets/models/dragon.glb": "e509370ddf10ec68dd43b8c02f113744308eee7d147c1d4716f08b297396d631",
+  "res://assets/models/dragon.glb.import": "5704ea1947538ce91815597720ab20b1f088737d7c8a34780d6462b21fb556dc",
+  "res://project.godot": "4b12dca180198ee3c92986f5dd39ed648480d3a604421c5609fd760cd8b4da1f",
+  "res://scenes/main.tscn": "e6be17868c5dd0604706d3bb3116e678f471024b671d94cdc1ad6198ca81299c",
+  "res://scripts/combat/test_ground_escape.gd": "053a7ed5d7e9d8edeb93273554c28e2e6d36c4f480e01f4f4360ea23e41c5129",
+  "res://scripts/dragon_breath.gd": "9962d2b4ad347618aadd3ded7d684b65f29a0d95431bb51d31205817ceb7192b",
+  "res://scripts/dragon_breath_modifier.gd": "5a8ca567e5ca4eeeb21a0fa110d0f8998d5ddebca331fa36d4d71c6b28dbc484",
+  "res://scripts/dragon_controller.gd": "865aa84623af7b5642e79e55d17dffc69ec92ade6de60f4d4066b5cb52ac7bc3",
+  "res://scripts/dragon_ground_contact.gd": "4a6d03ea85edd850d548fdda58dba711dd4b101417e2d8c330c1abfece322c44",
+  "res://scripts/dragon_ground_pose.gd": "226db6f9eff34c6edfe1c64344fc7818ac6a4caa2933f075700f80cda36e8ac0",
+  "res://scripts/dragon_head_pose.gd": "449e45fa1a1ee6cd094c7979ae0575209417bcfb424df578d7983e81dd5d3cfb",
+  "res://scripts/dragon_pose_probe.gd": "234e2cf33afee4956f30f55acdbe5ddd54d554fb6c7ced804528da68362efeaf",
+  "res://scripts/dragon_skeleton_modifier.gd": "eb6cc673e19432877133a19171ae452b1364ddc0c1230a54b9360446556eb568",
+  "res://scripts/dragon_wing_contact.gd": "d81e8d641e5fa6b0e9c7aebf45c3e1ada938eadc7ec8c80b640901131b54e349",
+  "res://scripts/dragon_wing_extrema.json": "5ce009cb3512d3a5698b7e4d1b139da33313cb128f0d4cbb211a12ee0de6f88d",
+  "res://scripts/siege_environment.gd": "b1571bd906c96bcdef65143b37edcff169725b32101668d4eb74dcd3fca0b661",
+  "res://scripts/terrain.gd": "0b6b1d752c85a902a88c40d095ca88cf050cff57f03f13f3d4295dc5057a8353"
+ },
+ "sources_unchanged": true,
+ "stage_quality": {
+  "forward": {
+   "frames": 306,
+   "maximum_stance_slide_m": 0.250599890947342,
+   "minimum_skin_terrain_clearance_m": -1.3007061006315
+  },
+  "forward_after_turn": {
+   "frames": 65,
+   "maximum_stance_slide_m": 0.00187055580317974,
+   "minimum_skin_terrain_clearance_m": -0.231988276285094
+  },
+  "left": {
+   "frames": 125,
+   "maximum_stance_slide_m": 0.00269804568961263,
+   "minimum_skin_terrain_clearance_m": 0.0226887001842258
+  },
+  "left_return": {
+   "frames": 125,
+   "maximum_stance_slide_m": 0.00223347195424139,
+   "minimum_skin_terrain_clearance_m": 0.025010451623249
+  },
+  "reverse": {
+   "frames": 185,
+   "maximum_stance_slide_m": 0.00197328650392592,
+   "minimum_skin_terrain_clearance_m": -0.322410278432042
+  },
+  "reverse_after_turn": {
+   "frames": 125,
+   "maximum_stance_slide_m": 0.00225773360580206,
+   "minimum_skin_terrain_clearance_m": -0.28540984342338
+  },
+  "right": {
+   "frames": 245,
+   "maximum_stance_slide_m": 0.00224858848378062,
+   "minimum_skin_terrain_clearance_m": 0.0239591093733864
+  }
+ },
+ "stages": {
+  "forward": {
+   "horizontal_distance_m": 19.902717590332,
+   "yaw_delta_deg": 0.000000027185345862154
+  },
+  "forward_after_turn": {
+   "horizontal_distance_m": 4.54696273803711,
+   "yaw_delta_deg": 0.00000170754729250319
+  },
+  "left": {
+   "horizontal_distance_m": 0.368881314992905,
+   "yaw_delta_deg": 11.0223099806619
+  },
+  "left_return": {
+   "horizontal_distance_m": 0.0,
+   "yaw_delta_deg": 0.0
+  },
+  "reverse": {
+   "horizontal_distance_m": 11.9573011398315,
+   "yaw_delta_deg": -12.5146630760192
+  },
+  "reverse_after_turn": {
+   "horizontal_distance_m": 7.39516878128052,
+   "yaw_delta_deg": 0.0
+  },
+  "right": {
+   "horizontal_distance_m": 0.0,
+   "yaw_delta_deg": -21.749493463703
+  }
+ },
+ "worst_skin": {
+  "articulation": {
+   "body_compensated": 0,
+   "folded": 2,
+   "restored": 2,
+   "uncleared": 16
+  },
+  "clearance": -1.3007061006315,
+  "physics_frame": 347,
+  "process_frame": 346,
+  "ray": "{ \"position\": (216.0127, 24.07633, 196.0797), \"normal\": (0.0, 0.999464, -0.032747), \"face_index\": -1, \"collider_id\": 43201332851, \"collider\": ErodedValleyGround_col:<StaticBody3D#43201332851>, \"shape\": 0, \"rid\": RID(644245094401) }",
+  "root": "(214.998, 28.21829, 199.135)",
+  "rotation": "(-0.321129, 0.0, 0.002689)",
+  "sample": "{ \"vertex\": (-3.46556, -1.758921, 8.997215), \"influence\": [{ \"bone\": 36, \"bind\": [X: (0.000012, -0.000296, 151.4212), Y: (19.27872, -150.1911, -0.000107), Z: (150.1911, 19.27872, 0.000042), O: (-1124.05, -163.0527, 570.8563)], \"weight\": 0.63529413938522, \"key\": 1036 }, { \"bone\": 145, \"bind\": [X: (151.4211, 0.000242, -0.000014), Y: (-0.000041, 134.3539, 69.84329), Z: (0.00015, -69.84329, 134.3539), O: (570.8544, 732.3113, -1101.375)], \"weight\": 0.3647058904171, \"key\": 1145 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": -1, \"limb_claw\": -1, \"mesh\": &\"Object_7\", \"surface\": 0, \"index\": 3947 }",
+  "stage": "forward",
+  "tick": 74,
+  "world": "(216.0127, 22.77561, 196.0797)"
+ },
+ "worst_stance": {
+  "articulation": {
+   "body_compensated": 0,
+   "folded": 2,
+   "restored": 2,
+   "uncleared": 16
+  },
+  "claw": 41,
+  "point": "(213.1275, 24.20241, 194.8376)",
+  "previous": "(213.1707, 24.06893, 195.0845)",
+  "root": "(214.9984, 28.22321, 196.1738)",
+  "rotation": "(-0.03598, 0.0, 0.000773)",
+  "sample": "{ \"vertex\": (-0.995189, -3.589288, 9.929777), \"influence\": [{ \"bone\": 52, \"bind\": [X: (103.2812, -11.18289, 110.165), Y: (-7.090592, -151.008, -8.681059), Z: (110.5055, 0.762439, -103.523), O: (-950.3276, -540.4337, 1101.585)], \"weight\": 1.0, \"key\": 2052 }], \"wing\": false, \"wing_root_mask\": 0, \"wing_side_mask\": 0, \"neck\": false, \"claw\": 41, \"limb_claw\": 41, \"mesh\": &\"Object_8\", \"surface\": 0, \"index\": 10210 }",
+  "slide": 0.250599890947342,
+  "stage": "forward",
+  "tick": 127
+ }
+}
