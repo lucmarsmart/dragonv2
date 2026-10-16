@@ -116,6 +116,19 @@ func run() -> void:
 	await ticks(150)
 	check(absf(dragon.rotation.z) < deg_to_rad(8.0), "Releasing turn rolls back to level")
 
+	# Recuperación: lento (8 m/s), batir con W no se desploma y recupera velocidad; trepar gana altura.
+	reset_air(8.0)
+	dragon.manual_move_input = 1.0
+	var y_slow := dragon.global_position.y
+	await ticks(180)
+	check(y_slow - dragon.global_position.y < 8.0 and dragon.current_speed > 14.0, "Flapping recovers from stall speed (drop %.1f m, %.1f m/s)" % [y_slow - dragon.global_position.y, dragon.current_speed])
+	reset_air(8.0)
+	dragon.manual_climb = true
+	var y_climb := dragon.global_position.y
+	await ticks(180)
+	check(dragon.global_position.y > y_climb + 10.0, "Climb from stall speed gains height (+%.1f m)" % (dragon.global_position.y - y_climb))
+	dragon.manual_climb = false
+
 	# V-04 Tempo de aleteo de crucero >= 1.9 s por batido (2 batidos por ciclo de 3 s).
 	reset_air()
 	await ticks(60)

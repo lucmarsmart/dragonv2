@@ -17,6 +17,9 @@ func _shot(path: String) -> void:
 
 func run() -> void:
 	root.size = Vector2i(960, 540)
+	# Sin foco y siempre visible: no roba el teclado y macOS no congela la ventana tapada.
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, true)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, true)
 	var out := _arg("out", ProjectSettings.globalize_path("res://artifacts/walk-cycle"))
 	var tag := _arg("tag", "marcha")
 	DirAccess.make_dir_recursive_absolute(out)

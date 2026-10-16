@@ -813,7 +813,8 @@ func _handle_input_keys(delta: float) -> void:
 
 	# El teclado comanda alabeo; el giro sale de inclinar la sustentación (g·tan(alabeo)/v).
 	# El ratón y el apuntado de ataque siguen fijando rumbo directo y el alabeo lo acompaña.
-	var max_bank := deg_to_rad(max_bank_angle)
+	# Sin velocidad no hay sustentación que inclinar: el alabeo máximo crece con la velocidad.
+	var max_bank := deg_to_rad(max_bank_angle) * clampf((current_speed - min_stall_speed) / (lift_speed - min_stall_speed), 0.25, 1.0)
 	var yaw_diff = wrapf(target_yaw - rotation.y, -PI, PI)
 	var desired_bank := clampf(turn_dir * max_bank + clampf(yaw_diff * 2.0, -1.0, 1.0) * max_bank * 0.8, -max_bank, max_bank)
 	target_roll = lerp_angle(target_roll, desired_bank, 1.0 - exp(-roll_response * delta))
@@ -945,6 +946,10 @@ func _calculate_flight_physics(delta: float) -> void:
 			var sustained := max_flap_speed if w_boost else cruise_speed
 			thrust = drag_coefficient * sustained * sustained
 			flap_lift = 0.25
+	# Batido de esfuerzo a baja velocidad (ref. Symmonds): sostiene casi todo el peso, para poder
+	# recuperarse de una pérdida o de un roce con la ladera en vez de quedar pegado hundiéndose.
+	if current_mode == FlightMode.NORMAL or current_mode == FlightMode.CLIMB:
+		flap_lift += 0.7 * (1.0 - clampf(current_speed / lift_speed, 0.0, 1.0))
 	var speed_rate := thrust - drag_k * current_speed * current_speed - gravity_magnitude * forward_dir.y
 	current_speed = clampf(current_speed + speed_rate * delta, min_stall_speed, dive_terminal_speed)
 
@@ -1108,8 +1113,11 @@ func _handle_terrain_collisions(delta: float, pre_slide_vel: Vector3 = Vector3.Z
 					target_roll += randf_range(-0.5, 0.5)
 			else:
 				# --- ROCE / COLISIÓN LEVE O MODERADA ---
-				velocity = velocity.slide(primary_normal) + primary_normal * 1.0
+				# Lento y pegado a la pendiente: se separa con más fuerza y nivela las alas.
+				var slow := 1.0 - clampf(current_speed / lift_speed, 0.0, 1.0)
+				velocity = velocity.slide(primary_normal) + primary_normal * (1.0 + 5.0 * slow)
 				current_speed = maxf(min_stall_speed, current_speed - max_impact_speed * 0.45)
+				target_roll = lerp_angle(target_roll, 0.0, 0.5)
 				if primary_normal.y >= cos(floor_max_angle) and not _over_water() and not _is_in_water():
 					if velocity.y < -0.5:
 						target_pitch = maxf(target_pitch, deg_to_rad(4.0))
