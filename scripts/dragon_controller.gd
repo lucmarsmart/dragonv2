@@ -23,6 +23,8 @@ var contact_fold_requested := 0.0
 var has_head_pose_driver := true
 var head_pose_blocked := false
 var pose_turn_blocked := false
+var pose_rollback_tick := -100
+var blocked_gait_time := 0.0
 var head_aim_active := false
 var attack_mode_active := false
 var head_aim_direction := Vector3.FORWARD
@@ -615,8 +617,12 @@ func _physics_process(delta: float) -> void:
 		var move_req := absf(manual_move_input) if manual_input_override else (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_S)) else 0.0)
 		var nominal_advance := move_req * walk_speed * delta
 		# Contra un obstáculo, agua o pared no hay marcha en el sitio: la fase sólo avanza con desplazamiento real.
-		# Incluye el retroceso a la pose segura tras chocar con roca o árbol: el cuerpo casi no avanza.
-		var obstructed: bool = is_on_wall() or wing_contact.predictive_contact or shoreline_blocked or distance_walked < nominal_advance * 0.2
+		# Incluye el retroceso a la pose segura tras chocar con roca o árbol (marcado por wing_contact).
+		var contact_now: bool = is_on_wall() or wing_contact.predictive_contact or shoreline_blocked or Engine.get_physics_frames() - pose_rollback_tick <= 2
+		# Sólo un bloqueo sostenido congela la marcha; al arrancar desde una pared las patas
+		# necesitan avanzar su fase para dar el primer paso que libera al cuerpo.
+		blocked_gait_time = blocked_gait_time + delta if (contact_now and distance_walked < nominal_advance * 0.2) else 0.0
+		var obstructed: bool = blocked_gait_time > 0.3
 		var effective_advance := maxf(distance_walked, nominal_advance * 0.8) if ((move_req > 0.01 or absf(current_speed) > 0.1) and not obstructed) else distance_walked
 		if effective_advance > 0.0005 or absf(ground_yaw_motion) > 0.0001:
 			walk_cycle_phase += (effective_advance + absf(ground_yaw_motion) * 4.0) * TAU / 3.5
@@ -760,7 +766,8 @@ func _handle_input_keys(delta: float) -> void:
 		target_pitch = lerp(target_pitch, deg_to_rad(15.0), 4.0 * delta)
 	elif is_climbing:
 		current_mode = FlightMode.CLIMB
-		target_pitch = lerp(target_pitch, deg_to_rad(42.0), 3.0 * delta)
+		# Trepada empinada (ref. Symmonds): cuerpo a ~55° con batidos de esfuerzo.
+		target_pitch = lerp(target_pitch, deg_to_rad(55.0), 3.0 * delta)
 	elif glide_mode_active:
 		current_mode = FlightMode.GLIDE
 	else:
@@ -905,8 +912,8 @@ func _calculate_flight_physics(delta: float) -> void:
 			drag_k = dive_drag_coefficient
 			thrust = 1.5 # recogida de alas y empuje de cola hacia la picada
 		FlightMode.CLIMB:
-			# Batido potente: equilibrio cerca de 15 m/s con 42° de cabeceo.
-			thrust = drag_coefficient * 15.0 * 15.0 + gravity_magnitude * sin(deg_to_rad(42.0))
+			# Batido potente: equilibrio cerca de 15 m/s con 55° de cabeceo.
+			thrust = drag_coefficient * 15.0 * 15.0 + gravity_magnitude * sin(deg_to_rad(55.0))
 			flap_lift = 0.35
 		FlightMode.GLIDE:
 			drag_k = glide_drag_coefficient
@@ -1578,7 +1585,7 @@ func _process(delta: float) -> void:
 		climb_roll_wobble = lerp(climb_roll_wobble, 0.0, 0.1)
 		
 	if visual_root:
-		var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+		var step_weight := _gait_weight()
 		var lateral_sway = sway_offset_x * 0.30 * flight_factor + sin(walk_cycle_phase) * 0.14 * step_weight * ground_blend
 		var ground_pitch_bob = -sin(walk_cycle_phase * 2.0) * deg_to_rad(2.6) * step_weight * ground_blend
 		var surge_basis = Basis.from_euler(Vector3(pitch_surge + ground_pitch_bob, 0.0, climb_roll_wobble))
@@ -1598,6 +1605,10 @@ func _process(delta: float) -> void:
 			visual_root.global_position += smoothed_anchor_offset
 		else:
 			visual_root.position = model_pos_offset + Vector3(lateral_sway, heave, 0.0)
+
+# Peso del vaivén de marcha (pelvis, columna, cola) según la velocidad real.
+func _gait_weight() -> float:
+	return clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
 
 func _body_core_world() -> Vector3:
 	var sum := Vector3.ZERO
@@ -1623,7 +1634,7 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 	
 	# 1. PELVIS / CADERA (Oscilación rítmica de transferencia de peso en marcha terrestre y elevación en aleteo)
 	if bone_pelvis != -1 and ground_blend > 0.01:
-		var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+		var step_weight := _gait_weight()
 		var cycle := walk_cycle_phase
 		var pel_yaw = sin(cycle) * deg_to_rad(7.5) * step_weight * ground_blend
 		var pel_roll = cos(cycle) * deg_to_rad(4.0) * step_weight * ground_blend
@@ -1654,7 +1665,7 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 			var flight_pitch = ((brake_blend * 0.12) - (climb_blend * 0.08)) * flight_factor
 			
 			var ground_wave_phase = walk_cycle_phase - float(i) * 0.40
-			var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+			var step_weight := _gait_weight()
 			var ground_spine_yaw = -sin(ground_wave_phase) * deg_to_rad(6.5) * step_weight * ground_blend
 			var ground_spine_roll = -cos(ground_wave_phase) * deg_to_rad(3.0) * step_weight * ground_blend
 			
@@ -1749,14 +1760,16 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 							 (glide_blend * 0.04 * idx_ratio)) * flight_factor
 
 			# Onda serpentina inercial en marcha terrestre: amplitud natural anatómica
-			var step_weight := clampf(absf(ground_motion_speed) / walk_speed, 0.0, 1.0)
+			var step_weight := _gait_weight()
 			var ground_tail_phase = walk_cycle_phase - float(i) * 0.55
 			var ground_tail_yaw = sin(ground_tail_phase) * deg_to_rad(1.5 + idx_ratio * 3.5) * step_weight * ground_blend
 			var ground_tail_pitch = (ground_blend * -0.08 * idx_ratio) + cos(walk_cycle_phase * 2.0 - float(i) * 0.3) * deg_to_rad(1.8) * step_weight * ground_blend
 
 			# Límites fisiológicos intervertebrales (rango de movimiento según osteología caudal)
 			var final_tail_yaw = clampf(tail_lag_yaw + tail_wave_yaw + ground_tail_yaw, -deg_to_rad(4.5), deg_to_rad(4.5))
-			var final_tail_pitch = clampf(tail_flight_pitch + tail_flap_lag + ground_tail_pitch, -deg_to_rad(5.5), deg_to_rad(5.5))
+			# En vuelo la cola cuelga y latiguea más (trepada); en tierra conserva el rango osteológico.
+			var tail_pitch_limit := deg_to_rad(lerpf(5.5, 9.0, flight_factor))
+			var final_tail_pitch = clampf(tail_flight_pitch + tail_flap_lag + ground_tail_pitch, -tail_pitch_limit, tail_pitch_limit)
 
 			var t_rot = Quaternion(bone_yaw_axes[b], final_tail_yaw) * \
 						Quaternion(bone_pitch_axes[b], final_tail_pitch)

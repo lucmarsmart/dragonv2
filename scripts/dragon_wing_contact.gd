@@ -477,7 +477,17 @@ func guard_body_pose(dragon: Node3D, sk: Skeleton3D) -> void:
 		if _body_contact(dragon,2) and body_pose_safe.has("actor"):
 			var safe_actor:Transform3D=body_pose_safe.actor
 			var maximum_step:float=dragon.walk_speed/Engine.physics_ticks_per_second+.05
-			if dragon.global_position.distance_to(safe_actor.origin)<=maximum_step:
+			# Un paso que aleja el cuerpo del obstáculo reduce la penetración: rechazarlo
+			# dejaba al dragón trabado (p. ej. la cola apoyada en una pared tras retroceder).
+			var separating:=(dragon.global_position-safe_actor.origin).dot(_body_contact_normal(dragon))>.0005
+			if separating:
+				# Se acepta el desplazamiento pero se conserva la forma publicada: la pose natural
+				# recalculada tenía la cola 8 cm más atrás que la segura, dentro del obstáculo.
+				dragon.pose_rollback_tick=Engine.get_physics_frames()
+				dragon.visual_root.transform=body_pose_safe.visual
+				for bone in body_pose_safe.rotations:sk.set_bone_pose_rotation(int(bone),body_pose_safe.rotations[bone])
+				sample_final(dragon,sk)
+			elif dragon.global_position.distance_to(safe_actor.origin)<=maximum_step:
 				var turn_angle:=dragon.global_basis.get_rotation_quaternion().angle_to(safe_actor.basis.get_rotation_quaternion())
 				if turn_angle<=deg_to_rad(5.0):
 					dragon.global_transform=safe_actor
@@ -487,6 +497,8 @@ func guard_body_pose(dragon: Node3D, sk: Skeleton3D) -> void:
 					dragon.target_yaw=dragon.rotation.y
 					dragon.smoothed_turn_rate=0.0
 					dragon.pose_turn_blocked=true
+					# Marca el retroceso para que la marcha no siga pisando en el sitio.
+					dragon.pose_rollback_tick=Engine.get_physics_frames()
 					dragon.visual_root.transform=body_pose_safe.visual
 					for bone in body_pose_safe.rotations:sk.set_bone_pose_rotation(int(bone),body_pose_safe.rotations[bone])
 					# The rejected foot pose must not complete its logical step.
@@ -709,6 +721,17 @@ func _fold_wing_away(dragon: Node3D, sk: Skeleton3D, side: int, root_bone: int) 
 	sample_final(dragon,sk)
 	return false
 
+
+# Normal del obstáculo hacia el cuerpo en el último casco con contacto (capa 2).
+func _body_contact_normal(dragon: Node3D) -> Vector3:
+	if body_contact_index<0 or body_contact_index>=hulls.size(): return Vector3.ZERO
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.transform = dragon.global_transform
+	query.exclude = [dragon.get_rid()]
+	query.shape = hulls[body_contact_index]
+	query.collision_mask = 2
+	var rest := dragon.get_world_3d().direct_space_state.get_rest_info(query)
+	return rest.normal if not rest.is_empty() else Vector3.ZERO
 
 func _body_contact(dragon: Node3D, mask: int = 3) -> bool:
 	# Reuse only identical queries inside this synchronous body modifier. Any

@@ -31,6 +31,26 @@ V-08 Cámara de jinete: la vista trasera en vuelo y en tierra va a 9 m detrás d
 V-09 Marcha: la velocidad corresponde al largo de las patas (caminata 4,8 m/s y carrera 8 m/s, antes 7,5 y 14 m/s, lo que equivalía a un galope). Cada pata pasa el 24 % del ciclo en el aire (antes el 36 %: cuatro pasos sumaban 1,44 ciclos, no entraban en uno y el cuerpo avanzaba a tirones entre 0 y 5,5 m/s). Contra un obstáculo, la fase de la marcha no avanza, así que el dragón no pisa en el lugar.
 V-10 Colisión de árboles: el alto y el radio del tronco salen de la malla real de cada especie. Antes, `18.96 × escala` aplicado a pinos con escala ~7,5 creaba troncos invisibles de ~180 m de alto y 4 m de radio, que frenaban al dragón en pleno vuelo hasta 7 m/s y bloqueaban la caminata.
 
+## Referencias adicionales del usuario
+
+- Marcha: "Dragon Walk Cycle animation" (Constantinos Sophocleous, https://youtu.be/QWVMwULRZ5s). Ciclo de unos 2 s con secuencia lateral, patas que se levantan mucho con flexión marcada, cuello bajo hacia adelante y una cola con onda viajera amplia.
+- Vuelo: "Dragon Flight Cycles" (Sophoria Academy y Jonathan Symmonds, https://youtu.be/LPJsorx9AzU).
+  - Trepada casi vertical (60–75°), con batidos que llevan las alas hacia adelante y abajo, y cola y patas colgando.
+  - Planeo con diedro y cola recta.
+  - Virajes de 60–90° con un ala alta.
+- Capturas del usuario de Dragontwin: la cámara se mueve con la maniobra (se abre en los virajes, baja al trepar, sube al picar) y la piel es mate y rugosa.
+
+V-11 Cámara cinemática: en la vista trasera de vuelo, la cámara se desplaza hacia el exterior del viraje (0,6 rad con giro máximo), baja 0,38 rad en trepada, sube 0,32 rad en picada y se aleja con la velocidad, con un muelle de 1,6/s.
+V-12 Piel natural: rugosidad 0,68–0,86 en el cuerpo y 0,6 en huesos y queratina, especular 0,3–0,4 y rim 0,12. Antes la rugosidad era 0,35–0,38 y el especular 0,55–0,65, y daba aspecto de plástico.
+V-13 Trepada empinada: cabeceo de 55° (antes 42°), con la física recalibrada al mismo ángulo. La cola gana rango vertical en vuelo (±9° por vértebra).
+
+## Rendimiento y tirones (medido el 15 de octubre en Apple M5, 32 GB)
+
+- Vuelo a 1280×720 con la máquina libre: ~139 FPS, p95 de 15 ms, ningún cuadro por encima de 33 ms (`scripts/benchmark_flight.gd`).
+- `timeout waiting for fence` (driver Metal de Godot 4.7): aparece al cargar, durante la compilación de shaders. En corridas con la CPU saturada por otros procesos (vitest al 480–750 %, agentes `codex exec`), el render cayó a 2–8 FPS con Metal y también con Vulkan. No es un problema de memoria ni de potencia de GPU.
+- Mitigaciones aplicadas: render limitado a 60 FPS (un tick de física por cuadro, sin cuadros repetidos ni saltos), pulso de aleteo moderado en crucero y troncos invisibles eliminados (frenaban al dragón en el aire).
+- Windows: no se agregó ningún ajuste propio de macOS. El lanzador `.bat` respeta `DRAGON_GODOT_BIN` y pasa `--path`.
+
 ## Evidencia
 
 `scripts/capture_flight_feel.gd` captura la cámara real con entradas reales (crucero, viraje, trepada, picada, planeo), antes y después, y registra velocidad, vy, altura, cabeceo y alabeo. `scripts/test_flight_physics.gd` verifica V-01 a V-04 con ticks reales.

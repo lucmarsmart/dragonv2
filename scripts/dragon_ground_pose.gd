@@ -5,6 +5,9 @@ const Biomechanics = preload("res://scripts/dragon_biomechanics.gd")
 # Fracción del ciclo en el aire por pata: 0.24 (duty factor ~0.76 de cuadrúpedo pesado)
 # permite que las cuatro patas pasen en secuencia dentro de un ciclo. Con 0.36 sumaban 1.44.
 const NOMINAL_SWING_DURATION: float = 0.24
+# Ritmo mínimo de una pata en el aire, independiente de la velocidad de marcha elegida:
+# con la marcha más lenta, el paso que destraba al cuerpo no debe hacerse más lento.
+const SWING_CLOCK_SPEED: float = 7.5
 var claw_probe = Probe.new()
 var limbs: Array[Dictionary] = []
 var debug_contacts: Array[Vector3] = []
@@ -104,7 +107,7 @@ func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 				# is still moving. Keep its nominal clock independent of that stop;
 				# recycling the last tiny body rate can make a step take20seconds.
 				if candidate.swinging and not candidate.repositioning:
-					advance=maxf(advance,dragon.walk_speed/3.5*elapsed_s)
+					advance=maxf(advance,SWING_CLOCK_SPEED/3.5*elapsed_s)
 				if candidate.swinging and not candidate.repositioning:
 					advance/=float(candidate.get("startup_distance_scale",1.0))
 				if advance>0: candidate.swing_clock_rate=advance/elapsed_s
