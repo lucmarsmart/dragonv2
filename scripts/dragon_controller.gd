@@ -213,6 +213,10 @@ func _update_head_aim(delta: float) -> void:
 		set_head_aim(head_requested_yaw + horizontal * delta * 0.9, head_requested_pitch + vertical * delta * 0.9)
 	var yaw := head_requested_yaw if (head_aim_active or is_instance_valid(locked_target)) else sin(tail_wave_time * 0.43) * deg_to_rad(2.2) + smoothed_turn_rate * 0.12
 	var pitch := head_requested_pitch if (head_aim_active or is_instance_valid(locked_target)) else deg_to_rad(3.0) + sin(tail_wave_time * 0.68) * deg_to_rad(1.4)
+	if not (head_aim_active or is_instance_valid(locked_target)):
+		var air := clampf(1.0 - ground_blend, 0.0, 1.0)
+		yaw += _flight_neck_yaw() * air
+		pitch += _flight_neck_pitch() * air
 	var response := 1.0 - exp(-9.0 * delta)
 	var head_step := (Vector2(yaw, pitch) - Vector2(head_aim_yaw, head_aim_pitch)) * response
 	head_step = head_step.limit_length(deg_to_rad(240.0) * delta)
@@ -229,6 +233,20 @@ func _update_head_aim(delta: float) -> void:
 			if axis.length_squared() < 0.000001: axis = head_aim_direction.cross(Vector3.RIGHT)
 		head_aim_direction = (Basis(axis.normalized(),minf(world_angle,deg_to_rad(240.0) * delta)) * head_aim_direction).normalized()
 
+
+# Cuello en vuelo (ref. Symmonds/Dragontwin): la cabeza anticipa el viraje y estabiliza la mirada.
+# El cuello compensa el cabeceo de cada batido (la cabeza queda quieta mientras el cuerpo sube y baja),
+# mira al horizonte al trepar, a lo largo de la trayectoria al picar y se levanta al frenar.
+func _flight_neck_yaw() -> float:
+	return smoothed_turn_rate * neck_lead_strength * 0.45
+
+func _flight_neck_pitch() -> float:
+	var stabilize := -flap_pitch_surge * 0.9
+	var maneuver := -climb_blend * deg_to_rad(22.0) + brake_blend * deg_to_rad(10.0) + dive_fold_blend * deg_to_rad(6.0)
+	# Onda cervical leve, desfasada del batido (el cuello va detrás del hombro).
+	var flap_time: float = anim_player.current_animation_position if (anim_player and anim_player.is_playing() and is_flapping) else 0.0
+	var neck_wave := sin(fposmod(flap_time, 1.5) / 1.5 * TAU - 1.2) * deg_to_rad(2.5) * (1.0 - glide_blend)
+	return stabilize + maneuver + neck_wave
 
 const DragonSkeletonModifier = preload("res://scripts/dragon_skeleton_modifier.gd")
 
@@ -253,7 +271,7 @@ enum LocomotionState {
 @export_group("Locomoción Terrestre y Aterrizaje")
 @export var walk_speed: float = 4.8             # Marcha pesada: patas de ~2.5 m (Froude ~0.9) en vez de galope a 7.5
 @export var sprint_speed: float = 8.0           # Trote/carrera en tierra (Shift, m/s)
-@export var ground_turn_speed: float = 0.7       # Tasa de giro horizontal en tierra (rad/s)
+@export var ground_turn_speed: float = 0.75      # Tasa de giro horizontal en tierra (rad/s); compensa la marcha más lenta
 @export var ground_accel: float = 18.0          # Aceleración en tierra
 @export var ground_friction: float = 14.0       # Fricción al detenerse
 @export var jump_impulse: float = 16.0          # Impulso de salto / despegue (m/s)
@@ -278,8 +296,8 @@ enum LocomotionState {
 @export var max_sink_rate: float = 14.0           # Hundimiento máximo sin sustentación (m/s)
 @export var max_bank_angle: float = 65.0          # Alabeo máximo comandado (grados)
 @export var roll_response: float = 2.2            # Rapidez de entrada/salida del alabeo (1/s)
-@export var turn_gain: float = 1.35               # Agilidad sobre el viraje coordinado puro
-@export var max_turn_rate: float = 1.3            # Tasa de giro máxima (rad/s)
+@export var turn_gain: float = 1.9                # Agilidad sobre el viraje coordinado puro (~85°/s a 65°)
+@export var max_turn_rate: float = 1.6            # Tasa de giro máxima (rad/s)
 @export var flap_cycle_scale: float = 0.74        # Tempo del aleteo de crucero (~2 s por batido)
 
 @export_group("Maniobrabilidad (Sensibilidad)")
@@ -307,7 +325,7 @@ enum LocomotionState {
 @export var model_roll_offset: float = 0.0    # Ajuste fino sobre la calibración automática (grados)
 @export var model_pos_offset: Vector3 = Vector3.ZERO
 @export var auto_calibrate_orientation: bool = true
-@export var reverse_speed: float = 6.0         # Velocidad máxima de marcha atrás (S mantenido, m/s)
+@export var reverse_speed: float = 4.5         # Velocidad de marcha atrás (S mantenido, m/s); la de siempre (7.5 x 0.6)
 @export var model_scale: float = 1.6           # Escala colosal del dragón (Dragón Cuadrúpedo Colosal)
 
 # Base de orientación calculada a partir de los huesos (nariz -> -Z, lomo -> +Y)
@@ -372,6 +390,7 @@ var glide_blend: float = 0.0
 # Dinámica de bamboleo y transferencia de peso (Resorte de 2do orden)
 var smoothed_turn_rate: float = 0.0
 var climb_roll_wobble: float = 0.0
+var flap_pitch_surge: float = 0.0     # Cabeceo visual del batido, que el cuello compensa
 var sway_offset_x: float = 0.0
 var sway_vel_x: float = 0.0
 var sway_offset_y: float = 0.0
@@ -672,7 +691,8 @@ func _handle_input_keys(delta: float) -> void:
 			if Input.is_key_pressed(KEY_D) or (Input.is_key_pressed(KEY_RIGHT) and not head_aim_active):
 				turn_input -= 1.0
 			
-		var target_walk = (sprint_speed if is_sprint else walk_speed) * move_input
+		# Marcha atrás con su propia velocidad (S = -0.6 de entrada); no escala con la marcha hacia adelante.
+		var target_walk = (sprint_speed if is_sprint else walk_speed) * move_input if move_input >= 0.0 else reverse_speed * maxf(move_input / 0.6, -1.0)
 		# The landing stabilizer is still settling the four planted supports.
 		# Retain the input, but begin walking acceleration after that pose settles.
 		var settling_supports := ground_blend < 0.99
@@ -1579,10 +1599,12 @@ func _process(delta: float) -> void:
 		var flap_intensity = 1.1 if current_mode == FlightMode.CLIMB else 0.28
 		heave = sin(phase) * flap_intensity * flight_factor
 		pitch_surge = -cos(phase) * deg_to_rad(7.0 if current_mode == FlightMode.CLIMB else 2.0) * flight_factor
+		flap_pitch_surge = pitch_surge
 		# Bamboleo de esfuerzo en trepada: el cuerpo se balancea de lado a lado (un ciclo por aleteo doble)
 		climb_roll_wobble = sin(phase * 0.5 + 0.6) * deg_to_rad(5.0) * climb_blend * flight_factor
 	else:
 		climb_roll_wobble = lerp(climb_roll_wobble, 0.0, 0.1)
+		flap_pitch_surge = lerpf(flap_pitch_surge, 0.0, 0.1)
 		
 	if visual_root:
 		var step_weight := _gait_weight()
@@ -1762,11 +1784,13 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 			# Onda serpentina inercial en marcha terrestre: amplitud natural anatómica
 			var step_weight := _gait_weight()
 			var ground_tail_phase = walk_cycle_phase - float(i) * 0.55
-			var ground_tail_yaw = sin(ground_tail_phase) * deg_to_rad(1.5 + idx_ratio * 3.5) * step_weight * ground_blend
-			var ground_tail_pitch = (ground_blend * -0.08 * idx_ratio) + cos(walk_cycle_phase * 2.0 - float(i) * 0.3) * deg_to_rad(1.8) * step_weight * ground_blend
+			# Onda viajera amplia en marcha (ref. Sophocleous): la cola contrapesa cada paso.
+			var ground_tail_yaw = sin(ground_tail_phase) * deg_to_rad(2.5 + idx_ratio * 5.5) * step_weight * ground_blend
+			var ground_tail_pitch = (ground_blend * -0.08 * idx_ratio) + cos(walk_cycle_phase * 2.0 - float(i) * 0.3) * deg_to_rad(3.0) * step_weight * ground_blend
 
 			# Límites fisiológicos intervertebrales (rango de movimiento según osteología caudal)
-			var final_tail_yaw = clampf(tail_lag_yaw + tail_wave_yaw + ground_tail_yaw, -deg_to_rad(4.5), deg_to_rad(4.5))
+			var tail_yaw_limit := deg_to_rad(lerpf(4.5, 7.0, ground_blend))
+			var final_tail_yaw = clampf(tail_lag_yaw + tail_wave_yaw + ground_tail_yaw, -tail_yaw_limit, tail_yaw_limit)
 			# En vuelo la cola cuelga y latiguea más (trepada); en tierra conserva el rango osteológico.
 			var tail_pitch_limit := deg_to_rad(lerpf(5.5, 9.0, flight_factor))
 			var final_tail_pitch = clampf(tail_flight_pitch + tail_flap_lag + ground_tail_pitch, -tail_pitch_limit, tail_pitch_limit)

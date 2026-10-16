@@ -259,7 +259,8 @@ func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 			var t := swing_t
 			var smooth_t := t * t * (3.0 - 2.0 * t)
 			target = (limb.start as Vector3).lerp(limb.finish, smooth_t)
-			target.y += sin(pow(t, 0.85) * PI) * (0.65 if rear else 0.55)
+			# Paso alto con flexión marcada (ref. ciclo de marcha de dragón de Sophocleous).
+			target.y += sin(pow(t, 0.85) * PI) * (0.85 if rear else 0.75)
 			limb.planted = limb.finish
 		elif not moving and (limb.planted as Vector3).distance_to(home) > 1.8:
 			# Reposition when turning in place; avoid stretching limbs through the body.
