@@ -15,8 +15,8 @@ enum ViewPreset { BACK, FRONT, RIGHT, LEFT }
 @export var flight_follow_smoothness: float = 10.0 # Seguimiento con inercia en vuelo libre
 @export var rider_distance: float = 15.0         # Vista trasera en vuelo: distancia detrás de la montura
 @export var rider_height: float = 8.0            # Vista trasera en vuelo: altura (la cola queda debajo del encuadre)
-@export var ground_view_distance: float = 11.0   # En tierra: el animal entero desde atrás y arriba
-@export var ground_view_height: float = 6.5
+@export var ground_view_distance: float = 14.0   # En tierra: el animal entero desde atrás y arriba
+@export var ground_view_height: float = 7.5
 @export var landing_view_distance: float = 19.0  # Aterrizaje: encuadre amplio desde afuera, se ve el contacto
 @export var landing_view_height: float = 9.0
 @export var cinematic_drift: float = 0.5         # Deriva orbital lenta en vuelo (rad): no siempre desde atrás

@@ -1169,9 +1169,10 @@ func _update_surface_effects(delta: float) -> void:
 				elif ground_proximity < 4.2 and not ground_contact.is_empty():
 					CollisionEffects.spawn_surface_wash(get_parent(), ground_contact.position + Vector3.UP * 0.08, velocity, false)
 	elif locomotion_state == LocomotionState.GROUNDED:
-		if absf(ground_motion_speed) > 1.2:
+		# Polvo sólo al correr y espaciado: al caminar sobre pasto formaba una nube que tapaba la cámara.
+		if absf(ground_motion_speed) > walk_speed * 1.15:
 			_step_dust_timer += delta
-			if _step_dust_timer >= 0.32:
+			if _step_dust_timer >= 0.6:
 				_step_dust_timer = 0.0
 				var step_pos := global_position + Vector3.DOWN * 0.1
 				var on_water := _is_in_water() or _over_water()
