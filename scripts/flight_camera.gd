@@ -13,13 +13,21 @@ enum ViewPreset { BACK, FRONT, RIGHT, LEFT }
 @export var height: float = 5.0                  # Altura sobre el lomo
 @export var follow_smoothness: float = 16.0     # Suavidad y firmeza de seguimiento de posición
 @export var flight_follow_smoothness: float = 10.0 # Seguimiento con inercia en vuelo libre
-@export var rider_distance: float = 9.0          # Vista de jinete: distancia detrás de la montura
-@export var rider_height: float = 7.5            # Vista de jinete: altura sobre el lomo
+@export var rider_distance: float = 15.0         # Vista trasera en vuelo: distancia detrás de la montura
+@export var rider_height: float = 8.0            # Vista trasera en vuelo: altura (la cola queda debajo del encuadre)
+@export var ground_view_distance: float = 11.0   # En tierra: el animal entero desde atrás y arriba
+@export var ground_view_height: float = 6.5
+@export var landing_view_distance: float = 19.0  # Aterrizaje: encuadre amplio desde afuera, se ve el contacto
+@export var landing_view_height: float = 9.0
+@export var cinematic_drift: float = 0.5         # Deriva orbital lenta en vuelo (rad): no siempre desde atrás
+@export var intro_seconds: float = 4.5           # Barrido de entrada desde un costado y delante
 @export var cinematic_turn_swing: float = 0.6    # Apertura hacia el exterior del viraje (rad a giro máximo)
 @export var cinematic_response: float = 1.6      # Rapidez del muelle cinemático (1/s)
 var dynamic_yaw := 0.0
 var dynamic_pitch := 0.0
 var dynamic_stretch := 0.0
+var cinematic_time := 0.0
+var intro_time := 0.0
 @export var rotation_smoothness: float = 14.0   # Respuesta ágil de la orientación
 @export var base_fov: float = 74.0              # FOV base inmersivo
 @export var max_fov_boost: float = 14.0         # Aumento de FOV en picada a alta velocidad
@@ -84,6 +92,8 @@ const PRESET_YAW = {
 
 func _ready() -> void:
 	fov = base_fov
+	# Las pruebas automáticas (script de SceneTree propio) arrancan sin barrido de entrada.
+	intro_time = intro_seconds if Engine.get_main_loop().get_script() != null else 0.0
 	target_distance = distance
 	if target_node:
 		var forward = -target_node.global_transform.basis.z.normalized()
@@ -160,8 +170,10 @@ func _physics_process(delta: float) -> void:
 	# Vista de jinete en vuelo (ref. Dragontwin): sobre el lomo, detrás de los hombros.
 	# La cola (punta a ~17 m detrás y curvada hacia arriba) queda fuera del encuadre.
 	var rider = back_amount
-	var target_h = lerpf(3.2 if is_ground else 5.0, rider_height - (1.0 if is_ground else 0.0), rider)
-	var target_d = clampf(lerpf(14.0 if is_ground else 18.0, rider_distance + (2.0 if is_ground else 0.0), rider) + zoom_offset, min_distance, max_distance)
+	var view_d: float = ground_view_distance if is_ground else (landing_view_distance if is_landing else rider_distance)
+	var view_h: float = ground_view_height if is_ground else (landing_view_height if is_landing else rider_height)
+	var target_h = lerpf(3.2 if is_ground else 5.0, view_h, rider)
+	var target_d = clampf(lerpf(14.0 if is_ground else 18.0, view_d, rider) + zoom_offset, min_distance, max_distance)
 	height = lerp(height, target_h, 3.0 * delta)
 	target_distance = lerp(target_distance, target_d, 3.0 * delta)
 
@@ -190,23 +202,43 @@ func _physics_process(delta: float) -> void:
 	var speed: float = target_node.current_speed if "current_speed" in target_node else 26.0
 	var dk := 1.0 - exp(-cinematic_response * delta)
 	dynamic_yaw = lerpf(dynamic_yaw, turn * cinematic_turn_swing * cinematic, dk)
-	dynamic_pitch = lerpf(dynamic_pitch, (dive * 0.32 - climb * 0.38) * cinematic, dk)
+	dynamic_pitch = lerpf(dynamic_pitch, (dive * 0.55 - climb * 0.12) * cinematic, dk)
 	dynamic_stretch = lerpf(dynamic_stretch, clampf((speed - 26.0) * 0.12, -1.5, 3.0) * cinematic, dk)
-	var view_yaw: float = orbit_yaw + dynamic_yaw
-	var view_pitch: float = orbit_pitch + dynamic_pitch
-	var back_dir = -forward
-	var orbit_dir = back_dir.rotated(up, view_yaw)
-	var orbit_right = right.rotated(up, view_yaw)
+	# Deriva orbital lenta (períodos de 19 s y 11 s) y barrido de entrada: la cámara recorre al dragón.
+	cinematic_time += delta
+	intro_time = minf(intro_time + delta, intro_seconds)
+	var intro: float = 1.0 - smoothstep(0.0, 1.0, intro_time / maxf(intro_seconds, 0.01))
+	var drift_yaw: float = cinematic_drift * sin(cinematic_time * TAU / 19.0) * cinematic + 2.4 * intro
+	var drift_pitch: float = 0.12 * sin(cinematic_time * TAU / 11.0) * cinematic + 0.22 * intro
+	var view_yaw: float = orbit_yaw + dynamic_yaw + drift_yaw
+	var view_pitch: float = orbit_pitch + dynamic_pitch + drift_pitch
+	# Colocación en un marco parcialmente nivelado: al trepar o picar la cámara sigue detrás y
+	# arriba (ref. Dragontwin) en vez de quedar bajo la cola mirando a través de ella.
+	# En picada la cola sube detrás del dragón: menos nivelación y más altura para dejarla debajo.
+	var level := 0.6 * cinematic * (1.0 - 0.5 * dive)
+	var flat_forward := Vector3(forward.x, 0.0, forward.z)
+	var place_forward: Vector3 = forward if flat_forward.length_squared() < 0.01 else forward.lerp(flat_forward.normalized(), level).normalized()
+	var place_up: Vector3 = up.lerp(Vector3.UP, level).normalized()
+	var place_right: Vector3 = place_forward.cross(place_up).normalized()
+	var back_dir = -place_forward
+	var orbit_dir = back_dir.rotated(place_up, view_yaw)
+	var orbit_right = place_right.rotated(place_up, view_yaw)
 	orbit_dir = orbit_dir.rotated(orbit_right, -view_pitch)
-	var view_height: float = height * (1.0 - 0.45 * climb * cinematic)
-	var desired_pos = saddle + (orbit_dir * (distance + dynamic_stretch)) + (up * view_height * cos(view_pitch))
+	var view_height: float = height * (1.0 - 0.1 * climb * cinematic)
+	var desired_pos = saddle + (orbit_dir * (distance + dynamic_stretch + 6.0 * intro)) + (place_up * view_height * cos(view_pitch))
+	# Vaivén de montura acompasado con el batido: la cámara nunca queda clavada en vuelo recto.
+	if airborne and "is_flapping" in target_node and target_node.is_flapping and target_node.anim_player:
+		var beat: float = fposmod(target_node.anim_player.current_animation_position, 1.5) / 1.5 * TAU
+		desired_pos += up * sin(beat) * 0.35 * cinematic
 	# En vuelo el jinete mira hacia donde va la trayectoria, no sólo hacia donde apunta el morro.
 	var path_dir = forward
 	if airborne and "velocity" in target_node and target_node.velocity.length() > 6.0:
 		path_dir = forward.lerp(target_node.velocity.normalized(), 0.45).normalized()
 	var chase_target = saddle + (path_dir * 20.0) + (up * 0.2)
 	# Con la cámara desplazada, el encuadre se recentra en el dragón para no perderlo.
-	var off_axis: float = clampf((absf(dynamic_yaw) + absf(dynamic_pitch)) / 0.6, 0.0, 1.0)
+	var off_axis: float = clampf((absf(dynamic_yaw + drift_yaw) + absf(dynamic_pitch + drift_pitch)) / 0.6, 0.0, 1.0)
+	if is_landing:
+		off_axis = maxf(off_axis, 0.8)
 	chase_target = chase_target.lerp(saddle + path_dir * 7.0, off_axis * 0.55)
 	var breath = target_node.get_node_or_null("DragonBreath")
 	if breath and head_follow_blend > 0.001 and breath.mouth_pose_cached:
@@ -214,9 +246,12 @@ func _physics_process(delta: float) -> void:
 		# folded or beating wings cover soldiers while retreating or attacking.
 		var mouth: Vector3 = target_node.to_global(breath.mouth_actor_local)
 		var head_direction: Vector3 = (target_node.global_basis*breath.direction_actor_local).normalized()
-		var skull_back := clampf(0.7 + zoom_offset * 0.15, 0.25, 1.9)
-		var skull_height := clampf(2.2 + zoom_offset * 0.12, 1.5, 3.2)
-		var head_camera: Vector3 = mouth - head_direction * skull_back + Vector3.UP * skull_height
+		# Por encima y detrás de los cuernos, no dentro del cráneo: a 0,7 m de la boca la cámara
+		# quedaba dentro de la cabeza, sobre todo con el cuello vivo en vuelo.
+		var skull_back := clampf(5.0 + zoom_offset * 0.25, 3.5, 8.0)
+		var skull_height := clampf(3.5 + zoom_offset * 0.12, 2.8, 5.0)
+		var head_up: Vector3 = (target_node.global_basis.y).lerp(Vector3.UP, 0.5).normalized()
+		var head_camera: Vector3 = mouth - head_direction * skull_back + head_up * skull_height
 		desired_pos = desired_pos.lerp(head_camera, head_follow_blend)
 		chase_target = chase_target.lerp(mouth + head_direction * 14.0, head_follow_blend)
 		collision_pivot_world = saddle.lerp(mouth + Vector3.UP * 0.2, head_follow_blend)

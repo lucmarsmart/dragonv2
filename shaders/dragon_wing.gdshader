@@ -90,21 +90,24 @@ void fragment() {
 	}
 	
 	// 2. DISCRIMINACIÓN ANATÓMICA: MEMBRANA INTERDIGITAL VS FALANGES/HUESOS
-	float luma = dot(raw_rgb, vec3(0.299, 0.587, 0.114));
+	// skin_albedo llega en espacio lineal (source_color): la clasificación se hace en espacio
+	// perceptual. En lineal la mediana del ala es ~0.06 y todo caía bajo el umbral de membrana,
+	// pintando la membrana como hueso carbón (alas que parecían ramas).
+	float luma = pow(max(dot(raw_rgb, vec3(0.299, 0.587, 0.114)), 0.0), 1.0 / 2.2);
 	// Las falanges y huesos son oscuros/densos en la textura; el patagio interdigital es translúcido y más claro
-	float is_membrane = smoothstep(0.12, 0.42, luma);
+	float is_membrane = smoothstep(0.19, 0.26, luma);
 	
 	// 3. COLORACIÓN DE CUERO Y PATAGIO VIVO (100% LIBRE DE VIOLETA SINTÉTICO)
-	vec3 patagium_leather = mix(patagium_shadow_edge, patagium_amber_base, smoothstep(0.15, 0.50, luma));
-	patagium_leather = mix(patagium_leather, patagium_ochre_bright, smoothstep(0.50, 0.85, luma));
+	vec3 patagium_leather = mix(patagium_shadow_edge, patagium_amber_base, smoothstep(0.22, 0.32, luma));
+	patagium_leather = mix(patagium_leather, patagium_ochre_bright, smoothstep(0.32, 0.45, luma));
 	
 	// Huesos alares (falanges hipertrofiadas, húmero y radio) en tono gris carbón / pizarra acorazado
-	vec3 wing_bone = mix(wing_bone_charcoal * 0.8, wing_bone_charcoal * 1.4, smoothstep(0.05, 0.35, luma));
+	vec3 wing_bone = mix(wing_bone_charcoal * 0.8, wing_bone_charcoal * 1.4, smoothstep(0.12, 0.22, luma));
 	vec3 base_wing = mix(wing_bone, patagium_leather, is_membrane);
 	
 	// 4. INYECCIÓN DEL ENTRAMADO CAPILAR Y VASCULARIZACIÓN VIVA
 	float vein_mask = procedural_veins(UV2) * is_membrane;
-	base_wing = mix(base_wing, capillary_vein_color, vein_mask * 0.75);
+	base_wing = mix(base_wing, capillary_vein_color, vein_mask * 0.35);
 	
 	// Sombra de hendiduras y pliegues alares
 	float crevice = clamp(detail.z, 0.0, 1.0);

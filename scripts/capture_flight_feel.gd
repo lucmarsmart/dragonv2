@@ -22,6 +22,10 @@ func _arg(key: String, fallback: String) -> String:
 
 func run() -> void:
 	root.size = Vector2i(1280, 720)
+	# macOS deja de presentar cuadros en ventanas tapadas: la captura va siempre al frente.
+	# Sin foco: no roba el teclado a otras ventanas ni recibe teclas ajenas durante la captura.
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, true)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, true)
 	var out := _arg("out", ProjectSettings.globalize_path("res://artifacts/flight-feel"))
 	var tag := _arg("tag", "captura")
 	DirAccess.make_dir_recursive_absolute(out)

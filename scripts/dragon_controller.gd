@@ -315,6 +315,7 @@ enum LocomotionState {
 @export var spine_curve_strength: float = 0.40      # Curvatura lateral de columna en virajes
 @export var neck_lead_strength: float = 0.60        # Anticipación del cuello/cabeza hacia el viraje
 @export var tail_lag_strength: float = 0.90         # Retraso/arrastre elástico de la cola
+@export var tail_length_scale: float = 0.75         # Largo de la cola respecto del rig original
 @export var wing_asymmetry_strength: float = 0.35   # Desnivel diedro entre ala interior y exterior
 
 @export_group("Alineación del Modelo Visual (Cinemática Natural)")
@@ -1800,6 +1801,10 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 			sk.set_bone_pose_rotation(b, t_rot * sk.get_bone_pose_rotation(b))
 
 	# Recover parents before solving any descendant pose or stance contact.
+	# Cola proporcionada: el rig original la trae de ~17 m (casi el doble del torso). Escalar la raíz
+	# acorta y afina toda la cadena sin deformarla; las envolventes de contacto siguen siendo conservadoras.
+	if bone_tail_indices.size() > 0 and not is_equal_approx(tail_length_scale, 1.0):
+		sk.set_bone_pose_scale(bone_tail_indices[0], Vector3.ONE * tail_length_scale)
 	wing_contact.smooth_body_recovery(self,sk)
 	var head_started := Time.get_ticks_usec() if PoseProbe.profiling else 0
 	head_pose.apply(self, sk)
