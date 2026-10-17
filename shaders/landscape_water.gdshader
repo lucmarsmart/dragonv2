@@ -22,8 +22,8 @@ vec2 hash22(vec2 p) {
 
 // 2D Gradient Noise with quintic smoothstep (continuous derivatives, no lattice seams)
 vec2 grad(vec2 p) {
-	float a = hash2(p) * 6.2831853;
-	return vec2(cos(a), sin(a));
+	vec2 h = hash22(p) * 2.0 - 1.0;
+	return h * inversesqrt(max(dot(h, h), 0.0001));
 }
 
 float gnoise(vec2 p) {
@@ -108,17 +108,20 @@ void fragment() {
 	float stream_coord = dot(wp.xz, rdir);
 	float cross_coord  = dot(wp.xz, cdir);
 	
-	// Multi-scale streaming ripple layers moving downstream
-	vec2 flow1 = vec2(cross_coord * 0.35, stream_coord * 0.40 - TIME * 0.85);
-	vec2 flow2 = vec2(cross_coord * 0.55 + stream_coord * 0.15, stream_coord * 0.70 - TIME * 1.35);
-	vec2 micro = vec2(cross_coord * 1.80, stream_coord * 2.20 - TIME * 2.40);
-	
-	// Finite-difference normals for crisp wave facets
-	const float eps = 0.07;
-	float h_c = fbm_grad(flow1) * 0.48 + fbm_grad(flow2) * 0.36 + gnoise(micro) * 0.16;
-	float h_x = fbm_grad(flow1 + vec2(eps, 0.0)) * 0.48 + fbm_grad(flow2 + vec2(eps, 0.0)) * 0.36 + gnoise(micro + vec2(eps, 0.0)) * 0.16;
-	float h_y = fbm_grad(flow1 + vec2(0.0, eps)) * 0.48 + fbm_grad(flow2 + vec2(0.0, eps)) * 0.36 + gnoise(micro + vec2(0.0, eps)) * 0.16;
-	vec2 ripple = vec2(h_x - h_c, h_y - h_c) / eps;
+	vec2 ripple = vec2(0.0);
+	if (dist_fade > 0.005) {
+		// Multi-scale streaming ripple layers moving downstream
+		vec2 flow1 = vec2(cross_coord * 0.35, stream_coord * 0.40 - TIME * 0.85);
+		vec2 flow2 = vec2(cross_coord * 0.55 + stream_coord * 0.15, stream_coord * 0.70 - TIME * 1.35);
+		vec2 micro = vec2(cross_coord * 1.80, stream_coord * 2.20 - TIME * 2.40);
+		
+		// Finite-difference normals for crisp wave facets
+		const float eps = 0.07;
+		float h_c = fbm_grad(flow1) * 0.48 + fbm_grad(flow2) * 0.36 + gnoise(micro) * 0.16;
+		float h_x = fbm_grad(flow1 + vec2(eps, 0.0)) * 0.48 + fbm_grad(flow2 + vec2(eps, 0.0)) * 0.36 + gnoise(micro + vec2(eps, 0.0)) * 0.16;
+		float h_y = fbm_grad(flow1 + vec2(0.0, eps)) * 0.48 + fbm_grad(flow2 + vec2(0.0, eps)) * 0.36 + gnoise(micro + vec2(0.0, eps)) * 0.16;
+		ripple = vec2(h_x - h_c, h_y - h_c) / eps;
+	}
 	
 	// Broad standing wave swell along the canyon
 	vec2 broad_uv = vec2(cross_coord * 0.06, stream_coord * 0.06 - TIME * 0.25);
@@ -155,11 +158,14 @@ void fragment() {
 	vec3 transmission = exp(-depth * absorption_coeff);
 	
 	// Refracción y caústicas solares en el fondo cristalino
-	vec2 c_uv1 = vec2(cross_coord * 1.5, stream_coord * 1.5 - TIME * 1.1);
-	vec2 c_uv2 = vec2(cross_coord * 1.5 + 2.5, stream_coord * 1.5 + TIME * 0.95);
-	float caust = pow(clamp(1.0 - abs(gnoise(c_uv1) - gnoise(c_uv2)) * 1.5, 0.0, 1.0), 3.0);
 	float caust_mask = (1.0 - smoothstep(0.05, 2.2, depth)) * transmission.r;
-	vec3 caustics = vec3(0.95, 1.0, 0.98) * (caust * caust_mask * 0.45);
+	vec3 caustics = vec3(0.0);
+	if (caust_mask > 0.005) {
+		vec2 c_uv1 = vec2(cross_coord * 1.5, stream_coord * 1.5 - TIME * 1.1);
+		vec2 c_uv2 = vec2(cross_coord * 1.5 + 2.5, stream_coord * 1.5 + TIME * 0.95);
+		float caust = pow(clamp(1.0 - abs(gnoise(c_uv1) - gnoise(c_uv2)) * 1.5, 0.0, 1.0), 3.0);
+		caustics = vec3(0.95, 1.0, 0.98) * (caust * caust_mask * 0.45);
+	}
 	
 	// Rápidos de aguas bravas (Whitewater Rapids) y estelas de espuma (Foto 1)
 	// 1. Espuma en contacto con orillas y peñascos
@@ -169,12 +175,15 @@ void fragment() {
 	float crest_foam = smoothstep(0.06, 0.15, total_pert.y); // Espuma en crestas de oleaje
 	float foam_base = max(max(shore_contact * 0.95, rapids * 0.75), crest_foam * 0.85);
 	
-	// Estelas alargadas de burbujas arrastradas corriente abajo (wake foam)
-	vec2 foam_wake_uv = vec2(cross_coord * 2.8, stream_coord * 0.85 - TIME * 1.3);
-	float foam_cells = voronoi(vec2(cross_coord * 3.5, stream_coord * 1.4 - TIME * 1.5));
-	float foam_noise = fbm_grad(foam_wake_uv) + 0.5;
-	float foam_pattern = (1.0 - foam_cells * 0.85) * 0.70 + foam_noise * 0.30;
-	float foam_mask = smoothstep(0.28, 0.60, foam_base * foam_pattern);
+	float foam_mask = 0.0;
+	if (foam_base > 0.20) {
+		// Estelas alargadas de burbujas arrastradas corriente abajo (wake foam)
+		vec2 foam_wake_uv = vec2(cross_coord * 2.8, stream_coord * 0.85 - TIME * 1.3);
+		float foam_cells = voronoi(vec2(cross_coord * 3.5, stream_coord * 1.4 - TIME * 1.5));
+		float foam_noise = fbm_grad(foam_wake_uv) + 0.5;
+		float foam_pattern = (1.0 - foam_cells * 0.85) * 0.70 + foam_noise * 0.30;
+		foam_mask = smoothstep(0.28, 0.60, foam_base * foam_pattern);
+	}
 	vec3 foam_color = vec3(0.98, 1.0, 1.0);
 
 	

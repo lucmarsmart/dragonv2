@@ -36,6 +36,8 @@ var all_limb_bones: Array[int] = []
 var body_query_cache: Dictionary = {}
 var body_query_scope_active: bool = false
 var body_query_actor: Transform3D = Transform3D.IDENTITY
+var hull_probes: Array = []
+var broadphase_box := BoxShape3D.new()
 
 func _configure_topology(sk: Skeleton3D) -> void:
 	bone_descendants.clear()
@@ -187,8 +189,12 @@ func configure(dragon: Node3D, sk: Skeleton3D) -> void:
 	for boundary in boundaries:
 		probe.samples.append(boundary.sample)
 		sample_categories.append(boundary.part)
+	hull_probes.clear()
 	for side in LIMB_SEGMENTS.size()+4:
 		hulls.append(ConvexPolygonShape3D.new())
+		var hp = Probe.new()
+		hp.profile_label = "wing_skin"
+		hull_probes.append(hp)
 		if side>=4: body_indices.append(side)
 	# Refresh only original points affected by the final jaw modifier.
 	var offsets:Array[int]=[]
@@ -214,14 +220,28 @@ func configure(dragon: Node3D, sk: Skeleton3D) -> void:
 			if (-category&1)!=0:categories.append(0)
 			if (-category&2)!=0:categories.append(1)
 		for part in categories:
+			hull_probes[part].samples.append(sample)
 			if part==2 and tail_deformed:tail_hull_slots.append(offsets[part])
 			if jaw_deformed:
 				if not jaw_hull_slots.has(part):jaw_hull_slots[part]=[]
 				jaw_hull_slots[part].append({"point":offsets[part],"jaw":jaw_index})
 			offsets[part]+=1
+	for hp in hull_probes:
+		hp.prepare_coordinates()
+	probe.prepare_coordinates()
 	torso_bones=dragon.bone_spine_indices.duplicate()
 	jaw_probe.prepare_coordinates()
 	print("BODY_TORSO_RECOVERY bones=",torso_bones," jaw_hulls=",jaw_hull_slots.keys()," jaw_support_points=",jaw_probe.samples.size())
+
+func sample_hull(dragon: Node3D, sk: Skeleton3D, side: int) -> void:
+	_invalidate_body_query_cache()
+	var hp = hull_probes[side]
+	var pts: PackedVector3Array = hp.coordinates(sk, dragon)
+	final_hull_points[side] = pts
+	if hp.last_coordinates_changed or hulls[side].points.size() != pts.size():
+		var started := Time.get_ticks_usec() if Probe.profiling else 0
+		if pts.size() >= 4: hulls[side].points = pts
+		Probe.record("wing_hull_%d" % side, started)
 
 func sample_final(dragon: Node3D, sk: Skeleton3D) -> void:
 	_invalidate_body_query_cache()
@@ -229,23 +249,16 @@ func sample_final(dragon: Node3D, sk: Skeleton3D) -> void:
 	# Every call follows a pose change; the resulting hull must match that render.
 	frame = Engine.get_physics_frames()
 	if hulls.is_empty(): configure(dragon, sk)
-	var points: Array[PackedVector3Array] = []
-	for side in hulls.size(): points.append(PackedVector3Array())
-	var coordinates := probe.coordinates(sk,dragon)
-	for index in coordinates.size():
-		var local: Vector3 = coordinates[index]
-		var category: int = sample_categories[index]
-		if category>=0:
-			points[category].append(local)
-		else:
-			var wing_mask := -category
-			if (wing_mask & 1)!=0: points[0].append(local)
-			if (wing_mask & 2)!=0: points[1].append(local)
+	if final_hull_points.size() != hulls.size():
+		final_hull_points.resize(hulls.size())
 	for side in hulls.size():
-		var started := Time.get_ticks_usec() if Probe.profiling else 0
-		if points[side].size() >= 4: hulls[side].points = points[side]
-		Probe.record("wing_hull_%d" % side,started)
-	final_hull_points=points
+		var hp = hull_probes[side]
+		var pts: PackedVector3Array = hp.coordinates(sk, dragon)
+		final_hull_points[side] = pts
+		if hp.last_coordinates_changed or hulls[side].points.size() != pts.size():
+			var started := Time.get_ticks_usec() if Probe.profiling else 0
+			if pts.size() >= 4: hulls[side].points = pts
+			Probe.record("wing_hull_%d" % side, started)
 
 func sample_jaw_final(dragon:Node3D,sk:Skeleton3D) -> void:
 	_invalidate_body_query_cache()
@@ -253,10 +266,12 @@ func sample_jaw_final(dragon:Node3D,sk:Skeleton3D) -> void:
 	# Only mandibular support points changed after the final body modifier.
 	# Keep the other16/17 enclosures and all original point identities intact.
 	var coordinates:PackedVector3Array=jaw_probe.coordinates(sk,dragon)
+	if not jaw_probe.last_coordinates_changed:return
 	for category in jaw_hull_slots:
-		var points:PackedVector3Array=final_hull_points[category]
+		var points:PackedVector3Array=final_hull_points[category].duplicate()
 		for slot in jaw_hull_slots[category]:points[int(slot.point)]=coordinates[int(slot.jaw)]
 		final_hull_points[category]=points
+		hull_probes[category].has_cache=false
 		if points.size()>=4:hulls[category].points=points
 
 func constrain(dragon: Node3D, delta: float) -> void:
@@ -277,6 +292,16 @@ func constrain(dragon: Node3D, delta: float) -> void:
 	var requested_velocity:Vector3=dragon.velocity
 	if dragon.locomotion_state == dragon.LocomotionState.LANDING: contact_normal = Vector3.ZERO
 	if look_velocity.length()<.1: return
+	var motion_len := (look_velocity * delta).length()
+	broadphase_box.size = Vector3(36.0 + motion_len * 2.0, 22.0 + motion_len * 2.0, 38.0 + motion_len * 2.0)
+	var broad_query := PhysicsShapeQueryParameters3D.new()
+	broad_query.shape = broadphase_box
+	broad_query.transform = dragon.global_transform
+	broad_query.collision_mask = 3
+	broad_query.exclude = [dragon.get_rid()]
+	broad_query.margin = 0.6
+	if space.intersect_shape(broad_query, 1).is_empty():
+		return
 	for hull_index in hulls.size():
 		var hull: ConvexPolygonShape3D = hulls[hull_index]
 		if hull.points.size() < 4: continue
@@ -590,7 +615,7 @@ func guard_tail_terrain(dragon:Node3D,sk:Skeleton3D) -> void:
 	var parent:int=sk.get_bone_parent(bone)
 	var parent_q:Quaternion=(sk.global_basis*sk.get_bone_global_pose(parent).basis).orthonormalized().get_rotation_quaternion()
 	sk.set_bone_pose_rotation(bone,parent_q.inverse()*accepted)
-	sample_final(dragon,sk)
+	sample_hull(dragon,sk,2)
 
 func _wing_contact(dragon: Node3D, side: int) -> bool:
 	var query := PhysicsShapeQueryParameters3D.new()
@@ -605,15 +630,19 @@ func guard_grounded_wings(dragon: Node3D, sk: Skeleton3D) -> void:
 	# The translation sweep used the previously rendered pose. Reject only a
 	# new wing articulation that intersects after that sweep; feet and free
 	# head retain this tick's world targets and freshly solved rotations.
+	var wing_modified := false
 	for side in 2:
 		var root_bone: int = 96 if side==0 else 120
-		if _limit_wing_frame(sk,root_bone): sample_final(dragon,sk)
+		if _limit_wing_frame(sk,root_bone):
+			sample_hull(dragon,sk,side)
+			wing_modified = true
 		if _wing_contact(dragon,side) and wing_pose_safe.has(side):
 			var saved: Dictionary = wing_pose_safe[side]
 			for bone in saved.rotations:
 				sk.set_bone_pose_rotation(int(bone),saved.rotations[bone])
 			_limit_wing_frame(sk,root_bone)
-			sample_final(dragon,sk)
+			sample_hull(dragon,sk,side)
+			wing_modified = true
 			wing_pose_metrics.restored += 1
 			if _wing_contact(dragon,side):
 				# A changed body parent must not drag the cached wing angle into
@@ -625,12 +654,15 @@ func guard_grounded_wings(dragon: Node3D, sk: Skeleton3D) -> void:
 				var local_basis: Basis = parent_basis.inverse()*desired_basis
 				sk.set_bone_pose_rotation(root_bone,local_basis.orthonormalized().get_rotation_quaternion())
 				_limit_wing_frame(sk,root_bone)
-				sample_final(dragon,sk)
+				sample_hull(dragon,sk,side)
+				wing_modified = true
 				wing_pose_metrics.body_compensated += 1
 		# The first grounded frame may not have a saved wing pose yet.
 		# Its real contact still needs the same bounded fold correction.
-		if _wing_contact(dragon,side) and _fold_wing_away(dragon,sk,side,root_bone):
-			wing_pose_metrics.folded += 1
+		if _wing_contact(dragon,side):
+			wing_modified = true
+			if _fold_wing_away(dragon,sk,side,root_bone):
+				wing_pose_metrics.folded += 1
 		if _wing_contact(dragon,side):
 			wing_pose_metrics.uncleared += 1
 			dragon.contact_fold_requested = 1.0
@@ -642,6 +674,8 @@ func guard_grounded_wings(dragon: Node3D, sk: Skeleton3D) -> void:
 			rotations[bone]=sk.get_bone_pose_rotation(bone)
 		var body_basis: Basis = dragon.global_basis.orthonormalized().inverse()*sk.global_basis.orthonormalized()*sk.get_bone_global_pose(root_bone).basis.orthonormalized()
 		wing_pose_safe[side]={"rotations":rotations,"body_basis":body_basis}
+	if wing_modified:
+		sample_hull(dragon,sk,2)
 
 
 func _limit_wing_frame(sk: Skeleton3D, root_bone: int) -> bool:
@@ -709,7 +743,7 @@ func _fold_wing_away(dragon: Node3D, sk: Skeleton3D, side: int, root_bone: int) 
 		for bone in baseline: sk.set_bone_pose_rotation(int(bone),baseline[bone])
 		dragon._rotate_bone_world(sk,root_bone,axis.normalized(),deg_to_rad(float(step)*.25))
 		_limit_wing_frame(sk,root_bone)
-		sample_final(dragon,sk)
+		sample_hull(dragon,sk,side)
 		if not _wing_contact(dragon,side):
 			if diagnostic: print("WING_FOLD_CLEAR frame=",Engine.get_physics_frames()," side=",side," trial_deg=",float(step)*.25)
 			return true
@@ -718,7 +752,7 @@ func _fold_wing_away(dragon: Node3D, sk: Skeleton3D, side: int, root_bone: int) 
 			var actual := (sk.global_basis*sk.get_bone_global_pose(root_bone).basis).orthonormalized().get_rotation_quaternion()
 			print("WING_FOLD_BLOCKED frame=",Engine.get_physics_frames()," side=",side," trial_deg=",float(step)*.25," world_step_deg=",rad_to_deg(published.angle_to(actual)))
 	for bone in baseline: sk.set_bone_pose_rotation(int(bone),baseline[bone])
-	sample_final(dragon,sk)
+	sample_hull(dragon,sk,side)
 	return false
 
 
@@ -769,6 +803,15 @@ func _body_contact(dragon: Node3D, mask: int = 3) -> bool:
 
 func _rotation_contact(dragon: Node3D, mask: int = 3) -> bool:
 	var space := dragon.get_world_3d().direct_space_state
+	broadphase_box.size = Vector3(36.0, 22.0, 38.0)
+	var broad_query := PhysicsShapeQueryParameters3D.new()
+	broad_query.shape = broadphase_box
+	broad_query.transform = dragon.global_transform
+	broad_query.exclude = [dragon.get_rid()]
+	broad_query.margin = 0.05
+	broad_query.collision_mask = mask
+	if space.intersect_shape(broad_query, 1).is_empty():
+		return false
 	for index in hulls.size():
 		if hulls[index].points.size() < 4: continue
 		var query := PhysicsShapeQueryParameters3D.new()

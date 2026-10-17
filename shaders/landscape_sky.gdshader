@@ -50,38 +50,36 @@ void sky() {
 	vec3 sun_disk = vec3(1.0, 0.98, 0.90) * pow(sun_dot, 1500.0) * 3.5;
 	color += sun_halo + sun_disk;
 	
-	// Natural Cumulus Humilis clouds (Foto reference)
-	if (EYEDIR.y > 0.01) {
-		// Planar perspective projection across the sky dome
-		vec2 uv = (EYEDIR.xz / max(EYEDIR.y + 0.15, 0.08)) * 0.38 + vec2(TIME * 0.0016, TIME * 0.0004);
-		
-		float base_density = fbm_clouds(uv * 1.8);
-		// Billowy cumulus cauliflower puff structure: carve softer edges and puffy lobes
-		float billow = fbm_clouds(uv * 3.6 + vec2(1.7, 9.2));
-		float cloud_density = base_density * 0.68 + billow * 0.32;
-		
-		// Shape into distinct, puffy cumulus bodies separated by blue sky
-		float cloud_alpha = smoothstep(0.46, 0.68, cloud_density);
-		
-		// Directional illumination from the sun:
-		vec2 sun_offset = normalize(sun_dir.xz) * 0.06;
-		float sun_sample = fbm_clouds((uv + sun_offset) * 1.8);
-		float light_factor = clamp((cloud_density - sun_sample) * 4.5 + 0.65, 0.0, 1.0);
-		
-		// Silver-white sunlit cloud crest vs soft ambient blue-shaded underside
-		vec3 cloud_sunlit = vec3(1.0, 0.99, 0.97);
-		vec3 cloud_shaded = mix(vec3(0.62, 0.72, 0.84), vec3(0.78, 0.84, 0.90), light_factor);
-		vec3 cloud_color  = mix(cloud_shaded, cloud_sunlit, pow(light_factor, 1.3));
-		
-		// Atmospheric distance fade just touching the mountain tops
-		float horizon_fade = smoothstep(0.015, 0.10, EYEDIR.y);
-		color = mix(color, cloud_color, cloud_alpha * horizon_fade * 0.98);
-	}
-	
 	// Nadir (below horizon) soft atmospheric terrain ground tone
 	if (EYEDIR.y < 0.0) {
 		color = mix(vec3(0.24, 0.36, 0.28), sky_horizon, exp(EYEDIR.y * 14.0));
 	}
 	
-	COLOR = color;
+	if (AT_CUBEMAP_PASS) {
+		COLOR = color;
+	} else if (AT_HALF_RES_PASS) {
+		// Natural Cumulus Humilis clouds computed at half resolution
+		if (EYEDIR.y > 0.01) {
+			vec2 uv = (EYEDIR.xz / max(EYEDIR.y + 0.15, 0.08)) * 0.38;
+			
+			float base_density = fbm_clouds(uv * 1.8);
+			float billow = fbm_clouds(uv * 3.6 + vec2(1.7, 9.2));
+			float cloud_density = base_density * 0.68 + billow * 0.32;
+			float cloud_alpha = smoothstep(0.46, 0.68, cloud_density);
+			
+			vec2 sun_offset = normalize(sun_dir.xz) * 0.06;
+			float sun_sample = fbm_clouds((uv + sun_offset) * 1.8);
+			float light_factor = clamp((cloud_density - sun_sample) * 4.5 + 0.65, 0.0, 1.0);
+			
+			vec3 cloud_sunlit = vec3(1.0, 0.99, 0.97);
+			vec3 cloud_shaded = mix(vec3(0.62, 0.72, 0.84), vec3(0.78, 0.84, 0.90), light_factor);
+			vec3 cloud_color  = mix(cloud_shaded, cloud_sunlit, pow(light_factor, 1.3));
+			
+			float horizon_fade = smoothstep(0.015, 0.10, EYEDIR.y);
+			color = mix(color, cloud_color, cloud_alpha * horizon_fade * 0.98);
+		}
+		COLOR = color;
+	} else {
+		COLOR = EYEDIR.y > 0.01 ? HALF_RES_COLOR.rgb : color;
+	}
 }

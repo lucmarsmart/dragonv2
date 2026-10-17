@@ -235,10 +235,18 @@ func point(sk: Skeleton3D, sample: Dictionary) -> Vector3:
 		p += (sk.get_bone_global_pose(influence.bone) * influence.bind) * sample.vertex * float(influence.weight)
 	return sk.to_global(p)
 
+var cached_poses: Array[Transform3D] = []
+var cached_placement: Transform3D = Transform3D.IDENTITY
+var cached_result := PackedVector3Array()
+var has_cache := false
+var last_coordinates_changed := true
+
 # Production volumes need coordinates only. Avoid two per-vertex world/local node
 # calls and dictionary allocation; diagnostic points() retains independent samples.
 func _flatten_coordinates() -> void:
 	flat_count = samples.size()
+	has_cache = false
+	last_coordinates_changed = true
 	flat_vertices.clear()
 	flat_offsets.clear()
 	flat_keys.clear()
@@ -267,19 +275,50 @@ func prepare_coordinates() -> void:
 func coordinates(sk: Skeleton3D, relative: Node3D = null) -> PackedVector3Array:
 	var started := Time.get_ticks_usec() if profiling else 0
 	if flat_count != samples.size(): _flatten_coordinates()
+	var bone_count := flat_bones.size()
 	var poses: Array[Transform3D] = []
-	poses.resize(flat_bones.size())
-	for index in flat_bones.size():
-		poses[index] = sk.get_bone_global_pose(flat_bones[index])*flat_binds[index]
-	var result := PackedVector3Array()
-	result.resize(flat_vertices.size())
+	poses.resize(bone_count)
 	var placement := sk.global_transform
 	if relative != null: placement = relative.global_transform.affine_inverse()*placement
-	for index in flat_vertices.size():
+	var unchanged := has_cache and placement == cached_placement and cached_poses.size() == bone_count
+	for index in bone_count:
+		var pose := sk.get_bone_global_pose(flat_bones[index])*flat_binds[index]
+		poses[index] = pose
+		if unchanged and pose != cached_poses[index]:
+			unchanged = false
+	if unchanged:
+		last_coordinates_changed = false
+		record(profile_label,started)
+		return cached_result
+	var vertex_count := flat_vertices.size()
+	var result := PackedVector3Array()
+	result.resize(vertex_count)
+	for index in vertex_count:
 		var vertex := flat_vertices[index]
-		var p := Vector3.ZERO
-		for influence in range(flat_offsets[index],flat_offsets[index+1]):
-			p += poses[flat_keys[influence]]*vertex*flat_weights[influence]
+		var start_i := flat_offsets[index]
+		var end_i := flat_offsets[index+1]
+		var count_i := end_i - start_i
+		var p: Vector3
+		if count_i == 1:
+			p = poses[flat_keys[start_i]]*vertex*flat_weights[start_i]
+		elif count_i == 2:
+			p = poses[flat_keys[start_i]]*vertex*flat_weights[start_i] + poses[flat_keys[start_i+1]]*vertex*flat_weights[start_i+1]
+		elif count_i == 3:
+			p = poses[flat_keys[start_i]]*vertex*flat_weights[start_i] + poses[flat_keys[start_i+1]]*vertex*flat_weights[start_i+1] + poses[flat_keys[start_i+2]]*vertex*flat_weights[start_i+2]
+		elif count_i == 4:
+			p = poses[flat_keys[start_i]]*vertex*flat_weights[start_i] + poses[flat_keys[start_i+1]]*vertex*flat_weights[start_i+1] + poses[flat_keys[start_i+2]]*vertex*flat_weights[start_i+2] + poses[flat_keys[start_i+3]]*vertex*flat_weights[start_i+3]
+		else:
+			p = Vector3.ZERO
+			var influence := start_i
+			while influence < end_i:
+				p += poses[flat_keys[influence]]*vertex*flat_weights[influence]
+				influence += 1
 		result[index] = placement*p
+	cached_poses = poses
+	cached_placement = placement
+	cached_result = result
+	has_cache = true
+	last_coordinates_changed = true
 	record(profile_label,started)
 	return result
+

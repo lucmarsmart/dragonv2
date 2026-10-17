@@ -1,0 +1,33 @@
+{
+	"draw_calls": 235.508305647841,
+	"elapsed_s": 10.010092,
+	"fire": false,
+	"fps": 60.1393074109609,
+	"lod_counts": {
+		"LOD0": 0,
+		"LOD1": 0,
+		"LOD2": 0,
+		"LOD3": 0
+	},
+	"mesh_triangles": [
+		513,
+		1017,
+		513,
+		218
+	],
+	"p95_ms": 19.326,
+	"physics_ms": 3.54485714285712,
+	"pipeline_compilations": {
+		"PIPELINE_COMPILATIONS_CANVAS": 5.0,
+		"PIPELINE_COMPILATIONS_DRAW": 0.0,
+		"PIPELINE_COMPILATIONS_MESH": 56.0,
+		"PIPELINE_COMPILATIONS_SPECIALIZATION": 50.0,
+		"PIPELINE_COMPILATIONS_SURFACE": 46.0
+	},
+	"primitives": 2301850.23920266,
+	"process_ms": 16.5464568106314,
+	"render_cpu_ms": 0.600508305915566,
+	"render_gpu_ms": 16.1965000003675,
+	"terrain_sha256": "209bdfac3b2dd8d5956d4fcef7bd954f0798a092c75b9b4f44f31c1a14a799e2",
+	"variant": "runtime"
+}

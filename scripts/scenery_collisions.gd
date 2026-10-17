@@ -98,7 +98,9 @@ func _measure_tree_meshes() -> void:
 		if not cache.has(key):
 			var mm := landscape.get_node_or_null(key) as MultiMeshInstance3D if key != "" else null
 			if mm and mm.multimesh and mm.multimesh.mesh:
-				var aabb := mm.multimesh.mesh.get_aabb()
+				var am := mm.multimesh.mesh as ArrayMesh
+				var custom_box: AABB = am.get_custom_aabb() if am != null else AABB()
+				var aabb: AABB = custom_box if custom_box.size != Vector3.ZERO else mm.multimesh.mesh.get_aabb()
 				# Tronco ~7 % del ancho de copa (abeto: 0.46 m sobre 6.6 m de copa).
 				cache[key] = Vector2(0.07 * maxf(aabb.size.x, aabb.size.z), aabb.end.y)
 			else:

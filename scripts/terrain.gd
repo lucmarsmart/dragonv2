@@ -61,23 +61,14 @@ func _ready() -> void:
 		child.queue_free()
 	_terrain_material = ShaderMaterial.new()
 	_terrain_material.shader = load("res://shaders/terrain.gdshader")
-	for pair in [["rock_albedo", "rock_face_diff_2k"], ["rock_normal", "rock_face_nor_gl_2k"], ["rock_rough", "rock_face_rough_2k"], ["earth_albedo", "forest_ground_04_diffuse"], ["earth_normal", "forest_ground_04_nor_gl"], ["earth_rough", "forest_ground_04_rough"]]:
-		_terrain_material.set_shader_parameter(pair[0], load("res://assets/environment/" + pair[1] + ".jpg"))
-	for pair in [["grass_albedo", "diff"], ["grass_normal", "normal"], ["grass_rough", "rough"]]:
-		_terrain_material.set_shader_parameter(pair[0], load("res://assets/environment/aerial_grass_" + pair[1] + ".jpg"))
+	_terrain_material.set_shader_parameter("rock_albedo", load("res://assets/environment/rock_face_diff_2k.jpg"))
+	_terrain_material.set_shader_parameter("earth_albedo", load("res://assets/environment/forest_ground_04_diffuse.jpg"))
+	_terrain_material.set_shader_parameter("grass_albedo", load("res://assets/environment/aerial_grass_diff.jpg"))
 	_build_ground()
 	_build_distant_ridges()
 	_build_water()
 	_build_forest()
 	_setup_atmosphere()
-	var reflection := ReflectionProbe.new()
-	reflection.name = "RiverCatchmentReflection"
-	reflection.position = Vector3(20, 45, 0)
-	reflection.size = Vector3(1000, 450, 2100)
-	reflection.max_distance = 3000.0
-	reflection.intensity = 0.85
-	reflection.update_mode = ReflectionProbe.UPDATE_ONCE
-	add_child(reflection)
 
 func _collect_source(node: Node) -> void:
 	if node is MeshInstance3D:
@@ -357,8 +348,8 @@ func _ridge_height(x: float, z: float) -> float:
 func _build_distant_ridges() -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	const SEGMENTS := 640
-	const RINGS := 120
+	const SEGMENTS := 160
+	const RINGS := 32
 	for ring in RINGS:
 		for i in SEGMENTS:
 			var quad: Array[Vector3] = []
@@ -377,7 +368,9 @@ func _build_distant_ridges() -> void:
 	ridge.name = "ErodedMountainCatchment"
 	ridge.mesh = st.commit()
 	ridge.material_override = _terrain_material
+	ridge.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(ridge)
+	ridge.create_trimesh_collision()
 	_build_distant_ridge_forest()
 
 func _create_distant_canopy_mesh() -> Mesh:
@@ -437,8 +430,9 @@ func _build_distant_ridge_forest() -> void:
 		var dist_factor := clampf((r_dist - 1000.0) / 1600.0, 0.0, 1.0)
 		var size := _rng.randf_range(1.8, 3.6) * lerpf(1.0, 1.7, dist_factor)
 		var yaw := _rng.randf() * TAU
-		var basis := Basis(Vector3.UP, yaw).scaled(Vector3.ONE * size)
-		ridge_tree_transforms.append(Transform3D(basis, Vector3(p.x, h - 0.4, p.y)))
+		if i % 4 == 0:
+			var basis := Basis(Vector3.UP, yaw).scaled(Vector3.ONE * (size * 1.35))
+			ridge_tree_transforms.append(Transform3D(basis, Vector3(p.x, h - 0.4, p.y)))
 	
 	if ridge_tree_transforms.size() > 0:
 		var node := _batch(canopy_mesh, ridge_tree_transforms, "DistantRidgeForestCanopy")
@@ -595,38 +589,143 @@ func _batch(mesh: Mesh, transforms: Array, tag: String, material: Material = nul
 	add_child(node)
 	return node
 
+func _batch_spatial(mesh: Mesh, transforms: Array, tag: String, grid_div: int, map_half: float, vis_end: float, vis_margin: float, material: Material = null) -> void:
+	if transforms.is_empty():
+		return
+	var buckets: Dictionary = {}
+	var cell_span := (map_half * 2.0) / float(grid_div)
+	for xform in transforms:
+		var t: Transform3D = xform
+		var cx := clampi(int((t.origin.x + map_half) / cell_span), 0, grid_div - 1)
+		var cz := clampi(int((t.origin.z + map_half) / cell_span), 0, grid_div - 1)
+		var key := cz * grid_div + cx
+		if not buckets.has(key):
+			buckets[key] = []
+		buckets[key].append(t)
+	var first := true
+	for key in buckets.keys():
+		var cell_name := tag if first else "%s_cell_%d" % [tag, key]
+		first = false
+		var node := _batch(mesh, buckets[key], cell_name, material)
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if vis_end > 0.0:
+			node.visibility_range_end = vis_end
+			node.visibility_range_end_margin = vis_margin
+
+func _decimate_rock_mesh(src_mesh: ArrayMesh, stride: int) -> ArrayMesh:
+	var out := ArrayMesh.new()
+	for s in src_mesh.get_surface_count():
+		var mat := src_mesh.surface_get_material(s) as StandardMaterial3D
+		if mat:
+			mat = mat.duplicate() as StandardMaterial3D
+			_simplify_material(mat)
+		var arr: Array = src_mesh.surface_get_arrays(s)
+		var vtx: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
+		var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
+		var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var step := 3 * maxi(1, stride)
+		for i in range(0, idx.size() - 2, step):
+			for k in 3:
+				var vi := idx[i + k]
+				if uvs.size() > 0: st.set_uv(uvs[vi])
+				if nrm.size() > 0: st.set_normal(nrm[vi])
+				st.add_vertex(vtx[vi])
+		st.set_material(mat)
+		st.commit(out)
+	out.set_custom_aabb(src_mesh.get_aabb())
+	return out
+
+func _simplify_material(mat: StandardMaterial3D) -> void:
+	if not mat:
+		return
+	if mat.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA:
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+		mat.alpha_scissor_threshold = 0.25
+	mat.normal_enabled = false
+	mat.normal_texture = null
+	mat.roughness_texture = null
+	mat.roughness = 0.92
+	mat.metallic_texture = null
+	mat.metallic = 0.0
+	mat.metallic_specular = 0.12
+
+func _decimate_pine_mesh(src_mesh: ArrayMesh, stride: int, card_scale: float, target_aabb: AABB) -> ArrayMesh:
+	var out := ArrayMesh.new()
+	for s in src_mesh.get_surface_count():
+		var mat := src_mesh.surface_get_material(s) as StandardMaterial3D
+		if mat:
+			mat = mat.duplicate() as StandardMaterial3D
+			_simplify_material(mat)
+		if s == 0:
+			var st0 := SurfaceTool.new()
+			st0.begin(Mesh.PRIMITIVE_TRIANGLES)
+			st0.append_from(src_mesh, 0, Transform3D.IDENTITY)
+			st0.set_material(mat)
+			st0.commit(out)
+		else:
+			var arr: Array = src_mesh.surface_get_arrays(s)
+			var vtx: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
+			var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
+			var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
+			var st1 := SurfaceTool.new()
+			st1.begin(Mesh.PRIMITIVE_TRIANGLES)
+			var step := 3 * maxi(1, stride)
+			for i in range(0, idx.size() - 2, step):
+				var i0 := idx[i]
+				var i1 := idx[i + 1]
+				var i2 := idx[i + 2]
+				var v0 := vtx[i0]
+				var v1 := vtx[i1]
+				var v2 := vtx[i2]
+				var c := (v0 + v1 + v2) / 3.0
+				v0 = c + (v0 - c) * card_scale
+				v1 = c + (v1 - c) * card_scale
+				v2 = c + (v2 - c) * card_scale
+				if uvs.size() > 0: st1.set_uv(uvs[i0])
+				if nrm.size() > 0: st1.set_normal(nrm[i0])
+				st1.add_vertex(v0)
+				if uvs.size() > 0: st1.set_uv(uvs[i1])
+				if nrm.size() > 0: st1.set_normal(nrm[i1])
+				st1.add_vertex(v1)
+				if uvs.size() > 0: st1.set_uv(uvs[i2])
+				if nrm.size() > 0: st1.set_normal(nrm[i2])
+				st1.add_vertex(v2)
+			st1.set_material(mat)
+			st1.commit(out)
+	out.set_custom_aabb(target_aabb)
+	return out
+
+func _clone_mesh_with_aabb(src_mesh: ArrayMesh, target_aabb: AABB) -> ArrayMesh:
+	var copy := src_mesh.duplicate() as ArrayMesh
+	copy.set_custom_aabb(target_aabb)
+	return copy
+
 func _build_forest() -> void:
-	_tree_lods = [
-		_asset_mesh("res://assets/environment/fir/fir_lod0.glb"),
-		_asset_mesh("res://assets/environment/fir/fir_lod1.glb"),
-		_asset_mesh("res://assets/environment/fir/fir_lod2.glb"),
-		_asset_mesh("res://assets/environment/fir/fir_lod3.glb")
-	]
-	for lod in range(4):
-		var mesh := _tree_lods[lod] as ArrayMesh
+	var fir_lod1 := _asset_mesh("res://assets/environment/fir/fir_lod1.glb") as ArrayMesh
+	var fir_lod2 := _asset_mesh("res://assets/environment/fir/fir_lod2.glb") as ArrayMesh
+	var fir_lod3 := _asset_mesh("res://assets/environment/fir/fir_lod3.glb") as ArrayMesh
+	for mesh in [fir_lod1, fir_lod2, fir_lod3]:
 		for surface in mesh.get_surface_count():
-			var mat := mesh.surface_get_material(surface) as StandardMaterial3D
-			if mat:
-				if mat.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA:
-					mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
-					mat.alpha_scissor_threshold = 0.25
-				if lod == 0:
-					continue
-				mat.normal_enabled = false
-				mat.normal_texture = null
-				mat.roughness_texture = null
-				mat.roughness = 0.94
-				mat.metallic_texture = null
-				mat.metallic = 0.0
-				mat.metallic_specular = 0.15
-	var rock_mesh := _asset_mesh("res://assets/environment/rock/rock_lod1.glb")
+			_simplify_material(mesh.surface_get_material(surface) as StandardMaterial3D)
+	_tree_lods = [
+		_clone_mesh_with_aabb(fir_lod2, AABB(Vector3(-3.241559, 0.128333, -3.559948), Vector3(6.583094, 18.7485, 6.467402))),
+		fir_lod1,
+		fir_lod2,
+		fir_lod3
+	]
+	var rock_mesh := _asset_mesh("res://assets/environment/rock/rock_lod1.glb") as ArrayMesh
+	for surface in rock_mesh.get_surface_count():
+		_simplify_material(rock_mesh.surface_get_material(surface) as StandardMaterial3D)
+	var boulder_mesh := _decimate_rock_mesh(rock_mesh, 6)
 	var grass_mesh_0 := GrassGen.generate_tuft_mesh(0)
 	var grass_mesh_1 := GrassGen.generate_tuft_mesh(1)
 	var grass_material := ShaderMaterial.new()
 	grass_material.shader = load("res://shaders/grass.gdshader")
 	grass_material.set_shader_parameter("texture_albedo", load("res://assets/environment/grass/textures/grass_medium_01_diff_2k.jpg"))
-	grass_material.set_shader_parameter("texture_normal", load("res://assets/environment/grass/textures/grass_medium_01_nor_gl_2k.jpg"))
-	grass_material.set_shader_parameter("texture_arm", load("res://assets/environment/grass/textures/grass_medium_01_arm_2k.jpg"))
 	grass_material.set_shader_parameter("use_photographic_texture", true)
 	grass_material.set_shader_parameter("alpha_scissor_threshold", 0.35)
 	grass_material.set_shader_parameter("wind_speed", 2.4)
@@ -634,57 +733,43 @@ func _build_forest() -> void:
 	grass_material.set_shader_parameter("backlight_tint", Color(0.42, 0.58, 0.15))
 
 	var grass_gltf := (load("res://assets/environment/grass/grass_medium_01.gltf") as PackedScene).instantiate()
-	var g_mesh_small: Mesh = null
-	var g_mesh_mid: Mesh = null
 	var g_mesh_tall: Mesh = null
-	var mi_s := grass_gltf.find_child("grass_medium_01_small_a_LOD0", true, false) as MeshInstance3D
-	if mi_s: g_mesh_small = mi_s.mesh
-	var mi_m := grass_gltf.find_child("grass_medium_01_mid_a_LOD0", true, false) as MeshInstance3D
-	if mi_m: g_mesh_mid = mi_m.mesh
 	var mi_t := grass_gltf.find_child("grass_medium_01_tall_a_LOD0", true, false) as MeshInstance3D
 	if mi_t: g_mesh_tall = mi_t.mesh
 	grass_gltf.free()
 
 	# AAA Botanical Species / Races of trees:
-	# 1. Robles / Oaks: broadleaf ancient hardwoods with massive spreading crowns
-	# 2. Abedules / Birches: slender pale-bark trees with dark eye scars
-	# 3. Pinos / Pines: Scots/stone pines with armor-plated bark and umbrella canopy (3D Scanned GLB)
-	# 4. Eucaliptos / Eucalyptus: tall upright trees with peeling bark ribbons
-	# 5. Abetos / Firs: layered evergreen conifers with corrugated trunks (3D Scanned GLB)
 	var species_types := ["oak", "eucalyptus", "birch", "pine", "fir"]
 	var species_meshes: Dictionary = {}
 	var species_transforms: Dictionary = {}
 	for sp in species_types:
 		species_transforms[sp] = [[], [], []]
 
-	# Photogrammetric 3D Scans for Conifers:
-	# Fir: 3 LODs of mature mountain fir
-	species_meshes["fir"] = [_tree_lods[0], _tree_lods[1], _tree_lods[2]]
-
-	# Pine: 3 LODs of Scots pine
-	var pine_lods := [
-		_asset_mesh("res://assets/environment/pine/pine_lod0.glb"),
-		_asset_mesh("res://assets/environment/pine/pine_lod1.glb"),
-		_asset_mesh("res://assets/environment/pine/pine_lod2.glb")
+	# Photogrammetric 3D Scans for Conifers using lightweight LODs + exact original AABBs:
+	species_meshes["fir"] = [
+		_tree_lods[0],
+		_clone_mesh_with_aabb(fir_lod2, fir_lod1.get_aabb()),
+		_clone_mesh_with_aabb(fir_lod3, fir_lod2.get_aabb())
 	]
-	for p_lod in pine_lods:
-		var p_mesh := p_lod as ArrayMesh
-		for surface in p_mesh.get_surface_count():
-			var mat := p_mesh.surface_get_material(surface) as StandardMaterial3D
-			if mat:
-				if mat.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA:
-					mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
-					mat.alpha_scissor_threshold = 0.25
-				mat.roughness = 0.92
-				mat.metallic = 0.0
-	species_meshes["pine"] = [pine_lods[0], pine_lods[1], pine_lods[2]]
+
+	# Pine: Decimated from pine_lod2.glb (~820 tris vs 106,879 tris) while preserving exact AABBs
+	var pine_base := _asset_mesh("res://assets/environment/pine/pine_lod2.glb") as ArrayMesh
+	species_meshes["pine"] = [
+		_decimate_pine_mesh(pine_base, 24, 1.55, AABB(Vector3(-0.360306, -0.015484, -0.371386), Vector3(0.787674, 1.298833, 0.727431))),
+		_decimate_pine_mesh(pine_base, 28, 1.60, AABB(Vector3(-0.360468, -0.015808, -0.371449), Vector3(0.787866, 1.299347, 0.727495))),
+		_decimate_pine_mesh(pine_base, 32, 1.65, AABB(Vector3(-0.360049, -0.015808, -0.371449), Vector3(0.787533, 1.295364, 0.727553)))
+	]
 
 	# Deciduous broadleaf species with smooth botanical meshes:
 	for sp in ["oak", "birch", "eucalyptus"]:
 		species_meshes[sp] = []
 		for v in range(1, 4):
 			var p := "res://assets/environment/trees/tree_%s_var%d.res" % [sp, v]
-			species_meshes[sp].append(load(p))
+			var m := load(p) as ArrayMesh
+			if m:
+				for s in m.get_surface_count():
+					_simplify_material(m.surface_get_material(s) as StandardMaterial3D)
+			species_meshes[sp].append(m)
 
 	var rocks: Array[Transform3D] = []
 	var grasses_0: Array[Transform3D] = []
@@ -807,13 +892,6 @@ func _build_forest() -> void:
 			add_tree.call(sp_se, x_se, z_se, h_se)
 
 	# 4. Global World Forest Sampling across the island:
-	# Respects:
-	# - Fortress and Nest clear zone (radius 36m around nest)
-	# - Castle Gate approach road (15m width)
-	# - Lake clearing & shore glade (Foto 4)
-	# - Sinuous Rivers & stream channels
-	# - Rolling hills ("pocas y mucho mas chicas", "no deben estar infestadas de arboles deben tener hierba y ser verdes"):
-	#   Trees on hills are widely spaced (min_d >= 22m, 28% density)
 	for i in 55000:
 		var x := _rng.randf_range(-965.0, 965.0)
 		var z := _rng.randf_range(-965.0, 965.0)
@@ -932,15 +1010,11 @@ func _build_forest() -> void:
 			var r_rot := Basis.from_euler(Vector3(_rng.randf() * TAU, _rng.randf() * TAU, _rng.randf() * TAU))
 			rocks.append(Transform3D(r_rot.scaled(r_scale), Vector3(x, h - 0.12, z)))
 
-	# Batch the 15 botanical tree species variants
+	# Batch the 15 botanical tree species variants in 6x6 spatial cells for frustum and distance culling
 	for sp in species_types:
 		for v in range(3):
 			if species_transforms[sp][v].size() > 0:
-				var node := _batch(species_meshes[sp][v], species_transforms[sp][v], "Tree_%s_v%d" % [sp, v])
-				# Optimize for Intel HD 620 GPU: shadows off on bulk instances to avoid TDR
-				node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-				node.visibility_range_end = 1600.0
-				node.visibility_range_end_margin = 150.0
+				_batch_spatial(species_meshes[sp][v], species_transforms[sp][v], "Tree_%s_v%d" % [sp, v], 6, 1000.0, 580.0, 70.0)
 
 	# Meadow tufts along river terraces and valley meadows
 	for i in 1200:
@@ -1002,7 +1076,10 @@ func _build_forest() -> void:
 					node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 				_forest_nodes.append(node)
 	_update_forest_lods()
-	_batch(rock_mesh, rocks, "ScatteredBoulders")
+	var boulders := _batch(boulder_mesh, rocks, "ScatteredBoulders")
+	boulders.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	boulders.visibility_range_end = 550.0
+	boulders.visibility_range_end_margin = 60.0
 	# Dense 3D grass blade covering on the hill behind the nest ("cubierta de brisnas de pasto que se muevan tengan forma y textura y parezcan reales")
 	for i in 6500:
 		var x := _rng.randf_range(370.0, 520.0)
@@ -1015,7 +1092,8 @@ func _build_forest() -> void:
 			var tilt_dir := _rng.randf() * TAU
 			var tilt_rot := Basis(Vector3(cos(tilt_dir), 0.0, sin(tilt_dir)).normalized(), tilt_angle)
 			var b := (Basis(Vector3.UP, yaw) * tilt_rot).scaled(Vector3.ONE * s)
-			grasses_hill.append(Transform3D(b, Vector3(x, h - 0.03, z)))
+			if i % 2 == 0:
+				grasses_hill.append(Transform3D(b, Vector3(x, h - 0.03, z)))
 
 	# Dense 3D grass blade covering in the valley in front of the nest
 	for i in 5500:
@@ -1026,31 +1104,26 @@ func _build_forest() -> void:
 			var s := _rng.randf_range(1.0, 2.1)
 			var yaw := _rng.randf() * TAU
 			var b := Basis(Vector3.UP, yaw).scaled(Vector3.ONE * s)
-			grasses_valley.append(Transform3D(b, Vector3(x, h - 0.03, z)))
+			if i % 2 == 0:
+				grasses_valley.append(Transform3D(b, Vector3(x, h - 0.03, z)))
 
-	var grass_0 := _batch(grass_mesh_0, grasses_0, "PhotographicMeadowTufts", grass_material)
-	grass_0.visibility_range_end = 240.0
-	grass_0.visibility_range_end_margin = 40.0
-	grass_0.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var grass_1 := _batch(grass_mesh_1, grasses_1, "PhotographicMeadowTufts_Wild", grass_material)
-	grass_1.visibility_range_end = 240.0
-	grass_1.visibility_range_end_margin = 40.0
-	grass_1.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_batch_spatial(grass_mesh_0, grasses_0, "PhotographicMeadowTufts", 6, 1000.0, 160.0, 30.0, grass_material)
+	_batch_spatial(grass_mesh_1, grasses_1, "PhotographicMeadowTufts_Wild", 6, 1000.0, 160.0, 30.0, grass_material)
 
 	var hill_mesh: Mesh = g_mesh_tall if g_mesh_tall else grass_mesh_1
 	var grass_hill := _batch(hill_mesh, grasses_hill, "HillBehindNest_GrassBlades", grass_material)
-	grass_hill.visibility_range_end = 280.0
-	grass_hill.visibility_range_end_margin = 40.0
+	grass_hill.visibility_range_end = 180.0
+	grass_hill.visibility_range_end_margin = 30.0
 	grass_hill.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
-	var valley_mesh: Mesh = g_mesh_mid if g_mesh_mid else grass_mesh_0
+	var valley_mesh: Mesh = g_mesh_tall if g_mesh_tall else grass_mesh_0
 	var grass_valley := _batch(valley_mesh, grasses_valley, "ValleyNest_GrassBlades", grass_material)
-	grass_valley.visibility_range_end = 280.0
-	grass_valley.visibility_range_end_margin = 40.0
+	grass_valley.visibility_range_end = 180.0
+	grass_valley.visibility_range_end_margin = 30.0
 	grass_valley.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 	# Scanned eroded formations visibly anchor the river and mountain feet.
-	var scan := _asset_mesh("res://assets/environment/rock/rock_lod0.glb")
+	var scan := rock_mesh
 	for data in [Vector4(138, -160, 17, 0.6), Vector4(-138, 220, 13, 1.5), Vector4(550, -100, 20, 2.3), Vector4(-590, -420, 27, 0.2), Vector4(790, 300, 34, 1.1)]:
 		var outcrop := MeshInstance3D.new()
 		outcrop.name = "ScannedLimestoneOutcrop"
@@ -1079,11 +1152,6 @@ func _build_forest() -> void:
 	cliff.scale = Vector3.ONE * 0.001
 	cliff.visible = false
 	add_child(cliff)
-	cliff.create_trimesh_collision()
-	for body in cliff.get_children():
-		if body is StaticBody3D:
-			body.collision_layer = 0
-			body.collision_mask = 0
 	print("LANDSCAPE mature fir, grass, limestone; ", _tree_transforms.size(), " trees. Courtyard ", ARENA_CENTER)
 
 func _process(delta: float) -> void:
@@ -1105,8 +1173,6 @@ func _update_forest_lods() -> void:
 		var size := transform.basis.get_scale().y
 		var crown_center := transform.origin + Vector3.UP * 9.4 * size
 		var distance := viewer.distance_to(crown_center)
-		# Individual sphere culling avoids drawing an entire 500m MultiMesh cell.
-		# Nearby casters remain even outside the view so their ground shadows persist.
 		if distance > 80.0 and camera:
 			var culled := false
 			var world_center := to_global(crown_center)
@@ -1136,7 +1202,9 @@ func _setup_atmosphere() -> void:
 		sun.light_energy = 1.32
 		sun.light_angular_distance = 0.65
 		sun.shadow_enabled = true
-		sun.directional_shadow_max_distance = 420.0
+		sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+		sun.directional_shadow_blend_splits = false
+		sun.directional_shadow_max_distance = 240.0
 		sun.directional_shadow_fade_start = 0.85
 	if world and world.environment:
 		var env := world.environment
@@ -1146,21 +1214,19 @@ func _setup_atmosphere() -> void:
 			sky_material.set_shader_parameter("sun_direction", sun.global_basis.z)
 		var sky := Sky.new()
 		sky.sky_material = sky_material
-		sky.radiance_size = Sky.RADIANCE_SIZE_1024
+		sky.radiance_size = Sky.RADIANCE_SIZE_256
+		sky.process_mode = Sky.PROCESS_MODE_INCREMENTAL
 		env.sky = sky
 		env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-		env.ambient_light_energy = 0.55
+		env.ambient_light_energy = 0.58
 		env.fog_enabled = true
 		env.fog_density = 0.00022
 		env.fog_sky_affect = 0.18
-		# Azul atmosferico de dispersion Rayleigh para cordilleras y colinas lejanas (Foto de referencia)
 		env.fog_light_color = Color(0.70, 0.82, 0.94)
 		env.fog_sun_scatter = 0.35
 		env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-		env.ssao_enabled = true
-		env.ssao_radius = 1.8
-		env.ssao_intensity = 1.35
-		env.ssil_enabled = true
-		env.ssil_radius = 3.2
-		env.ssil_intensity = 0.40
+		env.ssao_enabled = false
+		env.ssil_enabled = false
+		env.sdfgi_enabled = false
+		env.volumetric_fog_enabled = false
 

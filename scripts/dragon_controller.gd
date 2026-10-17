@@ -415,6 +415,7 @@ var stabilizer_initialized: bool = false
 @onready var visual_root: Node3D = $VisualModel
 var skeleton: Skeleton3D = null
 var flight_camera = null
+var dragon_model_node: Node = null
 
 func _get_flight_camera():
 	if not is_instance_valid(flight_camera):
@@ -466,14 +467,13 @@ func _ready() -> void:
 	if visual_root:
 		visual_root.position = model_pos_offset
 		visual_root.basis = (_offset_basis() * calib_basis).scaled(Vector3.ONE * model_scale)
+		dragon_model_node = visual_root.get_node_or_null("DragonModel")
+	if not dragon_model_node:
+		dragon_model_node = find_child("DragonModel", true, false)
 	
 	breath = get_node_or_null("DragonBreath")
 	_find_and_setup_skeleton(self)
 	_find_and_setup_anim_player(self)
-	
-	var skin_manager = find_child("DragonModel", true, false)
-	if skin_manager and skin_manager.has_method("apply_materials"):
-		skin_manager.apply_materials()
 	
 	floor_snap_length = 1.2
 	floor_max_angle = deg_to_rad(50.0)
@@ -494,19 +494,21 @@ func _offset_basis() -> Basis:
 # Calcula la base del modelo usando los huesos: nariz (cabeza respecto de la cola) -> -Z,
 # lateral (muslo izq -> der) -> +X y lomo -> +Y. Independiente de la orientación horneada del rig.
 func _calibrate_model_orientation() -> void:
+	calibrating = true
 	for i in range(3):
 		await get_tree().process_frame
 	if not skeleton or not visual_root or not anim_player or not anim_player.has_animation("Qishilong_fly2"):
+		calibrating = false
 		return
 	var head = skeleton.find_bone("Bip001-Head_011")
 	var tail = skeleton.find_bone("Bone008_0154")
 	if head == -1 or tail == -1 or bone_l_thigh == -1 or bone_r_thigh == -1:
 		push_warning("Calibración de orientación: faltan huesos de referencia")
+		calibrating = false
 		return
 	
 	# Se muestrea la pose REAL de vuelo (la pose de reposo del rig no coincide con la del clip de aleteo)
 	# a lo largo del ciclo completo y se promedian los ejes del cuerpo.
-	calibrating = true
 	visual_root.visible = false
 	anim_player.play("Qishilong_fly2")
 	anim_player.pause()
@@ -987,11 +989,10 @@ func _calculate_flight_physics(delta: float) -> void:
 			wanted_velocity.y -= upstroke_sink
 
 	# Actualización de deformación aerodinámica de membranas alares vivas (Dragontwin)
-	var dragon_model = visual_root.get_node_or_null("DragonModel") if visual_root else null
-	if dragon_model and dragon_model.has_method("update_aero_params"):
+	if dragon_model_node and dragon_model_node.has_method("update_aero_params"):
 		var aero_billow := clampf((current_speed / cruise_speed) * 0.8 + (0.35 if is_diving else 0.0), 0.0, 1.0)
 		var aero_flutter := clampf((current_speed - 22.0) / 16.0, 0.0, 1.0)
-		dragon_model.update_aero_params(current_speed, aero_billow, aero_flutter)
+		dragon_model_node.update_aero_params(current_speed, aero_billow, aero_flutter)
 
 	# Dinámica en agua: permite sumergirse y nadar; flotabilidad suave solo si no está en picada activa
 	if _is_in_water():
@@ -1595,9 +1596,8 @@ func _cache_bone_relative_axes(b_idx: int) -> void:
 func _process(delta: float) -> void:
 	tail_wave_time += delta * (3.8 if is_flapping else 1.6)
 	
-	var skin_manager = find_child("DragonModel", true, false)
-	if skin_manager and skin_manager.has_method("update_aero_params"):
-		skin_manager.update_aero_params(current_speed, dive_fold_blend, 1.0 - glide_blend)
+	if dragon_model_node and dragon_model_node.has_method("update_aero_params"):
+		dragon_model_node.update_aero_params(current_speed, dive_fold_blend, 1.0 - glide_blend)
 	
 	var heave: float = 0.0
 	var pitch_surge: float = 0.0
@@ -1763,11 +1763,11 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 		if glide_pose_probe.samples.is_empty():
 			glide_pose_probe.configure(self, sk, 12)
 			glide_pose_probe.samples = glide_pose_probe.samples.filter(func(sample): return sample.wing)
+			glide_pose_probe.prepare_coordinates()
 		for level_pass in 2:
 			var left := Vector3.ZERO
 			var right := Vector3.ZERO
-			for point in glide_pose_probe.points(sk, true):
-				var local: Vector3 = to_local(point.position)
+			for local in glide_pose_probe.coordinates(sk, self):
 				if local.x < left.x: left = local
 				if local.x > right.x: right = local
 			var center_y := (left.y + right.y) * 0.5
