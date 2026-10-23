@@ -1864,16 +1864,18 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 		if ground_blend > 0.01:
 			var step_weight := _gait_weight()
 			var cycle := walk_cycle_phase
-			var pel_yaw = sin(cycle) * deg_to_rad(7.5) * step_weight * ground_blend
-			var pel_roll = cos(cycle) * deg_to_rad(4.0) * step_weight * ground_blend
+			# Dinámica de masa pélvica inspirada en el ciclo de marcha de Sophocleous:
+			# Contrarotación en Yaw, inclinación en Roll hacia la pata de apoyo y doble bombeo vertical (heave)
+			var pel_yaw = cos(cycle) * deg_to_rad(7.0) * step_weight * ground_blend
+			var pel_roll = sin(cycle) * deg_to_rad(4.5) * step_weight * ground_blend
 			var pel_rot = Quaternion(bone_yaw_axes[bone_pelvis], pel_yaw) if bone_yaw_axes.has(bone_pelvis) else Quaternion(Vector3.UP, pel_yaw)
 			var roll_axis = bone_roll_axes[bone_pelvis] if bone_roll_axes.has(bone_pelvis) else Vector3.FORWARD
 			pel_rot = Quaternion(roll_axis, pel_roll) * pel_rot
 			sk.set_bone_pose_rotation(bone_pelvis, pel_rot * sk.get_bone_pose_rotation(bone_pelvis))
 			
-			# Traslación pélvica tridimensional de masa (heave y sway métricos sumados al reposo)
-			var pel_heave = -absf(sin(cycle)) * 0.085 * step_weight * ground_blend
-			var pel_sway = sin(cycle) * 0.11 * step_weight * ground_blend
+			# Traslación pélvica tridimensional de masa (heave rítmico y sway lateral hacia la pata de apoyo)
+			var pel_heave = (sin(cycle * 2.0) * 0.055 - 0.02) * step_weight * ground_blend
+			var pel_sway = sin(cycle) * 0.13 * step_weight * ground_blend
 			sk.set_bone_pose_position(bone_pelvis, rest_pelvis_pos + Vector3(pel_sway, pel_heave, 0.0))
 		elif flight_factor > 0.01:
 			var flap_phase: float = _get_flap_cycle_phase()
@@ -1891,13 +1893,14 @@ func _apply_biomechanical_posture_to_skeleton(sk: Skeleton3D) -> void:
 			var flight_yaw = turn * spine_curve_strength * spine_weights[min(i, spine_weights.size() - 1)] * flight_factor
 			var flight_pitch = ((brake_blend * 0.12) - (climb_blend * 0.08)) * flight_factor
 			
-			var ground_wave_phase = walk_cycle_phase - float(i) * 0.40
+			var ground_wave_phase = walk_cycle_phase - float(i) * 0.45
 			var step_weight := _gait_weight()
-			var ground_spine_yaw = -sin(ground_wave_phase) * deg_to_rad(6.5) * step_weight * ground_blend
-			var ground_spine_roll = -cos(ground_wave_phase) * deg_to_rad(3.0) * step_weight * ground_blend
+			var ground_spine_yaw = -sin(ground_wave_phase) * deg_to_rad(7.2) * step_weight * ground_blend
+			var ground_spine_roll = -cos(ground_wave_phase) * deg_to_rad(3.5) * step_weight * ground_blend
+			var ground_spine_pitch = deg_to_rad(2.5) * ground_blend
 			
 			var spine_yaw_q = Quaternion(bone_yaw_axes[b], flight_yaw + ground_spine_yaw)
-			var spine_pitch_q = Quaternion(bone_pitch_axes[b], flight_pitch)
+			var spine_pitch_q = Quaternion(bone_pitch_axes[b], flight_pitch + ground_spine_pitch)
 			var spine_roll_q = Quaternion(bone_roll_axes[b], ground_spine_roll) if bone_roll_axes.has(b) else Quaternion.IDENTITY
 			sk.set_bone_pose_rotation(b, spine_yaw_q * spine_roll_q * spine_pitch_q * sk.get_bone_pose_rotation(b))
 
@@ -2100,32 +2103,37 @@ func _refit_compact_wings(sk: Skeleton3D) -> void:
 	var right: Vector3 = global_basis.x.normalized()
 	var fwd: Vector3 = -global_basis.z.normalized()
 
-	# Ala Izquierda: repliegue anatómico a lo largo de los flancos hacia la pelvis/cola
-	_rotate_bone_world(sk, 96, up, deg_to_rad(38.0) * shoulder_w)
-	_rotate_bone_world(sk, 96, fwd, deg_to_rad(-18.0) * shoulder_w)
+	# Rebote secundario elástico en las puntas al caminar (ref. ciclo de marcha Sophocleous)
+	var wing_bounce := sin(walk_cycle_phase * 2.0 - 0.4) * deg_to_rad(3.0) * _gait_weight() * compact_blend
+
+	# Ala Izquierda: repliegue anatómico elevado y horizontal a lo largo del lomo/flancos
+	_rotate_bone_world(sk, 96, up, deg_to_rad(68.0) * shoulder_w)
+	_rotate_bone_world(sk, 96, fwd, deg_to_rad(-28.0) * shoulder_w)
+	_rotate_bone_world(sk, 96, right, deg_to_rad(-12.0) * shoulder_w)
 	sk.force_update_all_bone_transforms()
 
-	_rotate_bone_world(sk, 97, up, deg_to_rad(-30.0) * elbow_w)
-	_rotate_bone_world(sk, 97, right, deg_to_rad(12.0) * elbow_w)
+	_rotate_bone_world(sk, 97, up, deg_to_rad(-62.0) * elbow_w)
+	_rotate_bone_world(sk, 97, right, (deg_to_rad(28.0) + wing_bounce) * elbow_w)
 	sk.force_update_all_bone_transforms()
 
-	for dig in [98, 104, 111]:
-		_rotate_bone_world(sk, dig, up, deg_to_rad(15.0) * digit_w)
-		_rotate_bone_world(sk, dig, right, deg_to_rad(28.0) * digit_w)
+	for dig in [98, 104, 111, 117]:
+		_rotate_bone_world(sk, dig, up, deg_to_rad(26.0) * digit_w)
+		_rotate_bone_world(sk, dig, right, (deg_to_rad(36.0) + wing_bounce * 1.5) * digit_w)
 	sk.force_update_all_bone_transforms()
 
 	# Ala Derecha: simetría bilateral idéntica invertida sobre el plano sagital
-	_rotate_bone_world(sk, 120, up, deg_to_rad(-38.0) * shoulder_w)
-	_rotate_bone_world(sk, 120, fwd, deg_to_rad(18.0) * shoulder_w)
+	_rotate_bone_world(sk, 120, up, deg_to_rad(-68.0) * shoulder_w)
+	_rotate_bone_world(sk, 120, fwd, deg_to_rad(28.0) * shoulder_w)
+	_rotate_bone_world(sk, 120, right, deg_to_rad(-12.0) * shoulder_w)
 	sk.force_update_all_bone_transforms()
 
-	_rotate_bone_world(sk, 121, up, deg_to_rad(30.0) * elbow_w)
-	_rotate_bone_world(sk, 121, right, deg_to_rad(12.0) * elbow_w)
+	_rotate_bone_world(sk, 121, up, deg_to_rad(62.0) * elbow_w)
+	_rotate_bone_world(sk, 121, right, (deg_to_rad(28.0) + wing_bounce) * elbow_w)
 	sk.force_update_all_bone_transforms()
 
-	for dig in [122, 128, 135]:
-		_rotate_bone_world(sk, dig, up, deg_to_rad(-15.0) * digit_w)
-		_rotate_bone_world(sk, dig, right, deg_to_rad(28.0) * digit_w)
+	for dig in [122, 128, 135, 141]:
+		_rotate_bone_world(sk, dig, up, deg_to_rad(-26.0) * digit_w)
+		_rotate_bone_world(sk, dig, right, (deg_to_rad(36.0) + wing_bounce * 1.5) * digit_w)
 	sk.force_update_all_bone_transforms()
 
 func _aim_bone_skin_point(sk: Skeleton3D, bone: int, current_world: Vector3, desired_world: Vector3) -> void:

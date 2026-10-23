@@ -578,7 +578,10 @@ func _merge_asset(node: Node, transform: Transform3D, st: SurfaceTool, merged: A
 	if node is Node3D:
 		t = transform * node.transform
 	if node is MeshInstance3D:
-		if String(node.name).begins_with("grass_medium_01") and String(node.name) != "grass_medium_01_small_a_LOD0":
+		var n_name := String(node.name)
+		if n_name.begins_with("searsia_burchellii_") and not n_name.ends_with("_LOD0"):
+			return
+		if n_name.begins_with("grass_medium_01") and n_name != "grass_medium_01_small_a_LOD0":
 			return
 		for surface in node.mesh.get_surface_count():
 			st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -587,6 +590,13 @@ func _merge_asset(node: Node, transform: Transform3D, st: SurfaceTool, merged: A
 			if mat is StandardMaterial3D:
 				mat = mat.duplicate()
 				mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+				var m_name := mat.resource_name.to_lower()
+				if "001" in m_name or "006" in m_name or "bark" in m_name:
+					mat.albedo_color = Color(0.28, 0.20, 0.14)
+				elif "002" in m_name or "007" in m_name or "leave" in m_name:
+					mat.albedo_color = Color(0.18, 0.38, 0.12)
+					mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+					mat.alpha_scissor_threshold = 0.25
 			st.set_material(mat)
 			st.commit(merged)
 	for child in node.get_children():

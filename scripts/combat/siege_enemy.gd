@@ -87,7 +87,7 @@ static var _cached_captain_scene: PackedScene
 func _load_visual() -> void:
 	var path := "res://assets/siege/weapons/ballista.glb"
 	if kind == "captain":
-		path = "res://assets/characters/knight_captain.glb"
+		path = "res://assets/characters/knight.glb"
 	elif kind == "knight":
 		path = "res://assets/characters/knight.glb"
 		
@@ -118,10 +118,35 @@ func _load_visual() -> void:
 		mesh_inst.visibility_range_end = max_vis_dist
 		if kind == "turret" and mesh_inst.mesh and mesh_inst.mesh.get_aabb().get_longest_axis_size() < 0.85:
 			mesh_inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		elif kind == "captain":
+			var cap_mat := StandardMaterial3D.new()
+			cap_mat.albedo_color = Color(0.96, 0.96, 0.98)
+			cap_mat.roughness = 0.35
+			cap_mat.metallic = 0.22
+			mesh_inst.material_override = cap_mat
 	# Models are normalized by the asset pipeline; preserve their authored rig and material.
 	for player: AnimationPlayer in visual.find_children("*","AnimationPlayer",true,false):
 		animator = player
 		break
+	if kind == "captain":
+		var shield_path := "res://assets/characters/crusader_shield.glb"
+		if ResourceLoader.exists(shield_path):
+			var shield_scene := load(shield_path) as PackedScene
+			var shield_inst := shield_scene.instantiate() as Node3D
+			shield_inst.name = "CrusaderHeaterShield"
+			var skeleton: Skeleton3D = null
+			for node in visual.find_children("*", "Skeleton3D", true, false):
+				skeleton = node as Skeleton3D
+				break
+			if skeleton:
+				var att := BoneAttachment3D.new()
+				att.name = "ShieldAttachment"
+				att.bone_name = "LeftForeArm"
+				skeleton.add_child(att)
+				att.add_child(shield_inst)
+				shield_inst.position = Vector3(0.08, 0.12, 0.05)
+				shield_inst.rotation_degrees = Vector3(0, 90, 0)
+				shield_inst.scale = Vector3.ONE * 0.75
 	if kind == "turret":
 		turret_pivot = visual.find_child("AimYaw",true,false) as Node3D
 		barrel_pivot = visual.find_child("AimPitch",true,false) as Node3D
