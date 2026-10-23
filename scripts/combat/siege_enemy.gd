@@ -24,7 +24,10 @@ var last_anim := ""
 var burning := 0.0
 var patrol_clock := 0.0
 var knight_scale := 1.0
+var _step_timer := 0.0
 const Projectile = preload("res://scripts/combat/siege_projectile.gd")
+static var _cached_knight_scene: PackedScene
+static var _cached_turret_scene: PackedScene
 
 func _ready() -> void:
 	if kind == "captain":
@@ -60,6 +63,11 @@ func _ready() -> void:
 	warning.omni_range = 7.0 * (knight_scale if kind != "turret" else 1.0)
 	warning.light_color = Color(1,0.24,0.07)
 	warning.light_energy = 0
+	warning.shadow_enabled = false
+	warning.visible = false
+	warning.distance_fade_enabled = true
+	warning.distance_fade_begin = 90.0
+	warning.distance_fade_length = 30.0
 	warning.position.y = 1.2 * knight_scale if kind != "turret" else 2.0
 	add_child(warning)
 	label = Label3D.new()
@@ -79,11 +87,26 @@ func _load_visual() -> void:
 	if not ResourceLoader.exists(path):
 		push_error("Required siege model missing: " + path)
 		return
-	visual = load(path).instantiate()
+	var packed: PackedScene
+	if kind == "turret":
+		if not _cached_turret_scene:
+			_cached_turret_scene = load(path) as PackedScene
+		packed = _cached_turret_scene
+	else:
+		if not _cached_knight_scene:
+			_cached_knight_scene = load(path) as PackedScene
+		packed = _cached_knight_scene
+	visual = packed.instantiate()
 	visual.name = "EnemyModel"
 	if kind != "turret":
 		visual.scale = Vector3.ONE * knight_scale
 	add_child(visual)
+	var max_vis_dist := 340.0 if kind == "turret" else 260.0
+	for mesh_inst: MeshInstance3D in visual.find_children("*", "MeshInstance3D", true, false):
+		mesh_inst.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+		mesh_inst.visibility_range_end = max_vis_dist
+		if kind == "turret" and mesh_inst.mesh and mesh_inst.mesh.get_aabb().get_longest_axis_size() < 0.85:
+			mesh_inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Models are normalized by the asset pipeline; preserve their authored rig and material.
 	for player: AnimationPlayer in visual.find_children("*","AnimationPlayer",true,false):
 		animator = player
@@ -122,8 +145,11 @@ func _die() -> void:
 	collision_mask = 0
 	velocity = Vector3.ZERO
 	warning.light_energy = 0
+	warning.visible = false
 	label.text = "DESTRUIDA" if kind == "turret" else ""
 	_play("death")
+	if kind != "turret":
+		GameAudio.play_knight_death(global_position)
 	combat.enemy_defeated(self)
 	combat.spawn_impact(global_position + Vector3.UP * (0.95 * knight_scale if kind != "turret" else 1.0), Vector3.UP, true)
 	if kind == "turret" and visual:
@@ -137,6 +163,7 @@ func _physics_process(delta: float) -> void:
 	cooldown = maxf(0, cooldown - delta)
 	burning = maxf(0, burning-delta)
 	warning.light_energy = 1.4 if burning > 0 else (1.5 if state == "windup" else 0.0)
+	warning.visible = warning.light_energy > 0.01
 	var dragon: CharacterBody3D = combat.dragon
 	var target := dragon.global_position
 	var offset := target - global_position
@@ -145,13 +172,14 @@ func _physics_process(delta: float) -> void:
 		_update_turret(delta,target,range_to_target)
 		return
 	var grounded: bool = dragon.locomotion_state == dragon.LocomotionState.GROUNDED
-	var visible_target := range_to_target < 65 and _line_of_sight(target, [get_rid(),dragon.get_rid()])
+	var visible_target: bool = not combat.is_free_flight and range_to_target < 65 and _line_of_sight(target, [get_rid(),dragon.get_rid()])
 	if state == "windup":
 		velocity.x = move_toward(velocity.x,0,18*delta)
 		velocity.z = move_toward(velocity.z,0,18*delta)
 		if state_time >= 0.68 and not attack_delivered:
 			attack_delivered = true
 			attacks += 1
+			GameAudio.play_knight_attack(global_position, kind == "captain")
 			var melee_range := 6.5 + (knight_scale - 1.0) * 1.5
 			if grounded and range_to_target < melee_range and _line_of_sight(target,[get_rid(),dragon.get_rid()]):
 				combat.damage_dragon(12 if kind == "captain" else 7,"Golpe de caballero")
@@ -202,6 +230,11 @@ func _physics_process(delta: float) -> void:
 		var actual_speed := Vector2(get_real_velocity().x,get_real_velocity().z).length()
 		_play("walk_loop" if actual_speed > 0.15 else "idle")
 		animator.speed_scale = clampf(actual_speed/1.6,0.1,1.8) if actual_speed > 0.15 else 1.0
+		if actual_speed > 0.35 and is_on_floor():
+			_step_timer += delta * (actual_speed / 1.5)
+			if _step_timer >= 0.48:
+				_step_timer = 0.0
+				GameAudio.play_knight_step(global_position)
 	elif animator:
 		animator.speed_scale = 1.0
 
@@ -212,7 +245,7 @@ func _line_of_sight(target: Vector3, excluded: Array[RID]) -> bool:
 	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 func _update_turret(delta: float,target: Vector3,range_to_target: float) -> void:
-	if range_to_target > 240 or not _line_of_sight(target,[get_rid(),combat.dragon.get_rid()]):
+	if combat.is_free_flight or range_to_target > 240 or not _line_of_sight(target,[get_rid(),combat.dragon.get_rid()]):
 		state = "idle"
 		return
 	var muzzle := global_position + Vector3.UP * 2.1
@@ -238,6 +271,7 @@ func _update_turret(delta: float,target: Vector3,range_to_target: float) -> void
 		bolt.owner_rid = get_rid()
 		bolt.damage = 18
 		combat.projectiles.add_child(bolt)
+		GameAudio.play_ballista_fire(bolt.global_position)
 		bolt.global_position = muzzle if actual_muzzle else muzzle + direction * 3.3
 		# Small, deterministic dispersion; the player can evade after the visible warning.
 		var side := direction.cross(Vector3.UP).normalized()

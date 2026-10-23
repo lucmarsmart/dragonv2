@@ -6,23 +6,23 @@ class_name FlightCamera
 # Por defecto detrás del dragón. Vistas rápidas (V / 1-4) y órbita libre (clic derecho + arrastrar).
 # ==============================================================================
 
-enum ViewPreset { BACK, FRONT, RIGHT, LEFT }
+enum ViewPreset { BACK, HEAD, FRONT, RIGHT, LEFT }
 
 @export var target_node: Node3D
 @export var distance: float = 16.0              # Distancia óptima detrás del dragón
 @export var height: float = 5.0                  # Altura sobre el lomo
 @export var follow_smoothness: float = 16.0     # Suavidad y firmeza de seguimiento de posición
-@export var flight_follow_smoothness: float = 10.0 # Seguimiento con inercia en vuelo libre
-@export var rider_distance: float = 15.0         # Vista trasera en vuelo: distancia detrás de la montura
-@export var rider_height: float = 8.0            # Vista trasera en vuelo: altura (la cola queda debajo del encuadre)
+@export var flight_follow_smoothness: float = 9.5 # Seguimiento con inercia en vuelo libre
+@export var rider_distance: float = 14.2         # Vista trasera en vuelo (ref. Dragontwin): encuadre heroico cercano
+@export var rider_height: float = 5.4            # Vista trasera en vuelo: muestra horizonte, montañas y nubes
 @export var ground_view_distance: float = 14.0   # En tierra: el animal entero desde atrás y arriba
 @export var ground_view_height: float = 7.5
 @export var landing_view_distance: float = 19.0  # Aterrizaje: encuadre amplio desde afuera, se ve el contacto
 @export var landing_view_height: float = 9.0
-@export var cinematic_drift: float = 0.5         # Deriva orbital lenta en vuelo (rad): no siempre desde atrás
+@export var cinematic_drift: float = 0.45        # Deriva orbital lenta en vuelo (rad): no siempre desde atrás
 @export var intro_seconds: float = 4.5           # Barrido de entrada desde un costado y delante
-@export var cinematic_turn_swing: float = 0.6    # Apertura hacia el exterior del viraje (rad a giro máximo)
-@export var cinematic_response: float = 1.6      # Rapidez del muelle cinemático (1/s)
+@export var cinematic_turn_swing: float = 0.72   # Apertura hacia el exterior del viraje (rad a giro máximo)
+@export var cinematic_response: float = 1.8      # Rapidez del muelle cinemático (1/s)
 var dynamic_yaw := 0.0
 var dynamic_pitch := 0.0
 var dynamic_stretch := 0.0
@@ -30,7 +30,7 @@ var cinematic_time := 0.0
 var intro_time := 0.0
 @export var rotation_smoothness: float = 14.0   # Respuesta ágil de la orientación
 @export var base_fov: float = 74.0              # FOV base inmersivo
-@export var max_fov_boost: float = 14.0         # Aumento de FOV en picada a alta velocidad
+@export var max_fov_boost: float = 17.0         # Aumento de FOV en picada a alta velocidad
 @export var orbit_sensitivity: float = 0.006    # Sensibilidad de la órbita con el mouse
 @export var orbit_return_delay: float = 2.0     # Segundos tras soltar el clic derecho para volver a la vista elegida
 @export var orbit_smoothness: float = 8.0       # Suavidad de los cambios de vista
@@ -85,6 +85,7 @@ func _sweep_camera(from: Vector3, to: Vector3, excluded: Array[RID]) -> Vector3:
 
 const PRESET_YAW = {
 	ViewPreset.BACK: 0.0,
+	ViewPreset.HEAD: 0.0,
 	ViewPreset.FRONT: PI,
 	ViewPreset.RIGHT: PI / 2.0,
 	ViewPreset.LEFT: -PI / 2.0,
@@ -111,7 +112,7 @@ func set_view(preset: ViewPreset) -> void:
 	return_timer = -1.0
 
 func cycle_view() -> void:
-	set_view(((view_preset + 1) % 4) as ViewPreset)
+	set_view(((view_preset + 1) % 5) as ViewPreset)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -141,10 +142,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_1:
 				set_view(ViewPreset.BACK)
 			KEY_2:
-				set_view(ViewPreset.FRONT)
+				set_view(ViewPreset.HEAD)
 			KEY_3:
-				set_view(ViewPreset.RIGHT)
+				set_view(ViewPreset.FRONT)
 			KEY_4:
+				set_view(ViewPreset.RIGHT)
+			KEY_5:
 				set_view(ViewPreset.LEFT)
 
 func _physics_process(delta: float) -> void:
@@ -162,11 +165,23 @@ func _physics_process(delta: float) -> void:
 	# Adaptación dinámica de altura y distancia al estar en tierra
 	var is_ground = target_node and "locomotion_state" in target_node and target_node.locomotion_state == 2 # GROUNDED
 	var is_landing = "locomotion_state" in target_node and target_node.locomotion_state == 1
-	var attack_view: bool = "attack_mode_active" in target_node and target_node.attack_mode_active
-	# La vista sobre el cráneo queda sólo para el modo ataque; caminando se ve al animal entero desde el lomo.
-	var head_view = attack_view
+
+	var breath = target_node.get_node_or_null("DragonBreath")
+	var breath_firing: bool = breath != null and "is_firing" in breath and breath.is_firing
+
+	var locked_enemy: Node = null
+	if target_node and "locked_target" in target_node:
+		locked_enemy = target_node.locked_target
+	var has_lock: bool = is_instance_valid(locked_enemy) and ("dead" not in locked_enemy or not locked_enemy.dead)
+
+	var head_aim: bool = target_node and "head_aim_active" in target_node and target_node.head_aim_active
+	var attack_active: bool = (target_node and "attack_mode_active" in target_node and target_node.attack_mode_active) or breath_firing or has_lock or head_aim
+	var manual_head_view: bool = (view_preset == ViewPreset.HEAD)
+	var wants_head_view: bool = manual_head_view or attack_active
+
 	var back_amount = 1.0 - clampf((absf(orbit_yaw) + absf(orbit_pitch)) / 0.6, 0.0, 1.0)
-	head_follow_blend = lerpf(head_follow_blend, (1.0 if attack_view else back_amount) if head_view else 0.0, 1.0 - exp(-4.0 * delta))
+	var target_blend: float = 1.0 if wants_head_view else 0.0
+	head_follow_blend = lerpf(head_follow_blend, target_blend, 1.0 - exp(-6.0 * delta))
 	# Vista de jinete en vuelo (ref. Dragontwin): sobre el lomo, detrás de los hombros.
 	# La cola (punta a ~17 m detrás y curvada hacia arriba) queda fuera del encuadre.
 	var rider = back_amount
@@ -195,7 +210,7 @@ func _physics_process(delta: float) -> void:
 	# Se abre hacia el exterior del viraje, baja al trepar mirando el vientre y las alas,
 	# sube en picada mirando hacia abajo y se aleja con la velocidad. Muelle lento: se percibe el peso.
 	var airborne = not is_ground and not is_landing
-	var cinematic: float = rider * (0.0 if (attack_view or orbiting) else 1.0) * (1.0 if airborne else 0.0)
+	var cinematic: float = rider * (0.0 if (wants_head_view or orbiting) else 1.0) * (1.0 if airborne else 0.0)
 	var turn: float = target_node.smoothed_turn_rate if "smoothed_turn_rate" in target_node else 0.0
 	var climb: float = target_node.climb_blend if "climb_blend" in target_node else 0.0
 	var dive: float = target_node.dive_fold_blend if "dive_fold_blend" in target_node else 0.0
@@ -228,32 +243,65 @@ func _physics_process(delta: float) -> void:
 	var desired_pos = saddle + (orbit_dir * (distance + dynamic_stretch + 6.0 * intro)) + (place_up * view_height * cos(view_pitch))
 	# Vaivén de montura acompasado con el batido: la cámara nunca queda clavada en vuelo recto.
 	if airborne and "is_flapping" in target_node and target_node.is_flapping and target_node.anim_player:
-		var beat: float = fposmod(target_node.anim_player.current_animation_position, 1.5) / 1.5 * TAU
+		var beat: float = fposmod(target_node._get_flap_cycle_phase(), TAU) if target_node.has_method("_get_flap_cycle_phase") else (fposmod(target_node.anim_player.current_animation_position, 1.5) / 1.5 * TAU)
 		desired_pos += up * sin(beat) * 0.35 * cinematic
-	# En vuelo el jinete mira hacia donde va la trayectoria, no sólo hacia donde apunta el morro.
+	# En vuelo el jinete mira hacia donde va la trayectoria y el horizonte alpino (ref. Dragontwin).
 	var path_dir = forward
 	if airborne and "velocity" in target_node and target_node.velocity.length() > 6.0:
 		path_dir = forward.lerp(target_node.velocity.normalized(), 0.45).normalized()
-	var chase_target = saddle + (path_dir * 20.0) + (up * 0.2)
+	var horizon_lift := 1.55 if airborne else 0.2
+	var chase_target = saddle + (path_dir * 22.0) + (up * horizon_lift)
 	# Con la cámara desplazada, el encuadre se recentra en el dragón para no perderlo.
 	var off_axis: float = clampf((absf(dynamic_yaw + drift_yaw) + absf(dynamic_pitch + drift_pitch)) / 0.6, 0.0, 1.0)
 	if is_landing:
 		off_axis = maxf(off_axis, 0.8)
-	chase_target = chase_target.lerp(saddle + path_dir * 7.0, off_axis * 0.55)
-	var breath = target_node.get_node_or_null("DragonBreath")
-	if breath and head_follow_blend > 0.001 and breath.mouth_pose_cached:
-		# Stay above the front of the skull: the old shoulder position let the
-		# folded or beating wings cover soldiers while retreating or attacking.
-		var mouth: Vector3 = target_node.to_global(breath.mouth_actor_local)
-		var head_direction: Vector3 = (target_node.global_basis*breath.direction_actor_local).normalized()
-		# Por encima y detrás de los cuernos, no dentro del cráneo: a 0,7 m de la boca la cámara
-		# quedaba dentro de la cabeza, sobre todo con el cuello vivo en vuelo.
-		var skull_back := clampf(5.0 + zoom_offset * 0.25, 3.5, 8.0)
-		var skull_height := clampf(3.5 + zoom_offset * 0.12, 2.8, 5.0)
-		var head_up: Vector3 = (target_node.global_basis.y).lerp(Vector3.UP, 0.5).normalized()
-		var head_camera: Vector3 = mouth - head_direction * skull_back + head_up * skull_height
+	chase_target = chase_target.lerp(saddle + path_dir * 7.5 + up * (horizon_lift * 0.5), off_axis * 0.55)
+	if head_follow_blend > 0.001:
+		# Ubicada en la frente / entre los cuernos y ojos del dragón:
+		# Al estar 1.4m detrás de la punta de la boca, las alas quedan 3 a 4 metros
+		# POR DETRÁS de la cámara, garantizando que el aleteo JAMÁS tape los objetivos en tierra ni en el aire.
+		var mouth: Vector3 = Vector3.ZERO
+		var head_direction: Vector3 = forward
+		if breath and breath.mouth_pose_cached:
+			mouth = target_node.to_global(breath.mouth_actor_local)
+			head_direction = (target_node.global_basis * breath.direction_actor_local).normalized()
+		elif target_node and "skeleton" in target_node and target_node.skeleton:
+			var sk: Skeleton3D = target_node.skeleton
+			var head_bone: int = target_node.bone_head_idx if "bone_head_idx" in target_node else -1
+			if head_bone < 0:
+				head_bone = sk.find_bone("Bip001-Head_011")
+				if head_bone < 0: head_bone = sk.find_bone("head")
+			if head_bone >= 0:
+				var head_pos := sk.to_global(sk.get_bone_global_pose(head_bone).origin)
+				head_direction = forward
+				mouth = head_pos + head_direction * 1.2
+		if mouth == Vector3.ZERO:
+			mouth = saddle + forward * 10.0 + up * 0.2
+			head_direction = forward
+		var head_up: Vector3 = (target_node.global_basis.y).lerp(Vector3.UP, 0.35).normalized()
+		var head_right: Vector3 = head_direction.cross(head_up).normalized()
+		
+		# Cámara de Combate y Apuntado Over-The-Shoulder (OTS) Profesional:
+		# Soluciona el problema de geometría transparente/hueca (causado anteriormente por ubicar la cámara
+		# dentro de la cavidad craneal, sufriendo backface culling y clipping del near-plane).
+		# Adopta el estándar de la industria (Century: Age of Ashes, Monster Hunter, Horizon, Warframe):
+		# Ubicada al hombro/flanco superior derecho (+3.2m lateral, +2.1m altura, -3.4m detrás de la boca),
+		# encuadrando al dragón sólido e imponente a la izquierda según la regla de los tercios,
+		# mientras la retícula, el chorro de fuego y el campo de batalla quedan 100% despejados.
+		var ots_side := 3.2
+		var ots_back := clampf(3.4 + zoom_offset * 0.15, 1.8, 4.8)
+		var ots_height := clampf(2.1 + zoom_offset * 0.08, 1.4, 3.0)
+		var head_camera: Vector3 = mouth - head_direction * ots_back + head_right * ots_side + head_up * ots_height
+		
+		# Punto de mira: si hay objetivo fijado, enfoca directamente a él para centrarlo en retícula
+		var head_look_target: Vector3
+		if has_lock and target_node.has_method("_get_target_aim_point"):
+			head_look_target = target_node._get_target_aim_point(locked_enemy)
+		else:
+			head_look_target = mouth + head_direction * 35.0
+			
 		desired_pos = desired_pos.lerp(head_camera, head_follow_blend)
-		chase_target = chase_target.lerp(mouth + head_direction * 14.0, head_follow_blend)
+		chase_target = chase_target.lerp(head_look_target, head_follow_blend)
 		collision_pivot_world = saddle.lerp(mouth + Vector3.UP * 0.2, head_follow_blend)
 	
 	# 4. Prevención de colisión con el terreno (No atravesar montañas ni suelo)
@@ -266,15 +314,16 @@ func _physics_process(delta: float) -> void:
 	if ray_hit:
 		desired_pos = ray_hit.position + (ray_hit.normal * 0.8)
 		
-	# Clamp de altura mínima sobre el suelo absoluto
-	desired_pos.y = max(desired_pos.y, 2.0)
+	# Clamp de altura mínima sobre el suelo absoluto (más bajo en modo cabeza para tierra firme)
+	var min_ground_y := lerpf(2.0, 1.2, head_follow_blend)
+	desired_pos.y = max(desired_pos.y, min_ground_y)
 	
 	var excluded: Array[RID] = []
 	excluded.assign(ray_query.exclude)
 	desired_pos = _sweep_camera(collision_pivot_world, desired_pos, excluded)
 	var previous := global_position
 	# Seguimiento con inercia en vuelo: la cámara se queda algo atrás al acelerar y alcanza al frenar.
-	var follow_k: float = follow_smoothness if (not airborne or head_follow_blend > 0.5) else flight_follow_smoothness
+	var follow_k: float = maxf(follow_smoothness, 20.0) if (not airborne or head_follow_blend > 0.4) else flight_follow_smoothness
 	global_position = _sweep_camera(previous, previous.lerp(desired_pos, 1.0 - exp(-follow_k * delta)), excluded)
 	# Recheck the smoothed path: the interpolation itself must not cut through hills.
 	var final_ray = PhysicsRayQueryParameters3D.create(collision_pivot_world, global_position, 3)
@@ -284,14 +333,19 @@ func _physics_process(delta: float) -> void:
 		global_position = final_hit.position + final_hit.normal * 0.8
 	
 	# 5. Orientación: en la vista trasera mira al horizonte; al orbitar mira al dragón
-	var orbit_amount = 0.0 if attack_view else clamp((absf(orbit_yaw) + absf(orbit_pitch)) / 0.6, 0.0, 1.0)
+	var orbit_amount = clamp((absf(orbit_yaw) + absf(orbit_pitch)) / 0.6, 0.0, 1.0) * (1.0 - head_follow_blend)
 	var look_target = chase_target.lerp(saddle, orbit_amount)
 	
 	# El vector UP de la cámara acompaña el alabeo (bank roll) del dragón para un manejo intuitivo
 	var pitch_steepness = clamp(absf(forward.y), 0.0, 1.0)
 	var cam_up = up.lerp(Vector3.UP, lerp(0.25, 0.90, pitch_steepness)).normalized()
-	if attack_view or absf(orbit_pitch) > 0.5 or cam_up.length_squared() < 0.5:
+	if absf(orbit_pitch) > 0.5 or cam_up.length_squared() < 0.5:
 		cam_up = Vector3.UP
+	
+	# En vista de cabeza/ojos, la cámara acompaña sutilmente el alabeo de la cabeza sin marear
+	if head_follow_blend > 0.01:
+		var head_bank_up = up.lerp(Vector3.UP, 0.65).normalized()
+		cam_up = cam_up.lerp(head_bank_up, head_follow_blend)
 	
 	var current_transform = global_transform
 	var to_look = look_target - global_position
@@ -300,7 +354,8 @@ func _physics_process(delta: float) -> void:
 		if absf(cam_up.dot(look_dir)) > 0.92 or cam_up.length_squared() < 0.1:
 			cam_up = Vector3.UP if absf(look_dir.y) < 0.95 else Vector3.FORWARD
 		var target_transform = current_transform.looking_at(look_target, cam_up)
-		global_transform = current_transform.interpolate_with(target_transform, 1.0 - exp(-rotation_smoothness * delta))
+		var rot_speed: float = lerpf(rotation_smoothness, 22.0, head_follow_blend)
+		global_transform = current_transform.interpolate_with(target_transform, 1.0 - exp(-rot_speed * delta))
 	
 	# 6. Efecto dinámico de FOV según velocidad
 	if target_node and "current_speed" in target_node:

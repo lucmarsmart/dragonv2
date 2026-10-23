@@ -28,6 +28,8 @@ func _process_modification() -> void:
 			sk.set_bone_pose_rotation(bone, local_turn * sk.get_bone_pose_rotation(bone))
 	# Mandibular chain, whose child bones articulate the tongue.
 	var jaw := sk.find_bone("Bone015_012")
+	if jaw < 0:
+		jaw = sk.find_bone("jaw")
 	if jaw >= 0:
 		var parent := sk.get_bone_parent(jaw)
 		var axis_world: Vector3 = breath.dragon.global_basis.x.normalized()

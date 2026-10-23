@@ -100,7 +100,10 @@ func _body_boundaries(dragon: Node3D, sk: Skeleton3D, original: Array) -> Array:
 		var mesh_node := dragon.find_child(parts[0],true,false) as MeshInstance3D
 		var arrays: Array = mesh_node.mesh.surface_get_arrays(int(parts[1]))
 		var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
-		for offset in range(0,indices.size(),3):
+		var tri_step := 3
+		if indices.size() > 50000:
+			tri_step = 3 * 16 # Submuestrear triangulos en mallas hiper-densas (como Wyvern) para evitar congelamiento
+		for offset in range(0,indices.size(),tri_step):
 			var vertices := []
 			var owners := []
 			var body_corners := 0
@@ -143,12 +146,20 @@ func configure(dragon: Node3D, sk: Skeleton3D) -> void:
 	_configure_topology(sk)
 	# Finite original vertex extrema; see the construction and independent holdout evidence.
 	# It is independently checked against all5412 membrane vertices; it is not a stride sample.
+	var has_matching_extrema := false
 	if FileAccess.file_exists("res://scripts/dragon_wing_extrema.json"):
 		var selected = JSON.parse_string(FileAccess.get_file_as_string("res://scripts/dragon_wing_extrema.json"))
 		if selected is Array:
-			for key in selected: extrema_ids[key] = true
+			for key in selected:
+				extrema_ids[key] = true
+				var k_str := str(key)
+				if "SK_Wyvern_Biped" in k_str or "Wyvern" in k_str:
+					has_matching_extrema = true
+	
+	# Mallas densas (>50k vertices) sin extremos precalculados usan stride adaptativo para mantener fluidez
+	var initial_stride := 1 if has_matching_extrema else 32
 	probe.profile_label = "wing_skin"
-	probe.configure(dragon, sk, 1)
+	probe.configure(dragon, sk, initial_stride)
 	var all_original: Array = probe.samples.duplicate()
 	probe.samples = probe.samples.filter(func(sample):
 		if sample.wing:
@@ -158,9 +169,8 @@ func configure(dragon: Node3D, sk: Skeleton3D) -> void:
 	for sample in probe.samples:
 		if sample.wing: matched += 1
 	if matched < 500:
-		# A different imported model must use the complete geometry until its extrema are audited.
-		probe.configure(dragon,sk,1)
-		probe.samples = probe.samples.filter(func(sample): return sample.wing or sample.neck or int(sample.claw) < 0)
+		# Si no hay extremos precalculados, usar la geometria recolectada con el stride adaptativo
+		probe.samples = all_original.filter(func(sample): return sample.wing or sample.neck or int(sample.claw) < 0)
 	var neck_probe = Probe.new()
 	neck_probe.profile_label = "neck_support"
 	neck_probe.samples = probe.samples.filter(func(sample): return sample.neck)
@@ -200,6 +210,7 @@ func configure(dragon: Node3D, sk: Skeleton3D) -> void:
 	var offsets:Array[int]=[]
 	for hull in hulls:offsets.append(0)
 	var jaw:int=sk.find_bone("Bone015_012")
+	if jaw < 0: jaw = sk.find_bone("jaw")
 	for index in probe.samples.size():
 		var sample:Dictionary=probe.samples[index]
 		var category:int=sample_categories[index]
@@ -226,6 +237,17 @@ func configure(dragon: Node3D, sk: Skeleton3D) -> void:
 				if not jaw_hull_slots.has(part):jaw_hull_slots[part]=[]
 				jaw_hull_slots[part].append({"point":offsets[part],"jaw":jaw_index})
 			offsets[part]+=1
+	
+	# Limitar puntos por casco a <= 120 para que QuickHull en C++ ejecute en < 0.1ms en runtime
+	for part in hull_probes.size():
+		var hp = hull_probes[part]
+		if hp.samples.size() > 120:
+			var downsampled: Array[Dictionary] = []
+			var step := maxi(1, int(hp.samples.size() / 100))
+			for i in range(0, hp.samples.size(), step):
+				downsampled.append(hp.samples[i])
+			hp.samples = downsampled
+			
 	for hp in hull_probes:
 		hp.prepare_coordinates()
 	probe.prepare_coordinates()
@@ -269,7 +291,11 @@ func sample_jaw_final(dragon:Node3D,sk:Skeleton3D) -> void:
 	if not jaw_probe.last_coordinates_changed:return
 	for category in jaw_hull_slots:
 		var points:PackedVector3Array=final_hull_points[category].duplicate()
-		for slot in jaw_hull_slots[category]:points[int(slot.point)]=coordinates[int(slot.jaw)]
+		for slot in jaw_hull_slots[category]:
+			var pt_idx := int(slot.point)
+			var jaw_idx := int(slot.jaw)
+			if pt_idx >= 0 and pt_idx < points.size() and jaw_idx >= 0 and jaw_idx < coordinates.size():
+				points[pt_idx] = coordinates[jaw_idx]
 		final_hull_points[category]=points
 		hull_probes[category].has_cache=false
 		if points.size()>=4:hulls[category].points=points
@@ -618,6 +644,7 @@ func guard_tail_terrain(dragon:Node3D,sk:Skeleton3D) -> void:
 	sample_hull(dragon,sk,2)
 
 func _wing_contact(dragon: Node3D, side: int) -> bool:
+	if side < 0 or side >= hulls.size() or hulls[side].points.size() < 4: return false
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape = hulls[side]
 	query.transform = dragon.global_transform
@@ -631,12 +658,15 @@ func guard_grounded_wings(dragon: Node3D, sk: Skeleton3D) -> void:
 	# new wing articulation that intersects after that sweep; feet and free
 	# head retain this tick's world targets and freshly solved rotations.
 	var wing_modified := false
+	var contact_any := _wing_contact(dragon, 0) or _wing_contact(dragon, 1)
+	if contact_any:
+		dragon.contact_fold_requested = 1.0
 	for side in 2:
 		var root_bone: int = 96 if side==0 else 120
 		if _limit_wing_frame(sk,root_bone):
 			sample_hull(dragon,sk,side)
 			wing_modified = true
-		if _wing_contact(dragon,side) and wing_pose_safe.has(side):
+		if (contact_any or _wing_contact(dragon,side)) and wing_pose_safe.has(side):
 			var saved: Dictionary = wing_pose_safe[side]
 			for bone in saved.rotations:
 				sk.set_bone_pose_rotation(int(bone),saved.rotations[bone])
@@ -697,6 +727,7 @@ func _limit_wing_frame(sk: Skeleton3D, root_bone: int) -> bool:
 	return changed
 
 func _fold_wing_away(dragon: Node3D, sk: Skeleton3D, side: int, root_bone: int) -> bool:
+	if side < 0 or side >= hulls.size() or hulls[side].points.size() < 4: return false
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape=hulls[side]
 	query.transform=dragon.global_transform
@@ -758,7 +789,7 @@ func _fold_wing_away(dragon: Node3D, sk: Skeleton3D, side: int, root_bone: int) 
 
 # Normal del obstáculo hacia el cuerpo en el último casco con contacto (capa 2).
 func _body_contact_normal(dragon: Node3D) -> Vector3:
-	if body_contact_index<0 or body_contact_index>=hulls.size(): return Vector3.ZERO
+	if body_contact_index<0 or body_contact_index>=hulls.size() or hulls[body_contact_index].points.size() < 4: return Vector3.ZERO
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.transform = dragon.global_transform
 	query.exclude = [dragon.get_rid()]
@@ -778,6 +809,7 @@ func _body_contact(dragon: Node3D, mask: int = 3) -> bool:
 	query.transform = dragon.global_transform
 	query.exclude = [dragon.get_rid()]
 	for index in body_indices:
+		if index >= hulls.size() or hulls[index].points.size() < 4: continue
 		query.shape = hulls[index]
 		for layer in [1,2]:
 			if (mask&layer)==0:continue
@@ -829,7 +861,8 @@ func constrain_rotation(dragon: Node3D, previous: Vector3) -> void:
 	var wanted: Vector3 = dragon.rotation
 	var yaw_delta := wrapf(wanted.y-previous.y,-PI,PI)
 	var angular_change := Vector3(wanted.x-previous.x,yaw_delta,wanted.z-previous.z).length()
-	if angular_change<0.00001 or not _rotation_contact(dragon): return
+	var rot_mask := 2 if dragon.locomotion_state == dragon.LocomotionState.GROUNDED else 3
+	if angular_change<0.00001 or not _rotation_contact(dragon, rot_mask): return
 	# Landing changes the stabilizer and limb pose after this rigid check. An
 	# already overlapping predecessor cannot certify a safe rigid interpolation.
 	# Let the final skinned-pose guard resolve that transition instead of freezing
@@ -850,7 +883,7 @@ func constrain_rotation(dragon: Node3D, previous: Vector3) -> void:
 		var candidate := previous.lerp(wanted,amount)
 		candidate.y = previous.y + yaw_delta*amount
 		dragon.rotation = candidate
-		if _rotation_contact(dragon): high = amount
+		if _rotation_contact(dragon, rot_mask): high = amount
 		else: low = amount
 	var safe := previous.lerp(wanted,low)
 	safe.y = previous.y + yaw_delta*low

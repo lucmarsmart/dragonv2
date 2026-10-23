@@ -30,6 +30,13 @@ func configure(dragon: Node3D, sk: Skeleton3D, stride: int = 12) -> void:
 	flat_count = -1
 	mesh_count = 0
 	bone_map.clear()
+	var l_wing_root := 96
+	var r_wing_root := 120
+	if dragon and "bone_l_wing_root" in dragon and dragon.bone_l_wing_root != -1:
+		l_wing_root = dragon.bone_l_wing_root
+	if dragon and "bone_r_wing_root" in dragon and dragon.bone_r_wing_root != -1:
+		r_wing_root = dragon.bone_r_wing_root
+
 	for b in sk.get_bone_count():
 		var ancestor := b
 		var wing := false
@@ -37,11 +44,21 @@ func configure(dragon: Node3D, sk: Skeleton3D, stride: int = 12) -> void:
 		var claw := -1
 		var neck := false
 		while ancestor >= 0:
-			if ancestor in [96,120]:
+			if ancestor in [l_wing_root, 96]:
 				wing = true
-				wing_side_mask |= 1 if ancestor==96 else 2
-			if ancestor in [8,23,41,82]: claw = ancestor
-			if sk.get_bone_name(ancestor) in ["Bip001-Neck1_09","Bip001-Neck2_010","Bip001-Head_011"]: neck = true
+				wing_side_mask |= 1
+			elif ancestor in [r_wing_root, 120]:
+				wing = true
+				wing_side_mask |= 2
+			if ancestor in [8, 23, 41, 82]:
+				claw = ancestor
+			elif dragon and ("bone_l_foot" in dragon and ancestor == dragon.bone_l_foot):
+				claw = ancestor
+			elif dragon and ("bone_r_foot" in dragon and ancestor == dragon.bone_r_foot):
+				claw = ancestor
+			var aname := sk.get_bone_name(ancestor)
+			if aname in ["Bip001-Neck1_09", "Bip001-Neck2_010", "Bip001-Head_011", "neck_01", "neck_02", "neck_03", "head"]:
+				neck = true
 			ancestor = sk.get_bone_parent(ancestor)
 		bone_map[b] = {"wing":wing,"wing_side_mask":wing_side_mask,"claw":claw,"neck":neck}
 	_collect(dragon, sk, stride)

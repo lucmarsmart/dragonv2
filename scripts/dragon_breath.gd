@@ -50,6 +50,8 @@ var jet_probe := SphereShape3D.new()
 
 func _ready() -> void:
 	dragon = get_parent() as CharacterBody3D
+	set_physics_process(true)
+	set_process(true)
 	set_as_top_level(true)
 	flame_material = ShaderMaterial.new()
 	flame_material.shader = preload("res://shaders/flame.gdshader")
@@ -140,19 +142,29 @@ func _physics_process(delta: float) -> void:
 		jaw_modifier.name = "BreathJawModifier"
 		dragon.skeleton.add_child(jaw_modifier)
 		mouth_bone = dragon.skeleton.find_bone("Point021_018")
+		if mouth_bone == -1: mouth_bone = dragon.skeleton.find_bone("jaw")
+		if mouth_bone == -1: mouth_bone = dragon.skeleton.find_bone("head")
 		_configure_mouth_landmarks(dragon, dragon.skeleton)
-	var input_active: bool = manual_fire if manual_override else (requested or Input.is_key_pressed(KEY_F) or (Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and dragon.mouse_captured))
-	if exhausted and fuel >= 0.3:
+		_update_mouth()
+	elif not mouth_pose_cached:
+		_update_mouth()
+	var mouse_over_gui := get_viewport().gui_get_hovered_control() != null
+	var lmb_pressed: bool = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and (bool(dragon.mouse_captured) or not mouse_over_gui)
+	var input_active: bool = manual_fire if manual_override else (requested or Input.is_key_pressed(KEY_F) or lmb_pressed)
+	if exhausted and fuel >= 0.25:
 		exhausted = false
 	is_firing = input_active and not exhausted and fuel > 0.0
+	var airborne: bool = dragon.locomotion_state != dragon.LocomotionState.GROUNDED
+	var active_drain := drain_per_second * (0.58 if (airborne and not manual_override) else 1.0)
+	var active_recover := recover_per_second * (1.65 if not manual_override else 1.0)
 	if is_firing:
-		fuel = maxf(0, fuel - drain_per_second * delta)
+		fuel = maxf(0, fuel - active_drain * delta)
 		if fuel <= 0:
 			exhausted = true
 			is_firing = false
 	else:
-		fuel = minf(1, fuel + recover_per_second * delta)
-	intensity = move_toward(intensity, 1.0 if is_firing else 0.0, delta * (7.0 if is_firing else 4.0))
+		fuel = minf(1, fuel + active_recover * delta)
+	intensity = move_toward(intensity, 1.0 if is_firing else 0.0, delta * (8.5 if is_firing else 4.5))
 	var previous_impact := impact_active
 	var previous_point := hit_position
 	var previous_normal := hit_normal
@@ -162,23 +174,27 @@ func _physics_process(delta: float) -> void:
 		for emitter in [flames, smoke, embers]:
 			emitter.restart()
 		effect_resets += 1
+	var visual_reach := core_distance * (1.55 if (airborne and not core_impact_active) else 1.0)
 	for mat in [flame_material, smoke_material]:
 		mat.set_shader_parameter("attack_view", dragon.attack_mode_active)
 		mat.set_shader_parameter("mouth_position", mouth_position)
 		mat.set_shader_parameter("breath_direction", breath_direction)
-		mat.set_shader_parameter("reach", core_distance)
+		mat.set_shader_parameter("reach", visual_reach)
 		mat.set_shader_parameter("has_impact", core_impact_active)
 		mat.set_shader_parameter("impact_point", core_impact_point)
 		mat.set_shader_parameter("impact_normal", core_impact_normal)
 	flames.emitting = is_firing
 	smoke.emitting = is_firing
 	embers.emitting = is_firing
-	flames.initial_velocity_min = 35.0 + maxf(0, dragon.velocity.dot(breath_direction)) * 0.45
-	flames.initial_velocity_max = flames.initial_velocity_min + 8.0
+	var base_flame_speed := 46.0 if airborne else 35.0
+	flames.initial_velocity_min = base_flame_speed + maxf(0, dragon.velocity.dot(breath_direction)) * 0.65
+	flames.initial_velocity_max = flames.initial_velocity_min + 10.0
 	glow.position = Vector3(0,0,-1.5)
 	glow.light_energy = intensity * (3.0 + sin(Time.get_ticks_msec() * 0.027) * 0.35)
+	glow.visible = glow.light_energy > 0.01
 	impact.emitting = is_firing and impact_active
 	impact_glow.light_energy = intensity * 2.5 if impact_active else 0.0
+	impact_glow.visible = impact_glow.light_energy > 0.01
 
 func _configure_mouth_landmarks(node: Node, sk: Skeleton3D) -> void:
 	# Original CC-BY asset vertices: upper oral rim, then mandibular oral rim.
@@ -335,28 +351,13 @@ func _detect_impact() -> void:
 func _setup_audio() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
-	# A short procedural PCM loop avoids a streaming buffer allocation every frame.
-	noise_rng.seed = 772
+	var stream := GameAudio.load_ogg("res://assets/audio/github_sources/draconis_fire_breath.ogg", true)
+	if not stream:
+		stream = GameAudio.load_ogg("res://assets/audio/github_sources/veloren_fire_breath.ogg", true)
 	sound = AudioStreamPlayer3D.new()
-	var stream := AudioStreamWAV.new()
-	stream.format = AudioStreamWAV.FORMAT_16_BITS
-	stream.mix_rate = 22050
-	stream.stereo = false
-	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	stream.loop_begin = 0
-	stream.loop_end = 44100
-	var pcm := PackedByteArray()
-	pcm.resize(88200)
-	var low_noise := 0.0
-	for i in 44100:
-		low_noise = low_noise * 0.82 + noise_rng.randf_range(-1,1) * 0.18
-		var phase := TAU * 72.0 * float(i) / 22050.0
-		var value := (low_noise * 0.8 + sin(phase) * 0.16 + sin(phase * 0.5) * 0.07) * 18000.0
-		pcm.encode_s16(i * 2, int(value))
-	stream.data = pcm
 	sound.stream = stream
-	sound.max_distance = 90.0
-	sound.unit_size = 12.0
+	sound.max_distance = 120.0
+	sound.unit_size = 18.0
 	sound.volume_db = -80.0
 	add_child(sound)
 	sound.play()

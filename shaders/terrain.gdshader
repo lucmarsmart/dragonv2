@@ -3,6 +3,9 @@ render_mode diffuse_burley;
 uniform sampler2D rock_albedo : source_color, filter_linear_mipmap, repeat_enable;
 uniform sampler2D earth_albedo : source_color, filter_linear_mipmap, repeat_enable;
 uniform sampler2D grass_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D pebbles_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D pebbles_normal : filter_linear_mipmap, repeat_enable;
+uniform sampler2D pebbles_roughness : hint_default_white, filter_linear_mipmap, repeat_enable;
 varying vec3 wp;
 varying vec3 wn;
 varying float camera_distance;
@@ -38,9 +41,13 @@ void fragment(){
 	earth = mix(earth, earth_moss, 0.75);
 	float court_distance = max(abs(wp.x - 300.0) / 28.0, abs(wp.z - 120.0) / 24.0);
 	float humidity = smoothstep(0.15, 0.65, outcrop);
-	float riverbed = 1.0 - smoothstep(0.6, 1.8, wp.y);
-	float vegetation = flatness * soil_cover * (1.0 - smoothstep(440.0, 760.0, wp.y)) * (1.0 - riverbed);
+
+	// Riverbed, lakebed and moist gravel shorelines
+	float river_shore = 1.0 - smoothstep(0.6, 2.6 + macro * 0.5, wp.y);
+	float wet = clamp(1.0 - (wp.y - 0.4) / 1.6, 0.0, 1.0);
+	float vegetation = flatness * soil_cover * (1.0 - smoothstep(440.0, 760.0, wp.y)) * (1.0 - river_shore * 0.85);
 	float meadow = vegetation * smoothstep(0.85, 1.15, court_distance) * mix(0.82, 0.98, humidity);
+
 	// Multi-scale photographic grass detail (micro-blades for near views, field scale for distant hills)
 	vec3 grass_near = texture(grass_albedo, wp.xz / 3.4).rgb;
 	vec3 grass_far = texture(grass_albedo, wp.xz / 24.0).rgb;
@@ -61,9 +68,35 @@ void fragment(){
 	grass_tint = mix(grass_tint, forest_tint, hill_factor * 0.85);
 	
 	grass *= grass_tint * mix(0.92, 1.08, smoothstep(0.12, 0.66, macro));
-	vec3 base = mix(mix(rock, earth, soil_cover), grass, meadow);
-	float wet = 1.0 - smoothstep(0.6, 2.4, wp.y); base *= 1.0 - wet * 0.45;
+
+	// Multi-scale river pebbles: individual rounded stones + gravel bank matrix
+	vec3 pebbles_near = texture(pebbles_albedo, wp.xz * 0.36).rgb;
+	vec3 pebbles_far = texture(pebbles_albedo, wp.xz * 0.09).rgb;
+	vec3 pebbles = mix(pebbles_near, pebbles_far, smoothstep(10.0, 65.0, camera_distance) * 0.65);
+	vec3 wet_pebbles = pebbles * vec3(0.58, 0.60, 0.64) * 1.15;
+	vec3 river_stone_color = mix(pebbles, wet_pebbles, wet * 0.85);
+
+	// Blend layers: base rock/earth -> river pebbles -> meadow grass
+	vec3 land_base = mix(rock, earth, soil_cover);
+	vec3 ground = mix(land_base, river_stone_color, river_shore);
+	vec3 base = mix(ground, grass, meadow);
+	base *= 1.0 - wet * (1.0 - river_shore * 0.7) * 0.35;
 	float snow = smoothstep(630.0, 940.0, wp.y + macro * 75.0) * smoothstep(0.45, 0.93, abs(world_normal.y));
 	ALBEDO = clamp(mix(base * (0.88 + macro * 0.22), vec3(0.69, 0.75, 0.78), snow), vec3(0.0), vec3(1.0));
-	ROUGHNESS = 0.85;
+
+	// River pebbles surface relief & wet specular reflections
+	if (river_shore > 0.02 && meadow < 0.95) {
+		vec3 p_norm_map = texture(pebbles_normal, wp.xz * 0.36).xyz * 2.0 - 1.0;
+		vec3 t = normalize(cross(world_normal, vec3(0.0, 0.0, 1.0)));
+		if (length(t) < 0.1) t = normalize(cross(world_normal, vec3(1.0, 0.0, 0.0)));
+		vec3 b = normalize(cross(world_normal, t));
+		vec3 p_world_norm = normalize(t * p_norm_map.x + b * p_norm_map.y + world_normal * p_norm_map.z);
+		NORMAL = normalize(mix(NORMAL, p_world_norm, river_shore * (1.0 - meadow) * 0.85));
+
+		float p_rough = texture(pebbles_roughness, wp.xz * 0.36).r;
+		float river_roughness = mix(p_rough, 0.15, wet * 0.92);
+		ROUGHNESS = mix(0.85, river_roughness, river_shore * (1.0 - meadow));
+	} else {
+		ROUGHNESS = 0.85;
+	}
 }

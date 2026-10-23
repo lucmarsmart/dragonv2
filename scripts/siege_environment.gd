@@ -9,11 +9,9 @@ var rescue_point := Vector3.ZERO
 var escape_point := Vector3.ZERO
 var approach_spawn := Vector3.ZERO
 var _landscape: Node3D
-var _modules: Dictionary = {}
 var _chains: MultiMeshInstance3D
 var _egg_material: ShaderMaterial
 var _nest_freed := false
-var _fort_template: Node3D
 
 func _ready() -> void:
 	add_to_group("siege_environment")
@@ -22,73 +20,44 @@ func _ready() -> void:
 		push_error("Fortress requires landscape before SiegeEnvironment")
 		return
 	arena_center = _landscape.to_global(Vector3(300.0, _landscape.ground_height(300.0, 120.0), 120.0))
-	_fort_template = (load("res://assets/siege/environment/fort/modular_fort_01.gltf") as PackedScene).instantiate()
-	_collect_modules(_fort_template)
 	_build_fortress()
 	_build_positions()
 	_build_captive_egg()
-	_fort_template.free()
-	print("SIEGE ENVIRONMENT arena=", arena_center, " gate clear=24m court=144x124m; CC0 fort modules ", _modules.size())
-
-func _collect_modules(node: Node) -> void:
-	if node is MeshInstance3D:
-		_modules[String(node.name).replace("modular_fort_01_", "")] = node
-	for child in node.get_children():
-		_collect_modules(child)
-
-func _place_module(key: String, p: Vector3, yaw: float = 0.0, scale_value: Vector3 = Vector3.ONE) -> MeshInstance3D:
-	var template: MeshInstance3D = _modules[key]
-	var module := MeshInstance3D.new()
-	module.name = key
-	module.mesh = template.mesh
-	var bounds := module.mesh.get_aabb()
-	var pivot := Vector3(bounds.get_center().x, bounds.position.y, bounds.get_center().z)
-	var basis := Basis(Vector3.UP, yaw).scaled(scale_value)
-	module.transform = Transform3D(basis, p - basis * pivot)
-	add_child(module)
-	module.create_trimesh_collision()
-	for body in module.get_children():
-		if body is StaticBody3D:
-			body.collision_layer = 2
-			body.collision_mask = 0
-			body.add_to_group("scenery_obstacle")
-	return module
-
-func _wall_run(start: Vector3, end: Vector3, key: String = "wall_thick_straight_01") -> void:
-	var direction := (end - start).normalized()
-	var length := start.distance_to(end)
-	var count := ceili(length / 14.56)
-	var spacing := length / count
-	var yaw := atan2(direction.x, direction.z)
-	for i in count:
-		_place_module(key, start + direction * spacing * (i + 0.5), yaw, Vector3(1.0, 1.0, spacing / 14.56278))
+	_build_sentinels_and_relics()
+	print("SIEGE ENVIRONMENT arena=", arena_center, " unified castle citadel integrated (1 draw call)")
 
 func _build_fortress() -> void:
 	var c := arena_center
-	# Per user instruction: eliminate wall behind nest to reveal the natural rolling hill covered in grass
-	_wall_run(c + Vector3(-76, 0, -67), c + Vector3(-50, 0, -67))
-	_wall_run(c + Vector3(50, 0, -67), c + Vector3(76, 0, -67))
-	_wall_run(c + Vector3(-76, 0, -67), c + Vector3(-76, 0, 70))
-	_wall_run(c + Vector3(76, 0, -67), c + Vector3(76, 0, 70), "wall_thick_straight_02")
-	# Wide, roofless breach lets the folded dragon enter on foot and launch safely.
-	_wall_run(c + Vector3(-76, 0, 70), c + Vector3(-12, 0, 70))
-	_wall_run(c + Vector3(12, 0, 70), c + Vector3(76, 0, 70))
-	for corner in [Vector3(-76, 0, -67), Vector3(76, 0, -67), Vector3(-76, 0, 70), Vector3(76, 0, 70)]:
-		_place_module("tower_round", c + corner)
-	# Imported stone stairs and walkways, with concave collision on actual steps.
-	for x in [-69.0, 69.0]:
-		_place_module("wall_stairs_straight_01", c + Vector3(x, 0, -37), 0.0 if x < 0 else PI)
-		_place_module("wall_walkway_straight_01", c + Vector3(x, 0, -55), 0.0 if x < 0 else PI)
-	for offset in [Vector3(-15, 0, 68), Vector3(15, 0, 68)]:
+	# Opción A: Unified Medieval Castle Citadel (Single Draw Call, 1K PBR textures)
+	var castle_path := "res://assets/siege/environment/castle_citadel.glb"
+	if ResourceLoader.exists(castle_path):
+		var castle_scene := load(castle_path) as PackedScene
+		var castle := castle_scene.instantiate() as Node3D
+		castle.name = "MedievalCastleCitadel"
+		castle.position = c + Vector3(0.0, -1.2, 0.0)
+		castle.rotation.y = -PI * 0.5
+		add_child(castle)
+		for child: MeshInstance3D in castle.find_children("*", "MeshInstance3D", true, false):
+			child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+			child.visibility_range_end = 380.0
+		_add_mesh_collisions(castle)
+
+	# Torches / Lanterns flanking the castle breach
+	for offset in [Vector3(-18, 0, 52), Vector3(18, 0, 52)]:
 		var lantern := (load("res://assets/siege/environment/lantern.glb") as PackedScene).instantiate() as Node3D
 		lantern.name = "GitHubCC0WoodenLantern"
 		add_child(lantern)
 		lantern.position = c + offset
 		lantern.scale = Vector3.ONE * 0.15
+		for child: MeshInstance3D in lantern.find_children("*", "MeshInstance3D", true, false):
+			child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+			child.visibility_range_end = 140.0
 		_add_mesh_collisions(lantern)
+
 	# Defensive artillery positions remain low enough to be attacked from the court.
 	for offset in [Vector3(-49, 0, -30), Vector3(49, 0, -30), Vector3(50, 0, 42)]:
 		_platform(c + offset)
+
 	# Eroded stone nests, assembled from scanned geometry; central approach stays clear.
 	var scan_scene := (load("res://assets/environment/rock/rock_lod1.glb") as PackedScene).instantiate() as Node3D
 	for i in 7:
@@ -101,6 +70,9 @@ func _build_fortress() -> void:
 		stone.position = c + Vector3(sin(angle) * 7.0, -0.10, -38.0 + cos(angle) * 6.0)
 		stone.rotation.y = angle
 		stone.scale = Vector3(0.72, 0.90, 0.70)
+		for child: MeshInstance3D in stone.find_children("*", "MeshInstance3D", true, false):
+			child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+			child.visibility_range_end = 180.0
 		_add_mesh_collisions(stone)
 	scan_scene.free()
 
@@ -266,3 +238,56 @@ func reset_nest() -> void:
 		_chains.visible = true
 	if _egg_material:
 		_egg_material.set_shader_parameter("freed",0.0)
+
+
+func _build_sentinels_and_relics() -> void:
+	var c := arena_center
+	var sentinel_path := "res://assets/siege/environment/armor/armor_sentinel.glb"
+	if ResourceLoader.exists(sentinel_path):
+		var sentinel_scene := load(sentinel_path) as PackedScene
+		# 1. Royal Sentinel Monuments flanking the inner Sanctum Gate
+		# 2. Outer breach sentinels guarding entrance
+		# 3. High walkway sentinels looking over the courtyard
+		var sentinel_posts := [
+			{"pos": c + Vector3(-5.4, 0.0, -32.0), "yaw": 0.28, "scale": 1.15},
+			{"pos": c + Vector3(5.4, 0.0, -32.0), "yaw": -0.28, "scale": 1.15},
+			{"pos": c + Vector3(-16.0, 0.0, 52.0), "yaw": PI - 0.25, "scale": 1.10},
+			{"pos": c + Vector3(16.0, 0.0, 52.0), "yaw": PI + 0.25, "scale": 1.10},
+			{"pos": c + Vector3(-35.0, 0.0, 10.0), "yaw": PI * 0.5, "scale": 1.05},
+			{"pos": c + Vector3(35.0, 0.0, 10.0), "yaw": -PI * 0.5, "scale": 1.05}
+		]
+		for i in sentinel_posts.size():
+			var data = sentinel_posts[i]
+			var sentinel := sentinel_scene.instantiate() as Node3D
+			sentinel.name = "RoyalArmorSentinel_%d" % i
+			sentinel.position = data.pos
+			sentinel.rotation.y = data.yaw
+			sentinel.scale = Vector3.ONE * data.scale
+			add_child(sentinel)
+			for child: MeshInstance3D in sentinel.find_children("*", "MeshInstance3D", true, false):
+				child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+				child.visibility_range_end = 220.0
+			_add_mesh_collisions(sentinel)
+	
+	# Standalone Greatswords embedded near the sacred dais and stone walkway plinths
+	var sword_path := "res://assets/siege/weapons/greatsword.glb"
+	if ResourceLoader.exists(sword_path):
+		var sword_scene := load(sword_path) as PackedScene
+		var relic_posts := [
+			# Embedded in stone near the captive nest
+			{"pos": c + Vector3(3.2, 0.2, -36.0), "rot": Vector3(0.12, 0.65, -0.08), "scale": 1.10},
+			# Displayed at sanctum approach portal
+			{"pos": c + Vector3(-3.2, 0.2, -36.0), "rot": Vector3(-0.10, -0.65, 0.08), "scale": 1.10}
+		]
+		for i in relic_posts.size():
+			var data = relic_posts[i]
+			var sword_inst := sword_scene.instantiate() as Node3D
+			sword_inst.name = "FortressRelicGreatsword_%d" % i
+			sword_inst.position = data.pos
+			sword_inst.rotation = data.rot
+			sword_inst.scale = Vector3.ONE * data.scale
+			add_child(sword_inst)
+			for child: MeshInstance3D in sword_inst.find_children("*", "MeshInstance3D", true, false):
+				child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+				child.visibility_range_end = 180.0
+			_add_mesh_collisions(sword_inst)

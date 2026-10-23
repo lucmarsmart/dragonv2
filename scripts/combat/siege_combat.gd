@@ -8,6 +8,8 @@ const Enemy = preload("res://scripts/combat/siege_enemy.gd")
 const CollisionEffects = preload("res://scripts/collision_effects.gd")
 enum Phase { BRIEFING, DEFENSES, CAPTAIN, RESCUE, ESCAPE, VICTORY, DEFEAT }
 var phase := Phase.BRIEFING
+var is_free_flight := false
+var difficulty := "normal" # "easy", "normal", "hard"
 var dragon: CharacterBody3D
 var breath: Node3D
 var arena: Node3D
@@ -33,8 +35,10 @@ var initialized := false
 
 func _ready() -> void:
 	add_to_group("siege_combat")
-	dragon = get_parent().get_node("Dragon")
-	breath = dragon.get_node("DragonBreath")
+	if get_parent() and get_parent().has_node("Dragon"):
+		dragon = get_parent().get_node("Dragon")
+		if dragon.has_node("DragonBreath"):
+			breath = dragon.get_node("DragonBreath")
 	arena = get_tree().get_first_node_in_group("siege_environment")
 	projectiles = Node3D.new()
 	projectiles.name = "Projectiles"
@@ -42,6 +46,8 @@ func _ready() -> void:
 	call_deferred("_prepare")
 
 func _prepare() -> void:
+	if not is_instance_valid(dragon):
+		return
 	while dragon.calibrating:
 		await get_tree().process_frame
 	if not is_instance_valid(arena):
@@ -55,12 +61,11 @@ func _prepare() -> void:
 			push_error("Mission model unavailable: " + path)
 			return
 	_spawn_enemies()
-	# Prepare skin/contact data before enabling Start: first input should not pay
-	# the full model scan needed by swept wing collision.
 	if dragon.wing_contact.hulls.is_empty():
 		dragon.wing_contact.configure(dragon,dragon.skeleton)
 	dragon.ground_pose.prepare(dragon,dragon.skeleton)
 	initialized = true
+	_reset_player()
 	_hold_player(true)
 	state_changed.emit()
 
@@ -69,7 +74,6 @@ func is_running() -> bool:
 
 func _hold_player(held: bool) -> void:
 	dragon.set_physics_process(not held)
-	# Pose still breathes while stationary. Input is gated for briefing by the mission HUD.
 	breath.set_physics_process(not held)
 	if held:
 		dragon.velocity = Vector3.ZERO
@@ -108,24 +112,54 @@ func _spawn_enemies() -> void:
 		knight.waypoint = knight.home
 		enemies.append(knight)
 
-func start_mission() -> void:
-	if not initialized or phase != Phase.BRIEFING:
+func set_difficulty(new_diff: String) -> void:
+	difficulty = new_diff
+	match difficulty:
+		"easy":
+			max_health = 360.0
+		"hard":
+			max_health = 160.0
+		_:
+			max_health = 240.0
+	health = max_health
+
+func start_mission(free_flight: bool = false) -> void:
+	if not initialized:
 		return
+	is_free_flight = free_flight
 	_reset_player()
 	phase = Phase.DEFENSES
 	active_time = 0
-	grace = 4.0
+	grace = 6.0 if difficulty == "easy" else (4.0 if difficulty == "normal" else 2.5)
 	_hold_player(false)
-	_notify("El nido está al norte. Destruye las tres ballistas.")
+	if is_free_flight:
+		_notify("¡MODO VUELO LIBRE ACTIVADO! Explora las cumbres y practica el vuelo.")
+	else:
+		_notify("El nido está al norte. Destruye las tres ballistas.")
+	state_changed.emit()
+
+func return_to_briefing() -> void:
+	if not initialized:
+		return
+	_hold_player(true)
+	phase = Phase.BRIEFING
+	is_free_flight = false
+	_spawn_enemies()
+	set_difficulty(difficulty)
+	captain_dead = false
+	turrets_destroyed = 0
+	if arena.has_method("reset_nest"):
+		arena.reset_nest()
+	active_time = 0
+	_reset_player()
 	state_changed.emit()
 
 func retry() -> void:
 	if not initialized:
 		return
 	_hold_player(true)
-	phase = Phase.BRIEFING
 	_spawn_enemies()
-	health = max_health
+	set_difficulty(difficulty)
 	captain_dead = false
 	turrets_destroyed = 0
 	if arena.has_method("reset_nest"):
@@ -137,6 +171,13 @@ func retry() -> void:
 	damage_events = 0
 	fire_hits = 0
 	_reset_player()
+	phase = Phase.DEFENSES
+	grace = 4.0
+	_hold_player(false)
+	if is_free_flight:
+		_notify("Modo Vuelo Libre reiniciado.")
+	else:
+		_notify("El nido está al norte. Destruye las tres ballistas.")
 	state_changed.emit()
 
 func _reset_player() -> void:
@@ -184,67 +225,83 @@ func _physics_process(delta: float) -> void:
 	grace = maxf(0,grace-delta)
 	if breath.is_firing and breath.intensity > 0.05:
 		_damage_with_breath(delta)
+	if is_free_flight:
+		return
 	if phase == Phase.DEFENSES and turrets_destroyed >= arena.turret_spawn_points.size():
 		phase = Phase.CAPTAIN if not captain_dead else Phase.RESCUE
-		_notify("Las defensas han caído. Derrota al capitán del Hierro." if not captain_dead else "Acércate al nido y pulsa E para romper las cadenas.")
+		_notify("Las defensas han caído. Derrota al capitán del Hierro." if not captain_dead else "Acércate al nido o lánzale fuego para romper las cadenas.")
 		state_changed.emit()
 	if phase == Phase.CAPTAIN and captain_dead:
 		phase = Phase.RESCUE
-		_notify("La orden ha perdido a su capitán. Libera el nido con E.")
+		_notify("La orden ha perdido a su capitán. Acércate al nido o dispara fuego (o E) para liberarlo.")
 		state_changed.emit()
-	if phase == Phase.RESCUE and dragon.global_position.distance_to(arena.rescue_point) < 12 and Input.is_key_pressed(KEY_E):
-		rescue_nest()
-	if phase == Phase.ESCAPE and dragon.global_position.distance_to(arena.escape_point) < 22:
-		phase = Phase.VICTORY
-		_hold_player(true)
-		_notify("El valle vuelve a respirar. La última cría está a salvo.")
-		state_changed.emit()
+	if phase == Phase.RESCUE:
+		var dist_nest := dragon.global_position.distance_to(arena.rescue_point)
+		if dist_nest < 15.0 or (dist_nest < 24.0 and Input.is_key_pressed(KEY_E)) or (dist_nest < 34.0 and breath.is_firing):
+			rescue_nest()
+	if phase == Phase.ESCAPE:
+		var horiz_escape := Vector2(dragon.global_position.x - arena.escape_point.x, dragon.global_position.z - arena.escape_point.z).length()
+		if dragon.global_position.distance_to(arena.escape_point) < 35.0 or horiz_escape < 38.0:
+			phase = Phase.VICTORY
+			_hold_player(true)
+			_notify("El valle vuelve a respirar. La última cría está a salvo.")
+			state_changed.emit()
 
 func rescue_nest() -> void:
-	if phase != Phase.RESCUE or dragon.global_position.distance_to(arena.rescue_point) >= 12:
+	if phase != Phase.RESCUE or dragon.global_position.distance_to(arena.rescue_point) >= 35.0:
 		return
 	phase = Phase.ESCAPE
 	if arena.has_method("liberate_nest"):
 		arena.liberate_nest()
-	_notify("El nido está libre. Cruza el paso del sur para escapar.")
+	_notify("El nido está libre. Vuela hacia el paso del sur para escapar.")
 	state_changed.emit()
 
 func _damage_with_breath(delta: float) -> void:
 	var origin: Vector3 = breath.mouth_position
 	var direction: Vector3 = breath.breath_direction.normalized()
+	var airborne: bool = dragon.locomotion_state != dragon.LocomotionState.GROUNDED
 	for enemy in enemies:
 		if not is_instance_valid(enemy) or enemy.dead:
 			continue
 		var k_scale: float = enemy.knight_scale if ("knight_scale" in enemy) else 1.0
-		var center := enemy.global_position + Vector3.UP * (1.8 if enemy.kind == "turret" else (0.95 * k_scale))
+		var approx_along := maxf(0.0, (enemy.global_position - origin).dot(direction))
+		var ray_y := origin.y + direction.y * approx_along
+		var target_h := 1.8 if enemy.kind == "turret" else clampf(ray_y - enemy.global_position.y, 0.95, 1.45 * k_scale)
+		var center := enemy.global_position + Vector3.UP * target_h
 		var offset := center-origin
 		var along := offset.dot(direction)
 		var is_locked: bool = is_instance_valid(dragon.locked_target) and dragon.locked_target == enemy
-		var effective_reach: float = breath.max_reach * (1.25 if is_locked else 1.0)
+		var effective_reach: float = breath.max_reach * (2.4 if airborne else (1.25 if is_locked else 1.0))
 		if along < 0 or along > effective_reach:
 			continue
 		var lateral := (offset-direction*along).length()
 		var enemy_radius := 1.3 if enemy.kind == "turret" else (0.42 * k_scale)
-		var hit_cone_angle: float = deg_to_rad(15.0 if is_locked else 7.0)
-		var max_allowed_lateral: float = (1.1 if is_locked else 0.55) + along * tan(hit_cone_angle) + enemy_radius
+		var hit_cone_angle: float = deg_to_rad(22.0 if (airborne and is_locked) else (16.0 if (airborne or is_locked) else 7.0))
+		var max_allowed_lateral: float = (2.2 if airborne else (1.1 if is_locked else 0.55)) + along * tan(hit_cone_angle) + enemy_radius
 		if lateral > max_allowed_lateral:
 			continue
-		# Check the specific target. A nearby floor/other target must never authorize damage through a wall.
 		var ray := PhysicsRayQueryParameters3D.create(origin,center,7)
+		ray.hit_from_inside = true
 		ray.exclude = [dragon.get_rid()]
 		var hit := get_world_3d().direct_space_state.intersect_ray(ray)
 		if not hit.is_empty() and hit.collider != enemy:
-			continue
-		enemy.damage_from_fire(48.0*delta)
+			var hit_dist: float = (hit.position as Vector3).distance_to(center)
+			var is_turret: bool = (enemy.kind == "turret")
+			var tolerance: float = 3.6 if is_turret else (2.0 if is_locked else 1.2)
+			if hit_dist > tolerance:
+				continue
+		enemy.damage_from_fire((64.0 if airborne else 48.0)*delta)
 		fire_hits += 1
 
 func damage_dragon(amount: float, source: String) -> void:
-	if not is_running() or grace > 0 or amount <= 0:
+	if is_free_flight or not is_running() or grace > 0 or amount <= 0:
 		return
 	health = maxf(0, health-amount)
 	hit_flash = 0.22
 	damage_events += 1
 	player_hurt.emit(amount)
+	if dragon:
+		GameAudio.play_dragon_hurt(dragon.global_position, amount)
 	if health <= 0:
 		phase = Phase.DEFEAT
 		_hold_player(true)
@@ -260,6 +317,8 @@ func enemy_defeated(enemy: Node) -> void:
 		_notify("El capitán del Hierro ha caído.")
 
 func objective_text() -> String:
+	if is_free_flight:
+		return "MODO VUELO LIBRE · Explora el valle y practica las maniobras. [P] Menú"
 	match phase:
 		Phase.DEFENSES: return "Destruye las ballistas · %d/%d" % [turrets_destroyed,arena.turret_spawn_points.size()]
 		Phase.CAPTAIN: return "Derrota al capitán junto al nido"

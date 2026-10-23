@@ -30,11 +30,16 @@ func reset() -> void:
 # by apply on its actual first pose; reset retains this same-skeleton cache.
 func prepare(dragon: Node3D, sk: Skeleton3D) -> void:
 	if prepared_skeleton_id == sk.get_instance_id() and not prepared_probes.is_empty(): return
-	limbs.clear()
-	prepared_probes.clear()
-	claw_probe.configure(dragon,sk,1)
+	var claw_stride := 1 if sk.get_bone_count() > 82 else 16
+	claw_probe.configure(dragon,sk,claw_stride)
 	claw_probe.samples = claw_probe.samples.filter(func(sample): return int(sample.limb_claw)>=0)
-	for end in [8,82,23,41]:
+	var claw_ends: Array[int] = []
+	if sk.get_bone_count() > 82:
+		claw_ends = [8,82,23,41]
+	else:
+		if dragon.bone_l_foot != -1: claw_ends.append(dragon.bone_l_foot)
+		if dragon.bone_r_foot != -1: claw_ends.append(dragon.bone_r_foot)
+	for end in claw_ends:
 		var foot := Probe.new()
 		foot.samples = claw_probe.samples.filter(func(sample): return int(sample.limb_claw)==end)
 		foot.profile_label = "claw_%d" % end
@@ -44,15 +49,37 @@ func prepare(dragon: Node3D, sk: Skeleton3D) -> void:
 	prepared_skeleton_id = sk.get_instance_id()
 	preparation_count += 1
 
-func _configure(sk: Skeleton3D) -> void:
-	var specs := [
-		[[5, 6, 7], 8, Vector3(-1.45, 0.0, 1.65), 0.0],
-		[[80, 81], 82, Vector3(1.35, 0.0, -2.55), 0.75],
-		[[20, 21, 22], 23, Vector3(1.45, 0.0, 1.65), 0.5],
-		[[39, 40], 41, Vector3(-1.35, 0.0, -2.55), 0.25],
-	]
+func _configure(dragon: Node3D, sk: Skeleton3D) -> void:
+	var specs := []
+	if sk.get_bone_count() > 82:
+		specs = [
+			[[5, 6, 7], 8, Vector3(-1.45, 0.0, 1.65), 0.0],
+			[[80, 81], 82, Vector3(1.35, 0.0, -2.55), 0.75],
+			[[20, 21, 22], 23, Vector3(1.45, 0.0, 1.65), 0.5],
+			[[39, 40], 41, Vector3(-1.35, 0.0, -2.55), 0.25],
+		]
+	else:
+		var l_chain: Array = []
+		var r_chain: Array = []
+		if dragon.bone_l_thigh != -1: l_chain.append(dragon.bone_l_thigh)
+		if dragon.bone_l_calf != -1: l_chain.append(dragon.bone_l_calf)
+		var tarsus_l = sk.find_bone("tarsus_L")
+		if tarsus_l != -1: l_chain.append(tarsus_l)
+		
+		if dragon.bone_r_thigh != -1: r_chain.append(dragon.bone_r_thigh)
+		if dragon.bone_r_calf != -1: r_chain.append(dragon.bone_r_calf)
+		var tarsus_r = sk.find_bone("tarsus_R")
+		if tarsus_r != -1: r_chain.append(tarsus_r)
+
+		if dragon.bone_l_foot != -1:
+			specs.append([l_chain, dragon.bone_l_foot, Vector3(-1.35, 0.0, -0.5), 0.0])
+		if dragon.bone_r_foot != -1:
+			specs.append([r_chain, dragon.bone_r_foot, Vector3(1.35, 0.0, -0.5), 0.5])
+
 	for spec in specs:
-		limbs.append({"chain": spec[0], "end": spec[1], "home": spec[2], "phase": spec[3], "planted": Vector3.ZERO, "start": Vector3.ZERO, "finish": Vector3.ZERO, "swinging": false, "initialized": false, "foot_basis": Basis.IDENTITY, "repositioning": false, "step_t": 0.0, "actual": Vector3.ZERO, "clearance": 1.4, "probe": prepared_probes[spec[1]], "contact_sample": {}, "contact_anchor": Vector3.ZERO})
+		var probe_ref = prepared_probes.get(spec[1], null)
+		if probe_ref:
+			limbs.append({"chain": spec[0], "end": spec[1], "home": spec[2], "phase": spec[3], "planted": Vector3.ZERO, "start": Vector3.ZERO, "finish": Vector3.ZERO, "swinging": false, "initialized": false, "foot_basis": Basis.IDENTITY, "repositioning": false, "step_t": 0.0, "actual": Vector3.ZERO, "clearance": 1.4, "probe": probe_ref, "contact_sample": {}, "contact_anchor": Vector3.ZERO})
 
 func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 	pose_blend = dragon.ground_blend
@@ -61,7 +88,7 @@ func apply(dragon: Node3D, sk: Skeleton3D, recovery: bool = false) -> void:
 	elif dragon.locomotion_state == dragon.LocomotionState.GROUNDED:
 		pose_blend = 1.0
 	prepare(dragon,sk)
-	if limbs.is_empty(): _configure(sk)
+	if limbs.is_empty(): _configure(dragon, sk)
 	debug_contacts.clear()
 	debug_errors.clear()
 	# The same terrain transform is used for every original claw vertex in

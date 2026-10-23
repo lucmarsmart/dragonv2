@@ -97,6 +97,7 @@ func capture_pose() -> void:
 				if clearance<-.05: terrain_under += 1
 	for index in dragon.wing_contact.hulls.size():
 		for mask in [1,2]:
+			if dragon.wing_contact.hulls[index].points.size() < 4: continue
 			var query := PhysicsShapeQueryParameters3D.new()
 			query.shape = dragon.wing_contact.hulls[index]
 			query.transform = dragon.global_transform

@@ -34,6 +34,7 @@ func _physics_process(delta: float) -> void:
 			combat.damage_dragon(damage, "Virote de ballista")
 		combat.projectile_impacts += 1
 		combat.spawn_impact(result.position, result.normal, false)
+		GameAudio.play_ballista_impact(result.position)
 		queue_free()
 		return
 	global_position = end

@@ -250,6 +250,7 @@ static func spawn_water_splash(parent: Node, point: Vector3, normal: Vector3, se
 	var s := clampf(severity, 0.4, 4.5)
 
 	# Audio violento de entrada al agua / splashdown
+	GameAudio.play_water_splash(point, s > 1.2)
 	_play_audio(parent, point, _get_water_sound(), clampf(-10.0 + s * 3.5, -18.0, 5.0))
 
 	# --- A. Géiser central de espuma blanca vertical (Foam Geyser Spikes) ---

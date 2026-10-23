@@ -70,6 +70,10 @@ func run() -> void:
 	dragon.target_pitch = 0
 	dragon.target_roll = 0
 	dragon.velocity = Vector3.ZERO
+	dragon.current_speed = 0.0
+	dragon.manual_input_override = true
+	dragon.manual_move_input = 0.0
+	dragon.manual_turn_input = 0.0
 	
 	await ticks(15)
 	

@@ -11,20 +11,32 @@ var convex_bounds: Dictionary = {}
 func _drive(dragon: Node3D, sk: Skeleton3D, wanted: Vector3) -> void:
 	var head: int = dragon.bone_head_idx
 	var muzzle := sk.find_bone("Point021_018")
+	if muzzle < 0:
+		muzzle = sk.find_bone("jaw")
 	# The source's basal Neck joint also parents both fore-leg clavicles.
 	# Aim through the two upper cervicals and skull so looking sideways does
 	# not pull the load-bearing shoulders and planted forefeet with the head.
-	# Los cervicales reparten parte del giro y el cráneo completa el resto. Con 0.40 en el cráneo el
-	# cuello sólo recorría ~71 % por cuadro desde la pose animada y convergía ~10 grados sobre ella,
-	# pidiera lo que pidiera (hocico 20 grados abajo en tierra, fuego hacia el suelo).
-	for pair in [[dragon.bone_neck_indices[1], 0.22], [dragon.bone_neck_indices[2], 0.38], [head, 1.0]]:
-		var current := (sk.to_global(sk.get_bone_global_pose(muzzle).origin) - sk.to_global(sk.get_bone_global_pose(head).origin)).normalized()
+	var neck_pairs := []
+	if dragon.bone_neck_indices.size() > 1:
+		neck_pairs.append([dragon.bone_neck_indices[1], 0.22])
+	if dragon.bone_neck_indices.size() > 2:
+		neck_pairs.append([dragon.bone_neck_indices[2], 0.38])
+	neck_pairs.append([head, 1.0])
+	for pair in neck_pairs:
+		var current: Vector3
+		if muzzle >= 0:
+			current = (sk.to_global(sk.get_bone_global_pose(muzzle).origin) - sk.to_global(sk.get_bone_global_pose(head).origin)).normalized()
+		else:
+			current = wanted
 		var correction := Quaternion.IDENTITY.slerp(Quaternion(current, wanted), float(pair[1]))
 		var b: int = pair[0]
 		var parent := sk.get_bone_parent(b)
 		var parent_world := (sk.global_basis * sk.get_bone_global_pose(parent).basis).orthonormalized().get_rotation_quaternion()
 		sk.set_bone_pose_rotation(b, parent_world.inverse() * correction * parent_world * sk.get_bone_pose_rotation(b))
-	dragon.head_rendered_direction = (sk.to_global(sk.get_bone_global_pose(muzzle).origin) - sk.to_global(sk.get_bone_global_pose(head).origin)).normalized()
+	if muzzle >= 0:
+		dragon.head_rendered_direction = (sk.to_global(sk.get_bone_global_pose(muzzle).origin) - sk.to_global(sk.get_bone_global_pose(head).origin)).normalized()
+	else:
+		dragon.head_rendered_direction = wanted
 
 func _neck_contact(dragon: Node3D, sk: Skeleton3D) -> bool:
 	if probe.samples.is_empty():
@@ -103,8 +115,9 @@ func _limited_direction(previous: Vector3, wanted: Vector3, step: float) -> Vect
 
 func apply(dragon: Node3D, sk: Skeleton3D) -> void:
 	var head: int = dragon.bone_head_idx
+	if head < 0: return
 	var muzzle := sk.find_bone("Point021_018")
-	if head < 0 or muzzle < 0: return
+	if muzzle < 0: muzzle = sk.find_bone("jaw")
 	var bones: Array = dragon.bone_neck_indices.duplicate()
 	bones.append(head)
 	var nearby := _obstacle_near(dragon)
@@ -122,7 +135,10 @@ func apply(dragon: Node3D, sk: Skeleton3D) -> void:
 			sk.set_bone_pose_rotation(root,local.basis.orthonormalized().get_rotation_quaternion())
 			for bone in last_safe_pose.children:
 				sk.set_bone_pose_rotation(int(bone),last_safe_pose.children[bone].rotation)
-			dragon.head_rendered_direction = (sk.to_global(sk.get_bone_global_pose(muzzle).origin)-sk.to_global(sk.get_bone_global_pose(head).origin)).normalized()
+			if muzzle >= 0:
+				dragon.head_rendered_direction = (sk.to_global(sk.get_bone_global_pose(muzzle).origin)-sk.to_global(sk.get_bone_global_pose(head).origin)).normalized()
+			else:
+				dragon.head_rendered_direction = wanted
 	else:
 		var children := {}
 		for bone in bones:

@@ -25,6 +25,9 @@ var _tree_transforms: Array[Transform3D] = []
 var _tree_species: Array[String] = []
 var _tree_variants: Array[int] = []
 var _mature_fir_transforms: Array[Transform3D] = []
+var boulder_transforms: Array[Transform3D] = []
+var river_boulder_transforms: Array[Transform3D] = []
+var log_transforms: Array[Transform3D] = []
 var _tree_lods: Array = []
 var _forest_nodes: Array[MultiMeshInstance3D] = []
 var _lod_timer := 0.0
@@ -64,6 +67,9 @@ func _ready() -> void:
 	_terrain_material.set_shader_parameter("rock_albedo", load("res://assets/environment/rock_face_diff_2k.jpg"))
 	_terrain_material.set_shader_parameter("earth_albedo", load("res://assets/environment/forest_ground_04_diffuse.jpg"))
 	_terrain_material.set_shader_parameter("grass_albedo", load("res://assets/environment/aerial_grass_diff.jpg"))
+	_terrain_material.set_shader_parameter("pebbles_albedo", load("res://assets/environment/pebbles/river_pebbles_diff_2k.jpg"))
+	_terrain_material.set_shader_parameter("pebbles_normal", load("res://assets/environment/pebbles/river_pebbles_nor_gl_2k.jpg"))
+	_terrain_material.set_shader_parameter("pebbles_roughness", load("res://assets/environment/pebbles/river_pebbles_rough_2k.jpg"))
 	_build_ground()
 	_build_distant_ridges()
 	_build_water()
@@ -555,6 +561,18 @@ func _asset_mesh(path: String) -> Mesh:
 	scene.free()
 	return merged
 
+func _load_glb_mesh(path: String) -> Mesh:
+	if not ResourceLoader.exists(path):
+		return null
+	var sc := load(path) as PackedScene
+	if not sc:
+		return null
+	var inst := sc.instantiate()
+	var mi := inst.find_child("*", true, false) as MeshInstance3D
+	var m: Mesh = mi.mesh if mi else null
+	inst.free()
+	return m
+
 func _merge_asset(node: Node, transform: Transform3D, st: SurfaceTool, merged: ArrayMesh) -> void:
 	var t := transform
 	if node is Node3D:
@@ -772,6 +790,10 @@ func _build_forest() -> void:
 			species_meshes[sp].append(m)
 
 	var rocks: Array[Transform3D] = []
+	var scanned_boulders_01: Array[Transform3D] = []
+	var namaqualand_boulders: Array[Transform3D] = []
+	var fallen_logs: Array[Transform3D] = []
+	var river_pebble_clusters: Array[Transform3D] = []
 	var grasses_0: Array[Transform3D] = []
 	var grasses_1: Array[Transform3D] = []
 	var grasses_hill: Array[Transform3D] = []
@@ -1067,6 +1089,137 @@ func _build_forest() -> void:
 		var b_e := Basis.from_euler(Vector3(_rng.randf() * TAU, _rng.randf() * TAU, _rng.randf() * TAU)).scaled(Vector3(_rng.randf_range(0.85, 2.8), _rng.randf_range(0.45, 1.9), _rng.randf_range(0.85, 2.8)))
 		rocks.append(Transform3D(b_e, Vector3(x_e, h_e - 0.12, z_e)))
 
+	# Photogrammetric Scanned Boulders (boulder_01 & namaqualand) on fortress slopes and riverbed
+	# 1. Fortress Slopes & Perimeter Rocky Outcrops
+	for i in 60:
+		var angle := _rng.randf() * TAU
+		var dist := _rng.randf_range(68.0, 130.0)
+		var bx := ARENA_CENTER.x + cos(angle) * dist
+		var bz := ARENA_CENTER.z + sin(angle) * dist
+		if bz > 140.0 and bz < 380.0 and absf(bx - 300.0) < 18.0:
+			continue
+		var bh := ground_height(bx, bz)
+		if bh < 3.0:
+			continue
+		var s_xz := _rng.randf_range(1.1, 2.8)
+		var s_y := _rng.randf_range(0.8, 2.2)
+		var yaw := Basis(Vector3.UP, _rng.randf() * TAU)
+		var tilt := Basis(Vector3.RIGHT, _rng.randf_range(-0.15, 0.15)) * Basis(Vector3.FORWARD, _rng.randf_range(-0.15, 0.15))
+		var b_rot := (yaw * tilt).scaled(Vector3(s_xz, s_y, s_xz))
+		var xf := Transform3D(b_rot, Vector3(bx, bh - _rng.randf_range(0.04, 0.16), bz))
+		boulder_transforms.append(xf)
+		if i % 2 == 0:
+			scanned_boulders_01.append(xf)
+		else:
+			namaqualand_boulders.append(xf)
+
+	# 2. Cauce del Río & Riparian Stream Beds
+	for i in 180:
+		var rz := _rng.randf_range(-950.0, 950.0)
+		var rx := river_center(rz) + _rng.randf_range(-0.95, 0.95) * river_width(rz)
+		var rh := ground_height(rx, rz)
+		if rh >= -2.8 and rh <= 2.2:
+			var s_xz := _rng.randf_range(1.0, 2.8)
+			var s_y := _rng.randf_range(0.7, 2.0)
+			var yaw := Basis(Vector3.UP, _rng.randf() * TAU)
+			var tilt := Basis(Vector3.RIGHT, _rng.randf_range(-0.12, 0.12)) * Basis(Vector3.FORWARD, _rng.randf_range(-0.12, 0.12))
+			var b_rot := (yaw * tilt).scaled(Vector3(s_xz, s_y, s_xz))
+			var xf := Transform3D(b_rot, Vector3(rx, rh - _rng.randf_range(0.04, 0.15), rz))
+			river_boulder_transforms.append(xf)
+			if i % 3 == 0:
+				namaqualand_boulders.append(xf)
+			else:
+				scanned_boulders_01.append(xf)
+
+	for i in 45:
+		var zw := _rng.randf_range(-230.0, 320.0)
+		var xw := stream_west_center(zw) + _rng.randf_range(-10.0, 10.0)
+		var hw := ground_height(xw, zw)
+		var bw := Basis.from_euler(Vector3(_rng.randf() * TAU, _rng.randf() * TAU, _rng.randf() * TAU)).scaled(Vector3.ONE * _rng.randf_range(0.9, 2.4))
+		scanned_boulders_01.append(Transform3D(bw, Vector3(xw, hw - 0.10, zw)))
+
+	for i in 40:
+		var ze := _rng.randf_range(-340.0, 180.0)
+		var xe := stream_east_center(ze) + _rng.randf_range(-9.0, 9.0)
+		var he := ground_height(xe, ze)
+		var be := Basis.from_euler(Vector3(_rng.randf() * TAU, _rng.randf() * TAU, _rng.randf() * TAU)).scaled(Vector3.ONE * _rng.randf_range(0.9, 2.4))
+		namaqualand_boulders.append(Transform3D(be, Vector3(xe, he - 0.10, ze)))
+
+	# 4. Piedras de Rio y Bancos de Grava (river_pebbles_cluster)
+	for i in 220:
+		var rz := _rng.randf_range(-960.0, 960.0)
+		var rx := river_center(rz) + _rng.randf_range(-1.25, 1.25) * river_width(rz)
+		var rh := ground_height(rx, rz)
+		if rh >= -2.6 and rh <= 2.8:
+			var p_scale := Vector3(_rng.randf_range(0.85, 2.3), _rng.randf_range(0.55, 1.35), _rng.randf_range(0.85, 2.3))
+			var p_rot := Basis(Vector3.UP, _rng.randf() * TAU).scaled(p_scale)
+			river_pebble_clusters.append(Transform3D(p_rot, Vector3(rx, rh - 0.08, rz)))
+
+	for i in 75:
+		var a := _rng.randf() * TAU
+		var r := LAKE_RADIUS + _rng.randf_range(-14.0, 18.0)
+		var lx := LAKE_CENTER.x + cos(a) * r
+		var lz := LAKE_CENTER.y + sin(a) * r
+		var lh := ground_height(lx, lz)
+		if lh >= -2.0 and lh <= 3.0:
+			var p_scale := Vector3(_rng.randf_range(0.9, 2.5), _rng.randf_range(0.6, 1.4), _rng.randf_range(0.9, 2.5))
+			var p_rot := Basis(Vector3.UP, _rng.randf() * TAU).scaled(p_scale)
+			river_pebble_clusters.append(Transform3D(p_rot, Vector3(lx, lh - 0.07, lz)))
+
+	for i in 60:
+		var zw := _rng.randf_range(-230.0, 320.0)
+		var xw := stream_west_center(zw) + _rng.randf_range(-12.0, 12.0)
+		var hw := ground_height(xw, zw)
+		if hw >= -1.5 and hw <= 3.2:
+			var p_rot := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * _rng.randf_range(0.8, 1.9))
+			river_pebble_clusters.append(Transform3D(p_rot, Vector3(xw, hw - 0.08, zw)))
+
+	for i in 50:
+		var ze := _rng.randf_range(-340.0, 180.0)
+		var xe := stream_east_center(ze) + _rng.randf_range(-11.0, 11.0)
+		var he := ground_height(xe, ze)
+		if he >= -1.5 and he <= 3.2:
+			var p_rot := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * _rng.randf_range(0.8, 1.9))
+			river_pebble_clusters.append(Transform3D(p_rot, Vector3(xe, he - 0.08, ze)))
+
+	# 3. Tronco de Bosque Caído (dead_tree_trunk_02) en claros del bosque y zonas abiertas de planeo bajo
+	var add_log := func(lx: float, lz: float):
+		var yaw := _rng.randf() * TAU
+		var dir := Vector3(cos(yaw), 0.0, sin(yaw))
+		var p1 := Vector3(lx - dir.x * 2.0, ground_height(lx - dir.x * 2.0, lz - dir.z * 2.0), lz - dir.z * 2.0)
+		var p2 := Vector3(lx + dir.x * 2.0, ground_height(lx + dir.x * 2.0, lz + dir.z * 2.0), lz + dir.z * 2.0)
+		var tangent := (p2 - p1).normalized()
+		var side := tangent.cross(Vector3.UP).normalized()
+		var up := side.cross(tangent).normalized()
+		var scale_val := _rng.randf_range(0.92, 1.38)
+		var b := Basis(tangent, up, side).scaled(Vector3.ONE * scale_val)
+		var xf := Transform3D(b, Vector3(lx, (p1.y + p2.y) * 0.5 + 0.12 * scale_val, lz))
+		fallen_logs.append(xf)
+		log_transforms.append(xf)
+
+	for i in 28:
+		var lx := _rng.randf_range(115.0, 235.0)
+		var lz := _rng.randf_range(48.0, 195.0)
+		if ground_height(lx, lz) > WATER_LEVEL + 0.5:
+			add_log.call(lx, lz)
+
+	for i in 22:
+		var a := _rng.randf() * TAU
+		var r := _rng.randf_range(LAKE_RADIUS + 8.0, LAKE_CLEARING_RADIUS + 30.0)
+		var lx := LAKE_CENTER.x + cos(a) * r
+		var lz := LAKE_CENTER.y + sin(a) * r
+		if ground_height(lx, lz) > WATER_LEVEL + 0.4:
+			add_log.call(lx, lz)
+
+	for i in 40:
+		var lx := _rng.randf_range(-850.0, 850.0)
+		var lz := _rng.randf_range(-850.0, 850.0)
+		var h := ground_height(lx, lz)
+		if h > 1.5 and h < 9.0 and not is_water_at(Vector3(lx, 0, lz)):
+			var glade_val := _noise.get_noise_2d(lx * 0.005 + 520.0, lz * 0.005 - 280.0)
+			if glade_val > 0.38:
+				add_log.call(lx, lz)
+
 	# Batch mature firs with 4 LOD levels in 4x4 spatial cells
 	for lod in 4:
 		for cz in 4:
@@ -1080,6 +1233,31 @@ func _build_forest() -> void:
 	boulders.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	boulders.visibility_range_end = 550.0
 	boulders.visibility_range_end_margin = 60.0
+
+	# Instanced GPU Scenery MultiMeshes (1 draw call each)
+	var mesh_scanned_boulder_01 := _load_glb_mesh("res://assets/environment/rock/boulder_scanned_01.glb")
+	if mesh_scanned_boulder_01 and scanned_boulders_01.size() > 0:
+		var node_sb := _batch(mesh_scanned_boulder_01, scanned_boulders_01, "ScannedGraniteBoulders_01")
+		node_sb.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		node_sb.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+
+	var mesh_boulder_namaqualand := _load_glb_mesh("res://assets/environment/rock/boulder_namaqualand.glb")
+	if mesh_boulder_namaqualand and namaqualand_boulders.size() > 0:
+		var node_nb := _batch(mesh_boulder_namaqualand, namaqualand_boulders, "NamaqualandMonolithBoulders")
+		node_nb.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		node_nb.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+
+	var mesh_dead_trunk := _load_glb_mesh("res://assets/environment/trees/dead_tree_trunk_02.glb")
+	if mesh_dead_trunk and fallen_logs.size() > 0:
+		var node_dt := _batch(mesh_dead_trunk, fallen_logs, "FallenOldGrowthTrunks")
+		node_dt.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		node_dt.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+
+	var mesh_pebbles := _load_glb_mesh("res://assets/environment/pebbles/river_pebbles_cluster.glb")
+	if mesh_pebbles and river_pebble_clusters.size() > 0:
+		var node_pebbles := _batch(mesh_pebbles, river_pebble_clusters, "RiverPebbleClusters")
+		node_pebbles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		node_pebbles.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 	# Dense 3D grass blade covering on the hill behind the nest ("cubierta de brisnas de pasto que se muevan tengan forma y textura y parezcan reales")
 	for i in 6500:
 		var x := _rng.randf_range(370.0, 520.0)
@@ -1197,34 +1375,58 @@ func _setup_atmosphere() -> void:
 	var world := get_parent().get_node_or_null("WorldEnvironment") as WorldEnvironment
 	var sun := get_parent().get_node_or_null("DirectionalLight3D") as DirectionalLight3D
 	if sun:
-		sun.rotation_degrees = Vector3(-39.0, -38.0, 0)
-		sun.light_color = Color(1.0, 0.96, 0.88)
-		sun.light_energy = 1.32
-		sun.light_angular_distance = 0.65
+		# Calibrated to exact solar center of Kloofendal Pure Sky HDR (Elevation 47.8°, Azimuth 34.1°)
+		sun.rotation_degrees = Vector3(-47.8, -34.1, 0.0)
+		sun.light_color = Color(1.0, 0.97, 0.92)
+		sun.light_energy = 1.36
+		sun.light_angular_distance = 0.72
 		sun.shadow_enabled = true
 		sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 		sun.directional_shadow_blend_splits = false
-		sun.directional_shadow_max_distance = 240.0
+		sun.directional_shadow_max_distance = 250.0
 		sun.directional_shadow_fade_start = 0.85
 	if world and world.environment:
 		var env := world.environment
-		var sky_material := ShaderMaterial.new()
-		sky_material.shader = load("res://shaders/landscape_sky.gdshader")
-		if sun:
-			sky_material.set_shader_parameter("sun_direction", sun.global_basis.z)
+		var hdri_path := "res://materials/kloofendal_sky_2k.hdr"
+		var fallback_hdri := "res://materials/citrus_sky_2k.hdr"
 		var sky := Sky.new()
-		sky.sky_material = sky_material
-		sky.radiance_size = Sky.RADIANCE_SIZE_256
-		sky.process_mode = Sky.PROCESS_MODE_INCREMENTAL
+		if ResourceLoader.exists(hdri_path):
+			var panorama_mat := PanoramaSkyMaterial.new()
+			panorama_mat.panorama = load(hdri_path) as Texture2D
+			panorama_mat.filter = true
+			sky.sky_material = panorama_mat
+			sky.radiance_size = Sky.RADIANCE_SIZE_512
+			sky.process_mode = Sky.PROCESS_MODE_QUALITY
+		elif ResourceLoader.exists(fallback_hdri):
+			var panorama_mat := PanoramaSkyMaterial.new()
+			panorama_mat.panorama = load(fallback_hdri) as Texture2D
+			panorama_mat.filter = true
+			sky.sky_material = panorama_mat
+			sky.radiance_size = Sky.RADIANCE_SIZE_512
+			sky.process_mode = Sky.PROCESS_MODE_QUALITY
+		else:
+			var sky_material := ShaderMaterial.new()
+			sky_material.shader = load("res://shaders/landscape_sky.gdshader")
+			if sun:
+				sky_material.set_shader_parameter("sun_direction", sun.global_basis.z)
+			sky.sky_material = sky_material
+			sky.radiance_size = Sky.RADIANCE_SIZE_256
+			sky.process_mode = Sky.PROCESS_MODE_INCREMENTAL
+		env.background_mode = Environment.BG_SKY
 		env.sky = sky
 		env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-		env.ambient_light_energy = 0.58
+		env.ambient_light_energy = 0.76
+		env.ambient_light_sky_contribution = 0.85
 		env.fog_enabled = true
-		env.fog_density = 0.00022
-		env.fog_sky_affect = 0.18
-		env.fog_light_color = Color(0.70, 0.82, 0.94)
+		env.fog_density = 0.00020
+		env.fog_sky_affect = 0.16
+		env.fog_light_color = Color(0.72, 0.82, 0.94)
 		env.fog_sun_scatter = 0.35
 		env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+		env.adjustment_enabled = true
+		env.adjustment_contrast = 1.06
+		env.adjustment_saturation = 1.04
+		# Disabled heavy GPU passes for maximum 60 FPS stability
 		env.ssao_enabled = false
 		env.ssil_enabled = false
 		env.sdfgi_enabled = false
