@@ -9,16 +9,16 @@ class_name FlightCamera
 enum ViewPreset { BACK, HEAD, FRONT, RIGHT, LEFT }
 
 @export var target_node: Node3D
-@export var distance: float = 16.0              # Distancia óptima detrás del dragón
-@export var height: float = 5.0                  # Altura sobre el lomo
+@export var distance: float = 8.5              # Distancia óptima detrás del dragón
+@export var height: float = 2.8                  # Altura sobre el lomo
 @export var follow_smoothness: float = 16.0     # Suavidad y firmeza de seguimiento de posición
 @export var flight_follow_smoothness: float = 9.5 # Seguimiento con inercia en vuelo libre
-@export var rider_distance: float = 14.2         # Vista trasera en vuelo (ref. Dragontwin): encuadre heroico cercano
-@export var rider_height: float = 5.4            # Vista trasera en vuelo: muestra horizonte, montañas y nubes
-@export var ground_view_distance: float = 14.0   # En tierra: el animal entero desde atrás y arriba
-@export var ground_view_height: float = 7.5
-@export var landing_view_distance: float = 19.0  # Aterrizaje: encuadre amplio desde afuera, se ve el contacto
-@export var landing_view_height: float = 9.0
+@export var rider_distance: float = 7.4         # Vista trasera en vuelo (ref. Dragontwin): encuadre heroico cercano
+@export var rider_height: float = 2.9            # Vista trasera en vuelo: muestra horizonte, montañas y nubes
+@export var ground_view_distance: float = 7.2   # En tierra: el animal entero desde atrás y arriba
+@export var ground_view_height: float = 3.6
+@export var landing_view_distance: float = 9.8  # Aterrizaje: encuadre amplio desde afuera, se ve el contacto
+@export var landing_view_height: float = 4.4
 @export var cinematic_drift: float = 0.45        # Deriva orbital lenta en vuelo (rad): no siempre desde atrás
 @export var intro_seconds: float = 4.5           # Barrido de entrada desde un costado y delante
 @export var cinematic_turn_swing: float = 0.72   # Apertura hacia el exterior del viraje (rad a giro máximo)

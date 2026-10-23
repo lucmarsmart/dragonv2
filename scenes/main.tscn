@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cq5puhhmjqr31" path="res://scripts/combat/siege_combat.gd" id="11_combat"]
 [ext_resource type="Script" uid="uid://crachaqutgs5p" path="res://scripts/combat/siege_ui.gd" id="12_mission_ui"]
 [ext_resource type="Shader" path="res://materials/sky_dragon.gdshader" id="13_sky"]
+[ext_resource type="Script" path="res://scripts/game_audio.gd" id="14_audio"]
 
 [sub_resource type="ShaderMaterial" id="ProceduralSkyMaterial_sky"]
 shader = ExtResource("13_sky")
@@ -45,7 +46,7 @@ adjustment_contrast = 1.08
 adjustment_saturation = 1.05
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_dragon"]
-radius = 4.0
+radius = 1.6
 
 [node name="Main" type="Node3D" unique_id=94237171]
 
@@ -70,7 +71,6 @@ directional_shadow_max_distance = 260.0
 script = ExtResource("6_terrain")
 
 [node name="SiegeEnvironment" type="Node3D" parent="." unique_id=1458108067]
-transform = Transform3D(1, 0, 0, 0, 0.9462397, -0.3234662, 0, 0.3234662, 0.9462397, 0, 0, 0)
 script = ExtResource("10_fort")
 
 [node name="Dragon" type="CharacterBody3D" parent="." unique_id=104799319]
@@ -86,7 +86,7 @@ shape = SubResource("SphereShape3D_dragon")
 transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, 0, 0, 0)
 
 [node name="DragonModel" parent="Dragon/VisualModel" unique_id=1683796004 instance=ExtResource("4_dragon_model")]
-transform = Transform3D(0.99998355, -0.0057235416, 3.5136938e-05, 0.005723542, 0.99990827, -0.012274186, 3.5107136e-05, 0.012274184, 0.99992454, -0.026245117, -0.49476624, 0.056289673)
+transform = Transform3D(0.40, 0, 0, 0, 0.40, 0, 0, 0, 0.40, -0.01, -0.20, 0.02)
 script = ExtResource("9_skin")
 
 [node name="DragonBreath" type="Node3D" parent="Dragon" unique_id=2013395655]
@@ -233,3 +233,6 @@ script = ExtResource("11_combat")
 
 [node name="SiegeUI" type="CanvasLayer" parent="." unique_id=90920404]
 script = ExtResource("12_mission_ui")
+
+[node name="GameAudio" type="Node" parent="." unique_id=884712034]
+script = ExtResource("14_audio")

@@ -53,7 +53,7 @@ func _prepare() -> void:
 	if not is_instance_valid(arena):
 		push_error("Siege environment is required for mission")
 		return
-	if arena.turret_spawn_points.size() != 3 or arena.knight_spawn_points.size() < 2:
+	if arena.turret_spawn_points.size() < 3 or arena.knight_spawn_points.size() < 2:
 		push_error("Mission cannot initialize without fortress and all enemy spawn points")
 		return
 	for path in ["res://assets/characters/knight.glb","res://assets/siege/weapons/ballista.glb"]:

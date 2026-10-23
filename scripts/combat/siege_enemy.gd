@@ -82,8 +82,15 @@ func _ready() -> void:
 	add_child(label)
 	cooldown = 2.0 + float(get_instance_id() % 19) * 0.08
 
+static var _cached_captain_scene: PackedScene
+
 func _load_visual() -> void:
-	var path := "res://assets/siege/weapons/ballista.glb" if kind == "turret" else "res://assets/characters/knight.glb"
+	var path := "res://assets/siege/weapons/ballista.glb"
+	if kind == "captain":
+		path = "res://assets/characters/knight_captain.glb"
+	elif kind == "knight":
+		path = "res://assets/characters/knight.glb"
+		
 	if not ResourceLoader.exists(path):
 		push_error("Required siege model missing: " + path)
 		return
@@ -92,6 +99,10 @@ func _load_visual() -> void:
 		if not _cached_turret_scene:
 			_cached_turret_scene = load(path) as PackedScene
 		packed = _cached_turret_scene
+	elif kind == "captain":
+		if not _cached_captain_scene:
+			_cached_captain_scene = load(path) as PackedScene
+		packed = _cached_captain_scene
 	else:
 		if not _cached_knight_scene:
 			_cached_knight_scene = load(path) as PackedScene
@@ -242,6 +253,8 @@ func _line_of_sight(target: Vector3, excluded: Array[RID]) -> bool:
 	var eye_height := 1.7 * knight_scale if kind != "turret" else 1.8
 	var query := PhysicsRayQueryParameters3D.create(global_position+Vector3.UP*eye_height,target,3)
 	query.exclude = excluded
+	query.hit_from_inside = true
+	query.hit_back_faces = true
 	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 func _update_turret(delta: float,target: Vector3,range_to_target: float) -> void:

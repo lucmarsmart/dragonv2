@@ -24,6 +24,9 @@ func _ready() -> void:
 	_build_positions()
 	_build_captive_egg()
 	_build_sentinels_and_relics()
+	
+	_build_ground_catapults()
+	_build_leaning_wall_props()
 	print("SIEGE ENVIRONMENT arena=", arena_center, " unified castle citadel integrated (1 draw call)")
 
 func _build_fortress() -> void:
@@ -55,7 +58,7 @@ func _build_fortress() -> void:
 		_add_mesh_collisions(lantern)
 
 	# Defensive artillery positions remain low enough to be attacked from the court.
-	for offset in [Vector3(-49, 0, -30), Vector3(49, 0, -30), Vector3(50, 0, 42)]:
+	for offset in [Vector3(-49, 0, -30), Vector3(49, 0, -30), Vector3(62, 0, 35)]:
 		_platform(c + offset)
 
 	# Eroded stone nests, assembled from scanned geometry; central approach stays clear.
@@ -112,10 +115,16 @@ func _add_mesh_collisions(node: Node) -> void:
 			_add_mesh_collisions(child)
 
 func _build_positions() -> void:
-	for offset in [Vector3(-32, 0, 7), Vector3(31, 0, 12), Vector3(-22, 0, -16), Vector3(23, 0, -17), Vector3(-24, 0, 44), Vector3(24, 0, 48), Vector3(-56, 0, 16), Vector3(58, 0, 4)]:
+	# El Capitán blanco templario en la puerta de honor (índice 0), y soldados grises distribuidos
+	for offset in [Vector3(0, 0, 32), Vector3(-24, 0, 12), Vector3(24, 0, 12), Vector3(-18, 0, -16), Vector3(18, 0, -16), Vector3(-28, 0, 44), Vector3(28, 0, 44), Vector3(0, 0, 52)]:
 		knight_spawn_points.append(arena_center + offset)
-	for offset in [Vector3(-49, 4.5, -30), Vector3(49, 4.5, -30), Vector3(50, 4.5, 42)]:
-		turret_spawn_points.append(arena_center + offset)
+	# BALLESTAS EN LO ALTO DE LAS TORRES REDONDAS DEL CASTILLO (Foto de torre almenada)
+	turret_spawn_points = [
+		Vector3(259.18, 50.35, 163.71),
+		Vector3(340.65, 50.35, 164.17),
+		Vector3(340.65, 50.35, 76.52),
+		Vector3(259.34, 50.35, 76.52)
+	]
 	rescue_point = arena_center + Vector3(0, 0, -38)
 	escape_point = _landscape.to_global(Vector3(300, _landscape.ground_height(300, 275), 275))
 	approach_spawn = arena_center + Vector3(0, 76, 230)
@@ -291,3 +300,52 @@ func _build_sentinels_and_relics() -> void:
 				child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 				child.visibility_range_end = 180.0
 			_add_mesh_collisions(sword_inst)
+
+func _build_ground_catapults() -> void:
+	# CATAPULTAS ABAJO EN EL SUELO Y PATIO DE ARMAS (Foto de catapulta con municiones de piedra)
+	var cat_path := "res://assets/siege/weapons/catapult.glb"
+	if ResourceLoader.exists(cat_path):
+		var cat_scene := load(cat_path) as PackedScene
+		var ground_posts := [
+			{"pos": arena_center + Vector3(-26.0, 0.0, 56.0), "yaw": 0.15, "scale": 1.25},
+			{"pos": arena_center + Vector3(26.0, 0.0, 56.0), "yaw": -0.15, "scale": 1.25},
+			{"pos": arena_center + Vector3(0.0, 0.0, -12.0), "yaw": PI, "scale": 1.30}
+		]
+		for i in ground_posts.size():
+			var p = ground_posts[i]
+			var cat := cat_scene.instantiate() as Node3D
+			cat.name = "GroundSiegeCatapult_%d" % i
+			cat.position = p.pos
+			cat.rotation.y = p.yaw
+			cat.scale = Vector3.ONE * p.scale
+			add_child(cat)
+			for child: MeshInstance3D in cat.find_children("*", "MeshInstance3D", true, false):
+				child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+				child.visibility_range_end = 260.0
+			_add_mesh_collisions(cat)
+
+func _build_leaning_wall_props() -> void:
+	# BARRILES, LANZAS, HACHAS Y ESPADAS APOYADAS/TIRADAS JUNTO A LA PARED (Foto de armas y barriles)
+	var props_path := "res://assets/siege/environment/props/citadel_wall_props.glb"
+	if ResourceLoader.exists(props_path):
+		var props_scene := load(props_path) as PackedScene
+		var wall_spots := [
+			{"pos": arena_center + Vector3(-34.0, 0.0, 22.0), "yaw": PI * 0.5},
+			{"pos": arena_center + Vector3(34.0, 0.0, 22.0), "yaw": -PI * 0.5},
+			{"pos": arena_center + Vector3(-32.0, 0.0, -8.0), "yaw": PI * 0.45},
+			{"pos": arena_center + Vector3(32.0, 0.0, -8.0), "yaw": -PI * 0.45},
+			{"pos": arena_center + Vector3(-12.0, 0.0, 48.0), "yaw": 0.0},
+			{"pos": arena_center + Vector3(12.0, 0.0, 48.0), "yaw": 0.0}
+		]
+		for i in wall_spots.size():
+			var s = wall_spots[i]
+			var prop := props_scene.instantiate() as Node3D
+			prop.name = "CitadelWallProps_%d" % i
+			prop.position = s.pos
+			prop.rotation.y = s.yaw
+			prop.scale = Vector3.ONE * 1.05
+			add_child(prop)
+			for child: MeshInstance3D in prop.find_children("*", "MeshInstance3D", true, false):
+				child.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+				child.visibility_range_end = 160.0
+			_add_mesh_collisions(prop)

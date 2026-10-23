@@ -778,16 +778,18 @@ func _build_forest() -> void:
 		_decimate_pine_mesh(pine_base, 32, 1.65, AABB(Vector3(-0.360049, -0.015808, -0.371449), Vector3(0.787533, 1.295364, 0.727553)))
 	]
 
-	# Deciduous broadleaf species with smooth botanical meshes:
-	for sp in ["oak", "birch", "eucalyptus"]:
-		species_meshes[sp] = []
-		for v in range(1, 4):
-			var p := "res://assets/environment/trees/tree_%s_var%d.res" % [sp, v]
-			var m := load(p) as ArrayMesh
-			if m:
-				for s in m.get_surface_count():
-					_simplify_material(m.surface_get_material(s) as StandardMaterial3D)
-			species_meshes[sp].append(m)
+	# NEW REALISTIC 3D SCANNED TREE ASSETS (Completely replaces all old procedural trees):
+	var narnia_tree := _asset_mesh("res://assets/environment/narnia/narnia_tree_3d.glb") as ArrayMesh
+	var searsia_tree := _asset_mesh("res://assets/environment/trees/searsia_tree.glb") as ArrayMesh
+	if not narnia_tree: narnia_tree = fir_lod1
+	if not searsia_tree: searsia_tree = fir_lod2
+	for m in [narnia_tree, searsia_tree]:
+		for s in m.get_surface_count():
+			_simplify_material(m.surface_get_material(s) as StandardMaterial3D)
+
+	species_meshes["oak"] = [narnia_tree, _clone_mesh_with_aabb(narnia_tree, narnia_tree.get_aabb()), _clone_mesh_with_aabb(searsia_tree, searsia_tree.get_aabb())]
+	species_meshes["birch"] = [searsia_tree, _clone_mesh_with_aabb(searsia_tree, searsia_tree.get_aabb()), _clone_mesh_with_aabb(narnia_tree, narnia_tree.get_aabb())]
+	species_meshes["eucalyptus"] = [narnia_tree, _clone_mesh_with_aabb(searsia_tree, searsia_tree.get_aabb()), _clone_mesh_with_aabb(fir_lod2, fir_lod2.get_aabb())]
 
 	var rocks: Array[Transform3D] = []
 	var scanned_boulders_01: Array[Transform3D] = []
@@ -1037,6 +1039,38 @@ func _build_forest() -> void:
 		for v in range(3):
 			if species_transforms[sp][v].size() > 0:
 				_batch_spatial(species_meshes[sp][v], species_transforms[sp][v], "Tree_%s_v%d" % [sp, v], 6, 1000.0, 580.0, 70.0)
+
+	# 1. Modular Wooden Pier on Alpine Lake (Agua)
+	var pier_mesh := _asset_mesh("res://assets/environment/water/modular_pier.glb") as ArrayMesh
+	if pier_mesh:
+		var pier_inst := MeshInstance3D.new()
+		pier_inst.name = "LakeWoodenPier"
+		pier_inst.mesh = pier_mesh
+		pier_inst.position = Vector3(LAKE_CENTER.x + 35.0, WATER_LEVEL + 0.35, LAKE_CENTER.y - 12.0)
+		pier_inst.rotation.y = 0.45
+		add_child(pier_inst)
+		pier_inst.create_trimesh_collision()
+
+	# 2. Mountain Massif Cliffs & Peaks (Montañas)
+	var cliff_mesh := _asset_mesh("res://assets/environment/rock/coastal_cliff.glb") as ArrayMesh
+	if cliff_mesh:
+		var cliff_xforms: Array[Transform3D] = []
+		for m_pos in [Vector3(-720, 145, -640), Vector3(680, 160, -580), Vector3(-650, 150, 710), Vector3(740, 175, 680)]:
+			var c_basis := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * 5.5)
+			cliff_xforms.append(Transform3D(c_basis, m_pos))
+		_batch(cliff_mesh, cliff_xforms, "MountainMassifCliffs")
+
+	# 3. Riverbank Root Clusters (Agua y árboles)
+	var root_mesh := _asset_mesh("res://assets/environment/trees/root_cluster.glb") as ArrayMesh
+	if root_mesh:
+		var root_xforms: Array[Transform3D] = []
+		for i in 45:
+			var rz := _rng.randf_range(-650.0, 650.0)
+			var rx := river_center(rz) + (river_width(rz) + 3.5) * (1.0 if i % 2 == 0 else -1.0)
+			var rh := ground_height(rx, rz)
+			var r_basis := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * _rng.randf_range(1.2, 2.2))
+			root_xforms.append(Transform3D(r_basis, Vector3(rx, rh - 0.15, rz)))
+		_batch(root_mesh, root_xforms, "RiverbankRootClusters")
 
 	# Meadow tufts along river terraces and valley meadows
 	for i in 1200:

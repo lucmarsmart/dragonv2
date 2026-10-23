@@ -84,19 +84,27 @@ void fragment(){
 	float snow = smoothstep(630.0, 940.0, wp.y + macro * 75.0) * smoothstep(0.45, 0.93, abs(world_normal.y));
 	ALBEDO = clamp(mix(base * (0.88 + macro * 0.22), vec3(0.69, 0.75, 0.78), snow), vec3(0.0), vec3(1.0));
 
-	// River pebbles surface relief & wet specular reflections
+	// Volumetric Ground Relief & Tactile Plasticity (Suelo con volumen)
+	// Compute tangent frame for surface micro-displacement
+	vec3 t_surf = normalize(cross(world_normal, vec3(0.0, 0.0, 1.0)));
+	if (length(t_surf) < 0.1) t_surf = normalize(cross(world_normal, vec3(1.0, 0.0, 0.0)));
+	vec3 b_surf = normalize(cross(world_normal, t_surf));
+
+	// Volumetric earth soil relief (displaced lumps and clods)
+	float d_e_x = n3(wp * 0.22 + vec3(0.05, 0.0, 0.0)) - n3(wp * 0.22 - vec3(0.05, 0.0, 0.0));
+	float d_e_z = n3(wp * 0.22 + vec3(0.0, 0.0, 0.05)) - n3(wp * 0.22 - vec3(0.0, 0.0, 0.05));
+	vec3 earth_volumetric_norm = normalize(world_normal + (t_surf * -d_e_x + b_surf * -d_e_z) * 1.85);
+
 	if (river_shore > 0.02 && meadow < 0.95) {
 		vec3 p_norm_map = texture(pebbles_normal, wp.xz * 0.36).xyz * 2.0 - 1.0;
-		vec3 t = normalize(cross(world_normal, vec3(0.0, 0.0, 1.0)));
-		if (length(t) < 0.1) t = normalize(cross(world_normal, vec3(1.0, 0.0, 0.0)));
-		vec3 b = normalize(cross(world_normal, t));
-		vec3 p_world_norm = normalize(t * p_norm_map.x + b * p_norm_map.y + world_normal * p_norm_map.z);
-		NORMAL = normalize(mix(NORMAL, p_world_norm, river_shore * (1.0 - meadow) * 0.85));
+		vec3 p_world_norm = normalize(t_surf * p_norm_map.x + b_surf * p_norm_map.y + world_normal * p_norm_map.z);
+		NORMAL = normalize(mix(NORMAL, p_world_norm, river_shore * (1.0 - meadow) * 0.88));
 
 		float p_rough = texture(pebbles_roughness, wp.xz * 0.36).r;
 		float river_roughness = mix(p_rough, 0.15, wet * 0.92);
 		ROUGHNESS = mix(0.85, river_roughness, river_shore * (1.0 - meadow));
 	} else {
-		ROUGHNESS = 0.85;
+		NORMAL = normalize(mix(NORMAL, earth_volumetric_norm, soil_cover * 0.65));
+		ROUGHNESS = mix(0.85, 0.72, macro);
 	}
 }
